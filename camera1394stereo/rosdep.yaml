@@ -1,0 +1,12 @@
+# Note: does not work for Hardy, which is no longer supported after
+# boxturtle (1394 camera support in Hardy was problematic, anyway).
+libdc1394-dev:
+  ubuntu: libdc1394-22-dev
+  arch: libdc1394
+  fedora: libdc1394-devel
+  macports: libdc1394
+
+# Used to reset the bus after an improper closing of the driver.
+libdc1394-utils:
+  ubuntu: libdc1394-utils
+  debian: libdc1394-utils

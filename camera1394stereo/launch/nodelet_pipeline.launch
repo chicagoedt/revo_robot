@@ -1,0 +1,28 @@
+<launch>
+
+  <!-- start the driver in a camera_nodelet_manager process -->
+  <include file="$(find camera1394stereo)/launch/stereo_nodelet_manager.launch" />
+
+  <!-- Bayer color decoding -->
+  <node pkg="nodelet" type="nodelet" name="image_proc_debayer"
+        args="load image_proc/debayer stereo_camera_nodelet_manager">
+    <remap from="image_color" to="stereo_camera/image_color" />
+    <remap from="image_mono" to="stereo_camera/image_mono" />
+    <remap from="image_raw" to="stereo_camera/image_raw" />
+  </node>
+
+  <!-- mono rectification -->
+  <node pkg="nodelet" type="nodelet" name="image_proc_rect"
+        args="load image_proc/rectify stereo_camera_nodelet_manager">
+    <remap from="image_mono" to="stereo_camera/image_mono" />
+    <remap from="image_rect" to="stereo_camera/image_rect" />
+  </node>
+
+  <!-- color rectification -->
+  <node pkg="nodelet" type="nodelet" name="image_proc_rect_color"
+        args="load image_proc/rectify stereo_camera_nodelet_manager">
+    <remap from="image_mono" to="stereo_camera/image_color" />
+    <remap from="image_rect" to="stereo_camera/image_rect_color" />
+  </node>
+
+</launch>

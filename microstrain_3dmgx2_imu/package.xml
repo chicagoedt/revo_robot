@@ -1,0 +1,39 @@
+<package>
+  <name>microstrain_3dmgx2_imu</name>
+  <version>1.5.12</version>
+  <description>A driver for IMUs compatible the microstrain 3DM-GX2 and 3DM-GX3 protocol. Includes 
+    a heavily modified standalone driver pulled from the player distribution, 
+    and a ROS node.</description>
+  <maintainer email="chadrockey@gmail.com">Chad Rockey</maintainer>
+
+  <license>LGPL</license>
+
+  <url type="website">http://www.ros.org/wiki/microstrain_3dmgx2_imu</url>
+  <url type="bugtracker">https://github.com/ros-drivers/microstrain_3dmgx2_imu/issues</url>
+  <url type="repository">https://github.com/ros-drivers/microstrain_3dmgx2_imu</url>
+
+  <author>Jeremy Leibs</author>
+  <author>Blaise Gassend</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>log4cxx</build_depend>
+  <build_depend>message_generation</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>self_test</build_depend>
+  <build_depend>diagnostic_updater</build_depend>
+  <build_depend>tf</build_depend>
+  <build_depend>std_srvs</build_depend>
+  <build_depend>std_msgs</build_depend>
+
+  <run_depend>roscpp</run_depend>
+  <run_depend>log4cxx</run_depend>
+  <run_depend>message_runtime</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>self_test</run_depend>
+  <run_depend>diagnostic_updater</run_depend>
+  <run_depend>tf</run_depend>
+  <run_depend>std_srvs</run_depend>
+  <run_depend>std_msgs</run_depend>
+</package>

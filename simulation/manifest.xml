@@ -1,0 +1,14 @@
+<package>
+  <description brief="simulation">
+
+     simulation
+
+  </description>
+  <author>Krystian Gebis</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/simulation</url>
+
+</package>
+
+

@@ -1,0 +1,9 @@
+<launch>
+	<node pkg="odom" name="odom" type="odom"/>
+
+	<node name="gps_conv" pkg="gps_common" type="utm_odometry_node">
+		<param name="rot_covariance" value="99999" />
+		<param name="frame_id" value="odom" />
+	</node>
+	
+</launch>

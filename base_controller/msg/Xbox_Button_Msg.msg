@@ -1,0 +1,15 @@
+int8 a
+int8 b
+int8 x
+int8 y
+int8 left_bumper
+int8 right_bumper
+int8 back_button
+int8 start_button
+int8 power_button
+int8 button_stick_left
+int8 button_stick_right
+float32 left_trigger
+float32 right_trigger
+float32 dpad_leftright
+float32 dpad_updown

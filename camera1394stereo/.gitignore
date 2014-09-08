@@ -1,0 +1,29 @@
+# Specific files
+src/camera1394stereo/
+
+# Build objects
+lib/
+bin/
+build/
+docs/
+
+# Auto generated code
+cfg/cpp/
+cfg/*.cfgc
+msg_gen/
+msg/lisp/
+
+# CMake files
+CMakeCache.txt
+cmake_install.cmake
+CMakeFiles/
+src/*/Makefile
+src/*/cmake_install.cmake
+src/*/CMakeFiles/
+
+# Eclipse temporary files
+.cproject
+.project
+.pydevproject
+
+

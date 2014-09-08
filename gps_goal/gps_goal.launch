@@ -1,0 +1,20 @@
+<launch>
+    <node pkg="gps_goal" name="gps_goal" type="gps_goal" output="screen"/>
+    <param name="long0"		    value="-87.64569" type="double"/>
+    <param name="lat0"              value="41.868569" type="double"/>
+  <!-- 
+    <param name="long0"		    value="-88.007366" type="double"/>
+    <param name="lat0"              value="41.850749" type="double"/>
+    <param name="long1"             value="-87.645717" type="double"/>
+    <param name="long2"             value="-87.645920" type="double"/>
+    <param name="long3"             value="-87.645696" type="double"/>
+    <param name="long4"             value="-87.646559" type="double"/>
+    <param name="lat0"              value="41.868794" type="double"/>
+    <param name="lat1"              value="41.868587" type="double"/>
+    <param name="lat2"              value="41.868363" type="double"/>
+    <param name="lat3"              value="41.868367" type="double"/>
+    <param name="lat4"              value="41.868372" type="double"/>
+-->
+</launch>
+
+

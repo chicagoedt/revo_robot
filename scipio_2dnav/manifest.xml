@@ -1,0 +1,17 @@
+<package>
+  <description brief="scipio_2dnav">
+
+     scipio_2dnav
+
+  </description>
+  <author>Scipio</author>
+  <license>BSD</license>
+  <review status="unreviewed" notes=""/>
+  <url>http://ros.org/wiki/scipio_2dnav</url>
+  <depend package="move_base"/>
+  <depend package="robot_setup_tf"/>
+  <depend package="sick_tim3xx"/>
+
+</package>
+
+

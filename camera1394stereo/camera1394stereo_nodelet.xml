@@ -1,0 +1,9 @@
+<library path="lib/libcamera1394stereo_nodelet">
+  <class name="camera1394stereo/driver"
+         type="Camera1394StereoNodelet"
+         base_class_type="nodelet::Nodelet">
+    <description> 
+      IEEE 1394 stereo camera driver nodelet.
+    </description>
+  </class>
+</library>

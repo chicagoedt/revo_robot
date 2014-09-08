@@ -1,0 +1,36 @@
+<package>
+  <name>camera1394stereo</name>
+  <version>1.0.1</version>
+  <description>This is a modified version of the ROS driver for devices supporting the IEEE 
+    1394 Digital Camera (IIDC) protocol in package camera1394. 
+    It adds support for reading from stereo pairs.</description>
+  <maintainer email="miquel.massot@uib.es">Miquel Massot</maintainer>
+
+  <license>LGPL</license>
+
+  <url type="website">http://ros.org/wiki/camera1394stereo</url>
+  <url type="bugtracker">https://github.com/srv/camera1394stereo/issues</url> 
+
+  <author>Joan Pau Beltran</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>camera_info_manager</build_depend>
+  <build_depend>driver_base</build_depend> 
+  <build_depend>dynamic_reconfigure</build_depend> 
+  <build_depend>image_transport</build_depend> 
+  <build_depend>nodelet</build_depend> 
+  <build_depend>tf</build_depend>
+  <build_depend>libdc1394-dev</build_depend>
+  
+  <run_depend>camera_info_manager</run_depend> 
+  <run_depend>driver_base</run_depend> 
+  <run_depend>dynamic_reconfigure</run_depend> 
+  <run_depend>image_transport</run_depend> 
+  <run_depend>nodelet</run_depend> 
+  <run_depend>tf</run_depend> 
+
+  <export>
+    <nodelet plugin="${prefix}/camera1394stereo_nodelet.xml"/>
+  </export>
+</package>

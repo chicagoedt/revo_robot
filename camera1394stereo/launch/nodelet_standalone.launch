@@ -1,0 +1,14 @@
+<launch>
+
+  <node pkg="nodelet" type="nodelet" name="camera1394_nodelet"
+        args="standalone camera1394stereo/driver" >
+    <param name="video_mode" value="format7_mode3" />
+    <param name="format7_color_coding" value="raw16" />
+    <param name="bayer_pattern" value="grbg" />
+    <param name="bayer_method" value="Simple" />
+    <param name="stereo_method" value="Interlaced" />
+    <param name="camera_info_url_left" value="" />
+    <param name="camera_info_url_right" value="" />
+  </node>
+
+</launch>
