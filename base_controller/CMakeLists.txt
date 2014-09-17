@@ -7,7 +7,6 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation
 
 add_message_files(
     FILES
-    wheels_msg.msg
     Xbox_Button_Msg.msg
     )
 
