@@ -2,6 +2,7 @@ base_controller/doc/*
 base_controller/doc/html/*
 
 *.log
+*.rviz
 
 *.tar
 *.tar.gz
