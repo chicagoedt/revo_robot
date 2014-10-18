@@ -82,7 +82,7 @@ namespace oxoocoffee
             virtual ~SerialPort(void);
 
                             // connect will block if not device connected and running!!!!
-            virtual void    connect(const string& device, bool useSelect = true);
+            virtual void    connect(const string& device);
             virtual void    disconnect(bool echo = true);
 
             inline  bool    isOpen(void) const { return _fd != INVALID_FD; }
@@ -108,8 +108,6 @@ namespace oxoocoffee
                     void    applySettings(void);
 
         private:
-            bool            _useSelect;
-            termios         _oldtio;
             SerialLogger&   _logger;
             int             _fd;
             speed_t         _baud;

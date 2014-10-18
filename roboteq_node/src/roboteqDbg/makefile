@@ -50,5 +50,5 @@ ${OUTPUT}: ${OBJS}
 	${CXX} -c ${CFLAGS} ${INCS_DIR} $< -o $@
 
 clean:
-	rm -f ${CLEAN_OBJ} ./${OUTPUT}
+	rm -f ${CLEAN_OBJ} ./${OUTPUT} ../roboteqCom/*.o  ../serialConnector/*.o
 

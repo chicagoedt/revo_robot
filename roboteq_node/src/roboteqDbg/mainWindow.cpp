@@ -171,7 +171,7 @@ bool    MainWindow::Initialize(int argc, char* argv[])
 
     _comunicator.Open( _device );
 
-    _comunicator.IssueCommand("# C");   // Clears out telemetry strings
+    // Done in roboteqCom class
     _comunicator.IssueCommand("?S");    // Query for speed and enters this speed
                                         // request into telemetry system
     _comunicator.IssueCommand("# 200"); // auto message responce is 200ms
@@ -639,7 +639,6 @@ void    MainWindow::OnMsgEvent(IEventArgs& evt)
 
             default:
             break;
-
     }
 }
 

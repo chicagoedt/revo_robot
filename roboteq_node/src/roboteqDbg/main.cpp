@@ -53,6 +53,8 @@ int main(int argc, char* argv[])
     {
         if( app->Initialize(argc, argv) )
             app->Run();
+
+        refresh();
     }
     catch(std::exception& ex)
     {

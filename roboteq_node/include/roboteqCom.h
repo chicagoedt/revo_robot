@@ -57,7 +57,6 @@ class RoboteqCom : public IRunnable
         // Run is run the thread
         // Join blocks for the thread to finish
         virtual void Run(void);
-        virtual void Join(void);
 
     private:
         void    CTorInit(void);
