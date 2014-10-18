@@ -1,0 +1,59 @@
+<!-- Launch file for ekf_localization_node -->
+
+<launch>
+
+    <node pkg="robot_localization" type="utm_transform_node" name="utm_transform_node" respawn="true" output="screen">
+
+      <!-- Enter the magnetic declination for your location. If you don't
+           know it, see http://www.ngdc.noaa.gov/geomag-web/ (make sure to
+           convert the value to radians). -->
+      <param name="magnetic_declination_radians" value="0"/>
+      <param name="roll_offset" value="0"/>
+      <param name="pitch_offset" value="0"/>
+      <param name="yaw_offset" value="1.57080"/>
+      <param name="zero_altitude" value="false"/>
+
+      <remap from="/gps/gps_utm" to="/gps/utm" />
+      <remap from="/gps/fix" to="/fix" />
+
+    </node>
+
+
+
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true">
+
+      <param name="frequency" value="15"/>  
+      <param name="sensor_timeout" value="0.1"/>  
+      <param name="odom0" value="/gps/utm"/> 
+      <param name="imu0" value="/imu/data"/> 
+
+				<!--   x       y      z     roll   pitch yaw    vx     vy     vz     vrl    vp    vy -->
+      <rosparam param="odom0_config">[true, true, false, false, false, false, false, false, false, false, false, false]</rosparam> -->
+
+      <rosparam param="imu0_config">[false, false, false, false, false, true, false, false, false, false, false, false]</rosparam> 
+
+      <param name="odom0_differential" value="true"/> 
+      <param name="imu0_differential" value="true"/>
+
+      <param name="debug"           value="false"/>
+      <param name="debug_out_file"  value="/home/tmoore/Desktop/debug_ekf_localization.txt"/>
+
+      <param name="odom_frame" value="odom"/>
+      <param name="base_link_frame" value="base_footprint"/>
+
+      <rosparam param="process_noise_covariance">[0.03, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                  0.0, 0.03, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                  0.0, 0.0, 0.4, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                  0.0, 0.0, 0.0, 0.03, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                  0.0, 0.0, 0.0, 0.0, 0.03, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                  0.0, 0.0, 0.0, 0.0, 0.00, 0.04, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                  0.0, 0.0, 0.0, 0.0, 0.00, 0.0, 0.025, 0.0, 0.0, 0.0, 0.0, 0.0,
+                                                  0.0, 0.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.025, 0.0, 0.0, 0.0, 0.0,
+                                                  0.0, 0.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.0, 0.05, 0.0, 0.0, 0.0,
+                                                  0.0, 0.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.0, 0.0, 0.002, 0.0, 0.0,
+                                                  0.0, 0.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.0, 0.0, 0.0, 0.002, 0.0,
+                                                  0.0, 0.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.004]</rosparam>
+
+    </node>
+	 
+</launch>
