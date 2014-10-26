@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(line_detection)
 
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs cv_bridge)
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs)
 
 #catkin_python_setup()
 
