@@ -74,7 +74,7 @@ class line_detection:
         ## TODO find out what name the topic should have
         self.line_pub = rospy.Publisher('line_data', sensor_msgs.msg.PointCloud2)
         self.line_image_pub = rospy.Publisher('line_image', sensor_msgs.msg.Image)
-        self.warped_line_image_pub = rospy.Publisher('warped_line_image', sensor_msgs.msg.Image)
+        # self.warped_line_image_pub = rospy.Publisher('warped_line_image', sensor_msgs.msg.Image)
         # self.ray_pub = rospy.Publisher('ray', geometry_msgs.msg.Vector3Stamped)
 
 
@@ -314,7 +314,7 @@ class line_detection:
         # resize it again and remove third dimension
         warped_image.resize(warped_image.shape[0], warped_image.shape[1])
 
-        self.warped_line_image_pub.publish(warped_image_message)
+        # self.warped_line_image_pub.publish(warped_image_message)
 
 
 
@@ -575,7 +575,7 @@ class line_detection:
         ### TODO need to resize image to original 720p
 
 
-        line_pointcloud = self.get_pointcloud2_from_line_image(final_image)
+        # line_pointcloud = self.get_pointcloud2_from_line_image(final_image)
 
         # self.line_pub.publish(line_pointcloud)
 
