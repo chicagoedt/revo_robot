@@ -10,7 +10,7 @@ import std_msgs
 from sensor_msgs import point_cloud2
 import sensor_msgs
 import math
-from sensor_msgs.msg import Image
+from sensor_msgs.msg import CompressedImage
 from sensor_msgs.msg import CameraInfo
 import geometry_msgs
 from geometry_msgs.msg import Vector3Stamped
@@ -80,7 +80,7 @@ class line_detection:
 
         self.bridge = CvBridge()
         # self.img_geo = image_geometry.PinholeCameraModel()
-        self.image_sub = rospy.Subscriber("/camera/image_raw", Image, self.image_callback, queue_size=1)
+        self.image_sub = rospy.Subscriber("/camera/image_raw/compressed", CompressedImage, self.image_callback, queue_size=1)
         # self.image_sub = rospy.Subscriber("/camera/image_raw", Image, self.image_callback, queue_size=1)
     
         # self.camera_info_sub = rospy.Subscriber("/camera/camera_info", CameraInfo, self.camera_info_callback, queue_size=1 )
@@ -341,11 +341,16 @@ class line_detection:
         start_time = time.time()
 
         # first, we need to convert image from sensor_msgs/Image to numpy (or cv2). For this, we use cv_bridge
-        try:
-            img = self.bridge.imgmsg_to_cv2(image, "bgr8")
-            # img = self.bridge.imgmsg_to_cv2(image, desired_encoding="passthrough")
-        except CvBridgeError, e:
-            print e
+        # try:
+        #     img = self.bridge.imgmsg_to_cv2(image, "bgr8")
+        #     # img = self.bridge.imgmsg_to_cv2(image, desired_encoding="passthrough")
+        # except CvBridgeError, e:
+        #     print e
+
+        #### direct conversion to CV2 ####
+        np_arr = np.fromstring(image.data, np.uint8)
+        img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
+
         
         # cv2.imshow('img', img)
         # cv2.waitKey(1)
