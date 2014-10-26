@@ -5,6 +5,7 @@
 
   <node pkg="image_view" name="image_raw" type="image_view" output="screen">
     <remap from="image" to="/camera/image_raw" />
+    <param name="~image_transport" value="compressed" />
   </node>
 
   <node pkg="image_view" name="image_view_line" type="image_view" output="screen">
