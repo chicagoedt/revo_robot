@@ -80,7 +80,7 @@ class line_detection:
         # set publisher and subscriber
         ## TODO find out what name the topic should have
         self.line_pub = rospy.Publisher('line_data', sensor_msgs.msg.PointCloud2)
-        self.line_image_pub = rospy.Publisher('line_image', sensor_msgs.msg.Image)
+        self.line_image_pub = rospy.Publisher('line_image/compressed', sensor_msgs.msg.CompressedImage)
         # self.warped_line_image_pub = rospy.Publisher('warped_line_image', sensor_msgs.msg.Image)
         # self.ray_pub = rospy.Publisher('ray', geometry_msgs.msg.Vector3Stamped)
 
@@ -554,22 +554,27 @@ class line_detection:
         # print final_image
 
         # we have to resize the final_image to include the number of channels (because the function cv2_to_imgmsg expects a third dimension shape[2])
-        final_image.resize((final_image.shape[0], final_image.shape[1], 1))
+        # final_image.resize((final_image.shape[0], final_image.shape[1], 1))
 
 
         # print final_image.shape
 
-        final_image_message = image
+        # final_image_message = image
 
-        try:
-            final_image_message = self.bridge.cv2_to_imgmsg(final_image, "mono8")
-            # final_image_message = self.bridge.cv2_to_imgmsg(final_image, "bgr8" )
-        except CvBridgeError, e:
-            print e
+        # try:
+        #     final_image_message = self.bridge.cv2_to_imgmsg(final_image, "mono8")
+        #     # final_image_message = self.bridge.cv2_to_imgmsg(final_image, "bgr8" )
+        # except CvBridgeError, e:
+        #     print e
 
         # resize it again and remove third dimension
-        final_image.resize(final_image.shape[0], final_image.shape[1])
+        # final_image.resize(final_image.shape[0], final_image.shape[1])
 
+        #### Create CompressedImage to publish ####
+        final_image_message = CompressedImage()
+        final_image_message.header.stamp = rospy.Time.now()
+        final_image_message.format = "jpeg"
+        final_image_message.data = np.array(cv2.imencode('.jpg', final_image)[1]).tostring()
 
         self.line_image_pub.publish(final_image_message)
 

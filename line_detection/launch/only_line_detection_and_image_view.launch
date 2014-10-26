@@ -10,6 +10,7 @@
 
   <node pkg="image_view" name="image_view_line" type="image_view" output="screen">
     <remap from="image" to="/line_image" />
+    <param name="~image_transport" value="compressed" />
   </node> 
   
 </launch>
