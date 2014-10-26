@@ -16,6 +16,7 @@ import geometry_msgs
 from geometry_msgs.msg import Vector3Stamped
 from cv_bridge import CvBridge, CvBridgeError
 import image_geometry
+import rospkg
 
 ###################################################################################################
 ## Chicago Engineering Design Team
@@ -64,12 +65,18 @@ value_high = 255
 
 backprojection_threshold = 50
 
+training_file_path = ''
+
 class line_detection:
 
     def __init__(self):
 
         # initialize ROS stuff        
-        
+        rospack = rospkg.RosPack() #to find package path
+
+        global training_file_path # global keyword needed because it's modifying the variable
+        training_file_path = rospack.get_path('line_detection') + '/misc/training_images/training_for_backprojection_1.png'
+
         # set publisher and subscriber
         ## TODO find out what name the topic should have
         self.line_pub = rospy.Publisher('line_data', sensor_msgs.msg.PointCloud2)
@@ -374,8 +381,7 @@ class line_detection:
         # all above values are in opencv HSV ranges
 
         # note that Values depend on overall brightness (need to use adaptive method or dynamic one).
-
-        backprojection_training = cv2.imread('/home/scipio/ros_edt/catkin_ws/src/line_detection/src/training_for_backprojection_1.png')
+        backprojection_training = cv2.imread(training_file_path)
         backprojection_training = cv2.cvtColor(backprojection_training, cv2.COLOR_BGR2HSV)
         
     # begin HISTOGRAM BACKPROJECTION
