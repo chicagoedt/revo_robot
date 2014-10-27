@@ -17,6 +17,8 @@ from geometry_msgs.msg import Vector3Stamped
 from cv_bridge import CvBridge, CvBridgeError
 import image_geometry
 import rospkg
+from dynamic_reconfigure.server import Server
+from line_detection.cfg import LineDetectionConfig
 
 ###################################################################################################
 ## Chicago Engineering Design Team
@@ -48,7 +50,7 @@ global_threshold_factor = 2
 adaptive_threshold_block_size = 191
 adaptive_threshold_C = 30
 blur_size = 49
-# canny_threshold = 100
+canny_threshold = 100
 max_erode_iterations = 100
 bandpass_low_cutoff = 1
 bandpass_high_cutoff = 30
@@ -65,17 +67,14 @@ value_high = 255
 
 backprojection_threshold = 50
 
-training_file_path = ''
+training_file_name = 'training_for_backprojection_1.png'
+
 
 class line_detection:
 
     def __init__(self):
 
         # initialize ROS stuff        
-        rospack = rospkg.RosPack() #to find package path
-
-        global training_file_path # global keyword needed because it's modifying the variable
-        training_file_path = rospack.get_path('line_detection') + '/misc/training_images/training_for_backprojection_1.png'
 
         # set publisher and subscriber
         ## TODO find out what name the topic should have
@@ -381,6 +380,9 @@ class line_detection:
         # all above values are in opencv HSV ranges
 
         # note that Values depend on overall brightness (need to use adaptive method or dynamic one).
+
+        rospack = rospkg.RosPack() #to find package path
+        training_file_path = rospack.get_path('line_detection') + '/misc/training_images/' + training_file_name
         backprojection_training = cv2.imread(training_file_path)
         backprojection_training = cv2.cvtColor(backprojection_training, cv2.COLOR_BGR2HSV)
         
@@ -590,18 +592,60 @@ class line_detection:
 
         # self.line_pub.publish(line_pointcloud)
 
-
-
-
     ## end image_callback()
 
-      
+def reconfigure_callback(config, level):
+
+    # TODO fix this ugly hack by refactoring entire file into a class
+    global global_threshold
+    global global_threshold_factor
+    global adaptive_threshold_block_size
+    global adaptive_threshold_C
+    global blur_size
+    global canny_threshold
+    global max_erode_iterations
+    global bandpass_low_cutoff
+    global bandpass_high_cutoff
+    global hue_low
+    global hue_high
+    global saturation_low
+    global saturation_high
+    global value_low
+    global value_high
+    global backprojection_threshold
+    global training_file_name
+
+    # TODO check if the keys exist in the config dictionary or else error
+    # TODO also check if invalid values
+
+    global_threshold = config['global_threshold']
+    global_threshold_factor = config['global_threshold_factor']
+    adaptive_threshold_block_size = config['adaptive_threshold_block_size']
+    adaptive_threshold_C = config['adaptive_threshold_C']
+    blur_size = config['blur_size']
+    canny_threshold = config['canny_threshold']
+    max_erode_iterations = config['max_erode_iterations']
+    bandpass_low_cutoff = config['bandpass_low_cutoff']
+    bandpass_high_cutoff = config['bandpass_high_cutoff']
+    hue_low = config['hue_low']
+    hue_high = config['hue_high']
+    saturation_low = config['saturation_low']
+    saturation_high = config['saturation_high']
+    value_low = config['value_low']
+    value_high = config['value_high']
+    backprojection_threshold = config['backprojection_threshold']
+    training_file_name = config['training_file_name']
+    return config
+
 def main(args):
+    # TODO make this file into a class
     # create a line_detection object
     ld = line_detection()
-    
+
     # start the line_detector node and start listening
-    rospy.init_node('line_detection')
+    rospy.init_node('backprojectgrass_skeletonize')
+    # starts dynamic_reconfigure server
+    srv = Server(LineDetectionConfig, reconfigure_callback)
     rospy.spin()
     cv2.destroyAllWindows()
 
