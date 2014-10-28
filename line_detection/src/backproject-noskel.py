@@ -69,6 +69,8 @@ backprojection_threshold = 50
 
 training_file_name = 'training_for_backprojection_1.png'
 
+image_width = 640
+image_height = 480
 
 class line_detection:
 
@@ -357,7 +359,15 @@ class line_detection:
         np_arr = np.fromstring(image.data, np.uint8)
         img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
 
-        
+        #TODO throw these resolution resizing things into dynamic_reconfigure
+        #resize the large image (if it is large) to a 640x480 image
+        # print img.shape
+        if img.shape[0] > image_height or img.shape[1] > image_width:
+            # print "size is " + str(img.shape[1]) + "x" + str(img.shape[0])
+            # print "resized to " + str(image_width) + "x" + str(image_height)
+            img = cv2.resize(img, (image_width, image_height), 0, 0, 0, )
+        # print img.shape
+
         # cv2.imshow('img', img)
         # cv2.waitKey(1)
         # our region of interest is only in bottom half of image
@@ -617,6 +627,8 @@ def reconfigure_callback(config, level):
     global value_high
     global backprojection_threshold
     global training_file_name
+    global image_width
+    global image_height
 
     # TODO check if the keys exist in the config dictionary or else error
     # TODO also check if invalid values
@@ -638,6 +650,8 @@ def reconfigure_callback(config, level):
     value_high = config['value_high']
     backprojection_threshold = config['backprojection_threshold']
     training_file_name = config['training_file_name']
+    image_width = config['image_width']
+    image_height = config['image_height']
     return config
 
 def main(args):
