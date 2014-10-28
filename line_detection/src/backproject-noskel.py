@@ -646,7 +646,7 @@ def main(args):
     ld = line_detection()
 
     # start the line_detector node and start listening
-    rospy.init_node('backprojectgrass_for_disparity')
+    rospy.init_node('backprojectgrass_noskel')
     # starts dynamic_reconfigure server
     srv = Server(LineDetectionConfig, reconfigure_callback)
     rospy.spin()
