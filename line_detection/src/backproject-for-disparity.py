@@ -513,30 +513,30 @@ class line_detection:
         # cv2.imshow('before adaptive threshold', equ)
         # cv2.waitKey(1)
         # thresh = cv2.adaptiveThreshold(equ, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, adaptive_threshold_block_size, adaptive_threshold_C - 30)
-        thresh = equ
+        final_image = equ
         # cv2.imshow("after adaptive threshold", thresh)
         ## DEBUG: prints out side by side for comparison (analyzing effect of histogram equalization)
         # res = np.hstack((roi,equ)) #stacking images side-by-side
 
         ## skeletonize image
-        count = 0
-        size = np.size(thresh)
-        skel = np.zeros(thresh.shape,np.uint8)
-        element = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
-        done = False
-        # iteratively erode, dilate, subtract, then OR the image until it's 1 pixel thick
-        while(not done and count < 50 + max_erode_iterations):
-            eroded = cv2.erode(thresh,element)
-            temp = cv2.dilate(eroded,element)
-            temp = cv2.subtract(thresh,temp)
-            skel = cv2.bitwise_or(skel,temp)
-            thresh = eroded.copy()
+        # count = 0
+        # size = np.size(thresh)
+        # skel = np.zeros(thresh.shape,np.uint8)
+        # element = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
+        # done = False
+        # # iteratively erode, dilate, subtract, then OR the image until it's 1 pixel thick
+        # while(not done and count < 50 + max_erode_iterations):
+        #     eroded = cv2.erode(thresh,element)
+        #     temp = cv2.dilate(eroded,element)
+        #     temp = cv2.subtract(thresh,temp)
+        #     skel = cv2.bitwise_or(skel,temp)
+        #     thresh = eroded.copy()
      
-            zeros = size - cv2.countNonZero(thresh)
-            if zeros==size:
-                done = True
+        #     zeros = size - cv2.countNonZero(thresh)
+        #     if zeros==size:
+        #         done = True
 
-            count = count + 1
+        #     count = count + 1
 
 
         # canny_image = cv2.Canny(equ, canny_threshold, canny_threshold*2) # perform canny edge detection on blurred image
@@ -552,7 +552,7 @@ class line_detection:
         
 
         # skel = cv2.cvtColor(skel, cv2.COLOR_BGR2GRAY)
-        final_image = skel
+        # final_image = skel
         
         # print final_image.dtype
         # print final_image.shape
@@ -646,7 +646,7 @@ def main(args):
     ld = line_detection()
 
     # start the line_detector node and start listening
-    rospy.init_node('backprojectgrass_skeletonize')
+    rospy.init_node('backprojectgrass_for_disparity')
     # starts dynamic_reconfigure server
     srv = Server(LineDetectionConfig, reconfigure_callback)
     rospy.spin()
