@@ -391,6 +391,7 @@ class line_detection:
 
         # note that Values depend on overall brightness (need to use adaptive method or dynamic one).
 
+        # TODO make this more efficient by moving it outside instead of creating a new object every time
         rospack = rospkg.RosPack() #to find package path
         training_file_path = rospack.get_path('line_detection') + '/misc/training_images/' + training_file_name
         backprojection_training = cv2.imread(training_file_path)
@@ -597,9 +598,6 @@ class line_detection:
         # cv2.imshow('original', roi)
         # # cv2.imshow('gray_roi', gray_roi)
         # cv2.imshow('final image', final_image)
-
-        ### TODO need to resize image to original 720p
-
 
         # line_pointcloud = self.get_pointcloud2_from_line_image(final_image)
 

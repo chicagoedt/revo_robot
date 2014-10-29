@@ -5,6 +5,7 @@ find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs dynamic_reconfigur
 
 generate_dynamic_reconfigure_options(
   cfg/LineDetection.cfg
+  cfg/ImageResizer.cfg
 )
 
 #catkin_python_setup()
