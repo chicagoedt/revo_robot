@@ -1,0 +1,86 @@
+<?xml version="1.0"?>
+<robot name="scipio">
+	<link name="base_link">
+		<visual>
+			<geometry>
+				<box size="1 1 0.3"/>		<!-- Units for length are in meters -->
+			</geometry>
+			<material name="white">
+				<color rgba="1 1 1 1"/>
+			</material>
+		</visual>
+	</link>
+
+	<link name="wheel1">
+		<visual>
+			<geometry>
+				<cylinder length="0.1" radius="0.2"/>		<!-- length is the thickness of the wheel -->
+			</geometry>
+
+			<material name="black">
+				<color rgba="0 0 0 1"/>
+			</material>
+		</visual>
+	</link>
+
+	<link name="wheel2">
+		<visual>
+			<geometry>
+				<cylinder length="0.1" radius="0.2"/>
+			</geometry>
+
+			<material name="black"/>
+		</visual>
+	</link>
+
+	<link name="wheel3">
+		<visual>
+			<geometry>
+				<cylinder length="0.1" radius="0.2"/>
+			</geometry>
+
+			<material name="black"/>
+		</visual>
+	</link>
+
+	<link name="wheel4">
+		<visual>
+			<geometry>
+				<cylinder length="0.1" radius="0.2"/>
+			</geometry>
+
+			<material name="black"/>
+		</visual>
+	</link>
+	
+
+	<joint name="base_to_wheel1" type="continuous">
+		<parent link="base_link"/>
+		<child link="wheel1"/>
+		<axis xyz="0 0 1"/>
+		<origin rpy="1.570795 0 0" xyz="-0.45 -0.55 0"/>
+	</joint>
+
+	<joint name="base_to_wheel2" type="continuous">
+		<parent link="base_link"/>
+		<child link="wheel2"/>
+		<axis xyz="0 0 1"/>
+		<origin rpy="1.570795 0 0" xyz="-0.45 0.55 0"/>
+	</joint>
+									
+<!-- the origin for the link element specifies the origin of the geometric object while the origin for the joint element specifies the origin of the joint(where it will rotate from -->
+	<joint name="base_to_wheel3" type="continuous">
+		<parent link="base_link"/>
+		<child link="wheel3"/>
+		<axis xyz="0 0 1"/>
+		<origin rpy="1.570795 0 0" xyz="0.45 -0.55 0"/>
+	</joint>
+
+	<joint name="base_to_wheel4" type="continuous">
+		<parent link="base_link"/>
+		<child link="wheel4"/>
+		<axis xyz="0 0 1"/>
+		<origin rpy="1.570795 0 0" xyz="0.45 0.55 0"/>
+	</joint>
+
+</robot>

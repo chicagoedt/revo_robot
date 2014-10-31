@@ -1,5 +1,0 @@
-<launch>    
-  <node pkg="husky_interactive_markers" name="interactive_markers" type="marker_server">
-    <remap from="cmd_vel" to="husky/cmd_vel"/>
-  </node>
-</launch>

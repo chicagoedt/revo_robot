@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package>
+  <name>scipio_2dnav</name>
+  <version>1.0.0</version>
+  <description>The scipio_2dnav package</description>
+
+  <maintainer email="krgebis@gmail.com">Krystian-L0g1x</maintainer>
+
+  <license>GPLv2</license>
+
+  <author email="krgebis@gmail.com">Krystian-L0g1x</author>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+</package>
