@@ -3,36 +3,40 @@
 
 using namespace oxoocoffee;
 
+const int MAX_RETRY = 5;
+
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "roboteq_driver");
 
     int	 sleepTime(300);
-    bool keepRunnning(true);
+    int  keepRunnning(5);
 
     while(keepRunnning)
     {
-        ROS_WARN_STREAM_NAMED(NODE_NAME,"Stage... 1");
+        ROS_WARN_STREAM_NAMED(NODE_NAME,"entering loop");
 
         RosRoboteqDrv roboteqDrv;
 
-        ROS_WARN_STREAM_NAMED(NODE_NAME,"Stage... 2");
+        ROS_WARN_STREAM_NAMED(NODE_NAME,"Created");
 
         try
         {
+            ROS_WARN_STREAM_NAMED(NODE_NAME,"Initializing");
             roboteqDrv.Initialize();
 
-            ROS_WARN_STREAM_NAMED(NODE_NAME,"Stage... 3");
+            ROS_WARN_STREAM_NAMED(NODE_NAME,"Entering Run Loop");
             ros::spin();
 
-            ROS_WARN_STREAM_NAMED(NODE_NAME,"Stage... 4");
-            keepRunnning = false;
+            keepRunnning = 0;
+            
+            ROS_WARN_STREAM_NAMED(NODE_NAME,"Shutting Down");
             roboteqDrv.Shutdown();
-
-            ROS_WARN_STREAM_NAMED(NODE_NAME,"Stage... 5");
         }
         catch(std::exception& ex)
         {
+            keepRunnning--;
+            istringstream a2i; a2i << "Restarting... " << keepRunnning << " out of " << MAX_RETRY;
             ROS_ERROR_STREAM_NAMED(NODE_NAME,"Exception. Error: " << ex.what());
             roboteqDrv.Shutdown();
             boost::this_thread::sleep(boost::posix_time::milliseconds(sleepTime));
@@ -40,6 +44,8 @@ int main(int argc, char **argv)
         }
         catch(...)
         {
+            keepRunnning--;
+            istringstream a2i; a2i << "Restarting... " << keepRunnning << " out of " << MAX_RETRY;
             ROS_ERROR_STREAM_NAMED(NODE_NAME,"Exception. ???");
             roboteqDrv.Shutdown();
             boost::this_thread::sleep(boost::posix_time::milliseconds(sleepTime));
@@ -47,6 +53,7 @@ int main(int argc, char **argv)
         }
     }
 
+    ROS_WARN_STREAM_NAMED(NODE_NAME,"Exiting");
     ros::shutdown();
 }
 

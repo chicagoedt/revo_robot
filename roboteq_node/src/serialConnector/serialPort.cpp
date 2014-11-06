@@ -16,7 +16,7 @@ namespace oxoocoffee
 
 // -1 means invalid file 
 SerialPort::SerialPort(SerialLogger& log) 
- : INVALID_FD(-1), _useSelect(false), _logger(log), _fd(INVALID_FD)
+ : INVALID_FD(-1), _logger(log), _fd(INVALID_FD)
 {
     baud(9600);
     dateSize(eDataSize_8Bit);
@@ -28,8 +28,8 @@ SerialPort::SerialPort(SerialLogger& log)
 SerialPort::~SerialPort(void)
 {
 }
-        // device is /dev/tty???  and useSelect is default true
-void    SerialPort::connect(const string& device, bool useSelect)
+        // device is /dev/tty???
+void    SerialPort::connect(const string& device)
 {
     if( device.empty() )
         THROW_INVALID_ARG("SerialPort - invalid device path")
@@ -40,7 +40,7 @@ void    SerialPort::connect(const string& device, bool useSelect)
     if( _logger.IsLogOpen() )
         _logger.LogLine("SerialPort - opening " + device );
 
-    _fd = open(device.c_str(), O_RDWR | O_NOCTTY | O_NDELAY); 
+    _fd = open(device.c_str(), O_RDWR | O_NOCTTY); // | O_NDELAY); 
 
     if( isOpen() == false )
         THROW_RUNTIME_ERROR("SerialPort - failed to open device");
@@ -51,28 +51,7 @@ void    SerialPort::connect(const string& device, bool useSelect)
         THROW_RUNTIME_ERROR("SerialPort - invalid device");
     }
 
-    if( tcgetattr(_fd, &_oldtio) != 0)
-    {
-        ostringstream err; err << "SerialPort - failed to probe device. errno: " << errno;
-        disconnect();
-    }
-
-    if( useSelect )
-    {
-        int flags = fcntl(_fd, F_GETFL, 0);
-
-        if( flags == -1 )
-            THROW_RUNTIME_ERROR("SerialPort - fcntl F_GETFL failed");
-        
-        flags &= ~O_NONBLOCK;
-
-        if( fcntl(_fd, F_SETFL, flags) == -1)
-            THROW_RUNTIME_ERROR("SerialPort - fcntl F_SETFL(BLOCK) failed");
-    }
-
     applySettings();
-
-    _useSelect = useSelect;
 
     if( _logger.IsLogOpen() )
         _logger.LogLine("SerialPort - connected " + device );
@@ -236,33 +215,6 @@ int     SerialPort::read(char* pBuffer, const unsigned int numBytes)
     else if( pBuffer == 0L )
         THROW_RUNTIME_ERROR("SerialPort - trying to read to null pointer")
 
-    if( _useSelect )
-    {
-        timeval  timeout;
-        fd_set   fdset;
-
-        int i;
-
-        while( _fd != INVALID_FD )
-        {
-            FD_ZERO( &fdset );
-            FD_SET(_fd, &fdset);
-
-            timeout.tv_sec  = 1;    // 1 sec
-            timeout.tv_usec = 0;
-
-            i = select(_fd + 1, &fdset, NULL, NULL, &timeout);
-
-            if( i > 0 )
-                return ::read(_fd, pBuffer, numBytes);
-            else if( i < 0 )
-                return i;       // Return Error
-            // else if(i == 0)  // Timeout try to select again
-        } 
-
-        return -1;
-    }
-    else
         return ::read(_fd, pBuffer, numBytes);
 }
 
@@ -332,7 +284,46 @@ void    SerialPort::applySettings(void)
 {
     if( isOpen() )
     {
+        termios newtio;
+
+	bzero(&newtio, sizeof(newtio));
+
+	newtio.c_cflag = _baud | CRTSCTS | CS8 | CLOCAL | CREAD;
+	newtio.c_iflag = IGNPAR | ICRNL;
+	newtio.c_oflag = 0;
+	newtio.c_lflag = ICANON;
+
+	newtio.c_cc[VINTR]    = 0;     // Ctrl-c 
+        newtio.c_cc[VQUIT]    = 0;     /* Ctrl-\ */
+        newtio.c_cc[VERASE]   = 0;     // del
+        newtio.c_cc[VKILL]    = 0;     // @
+        newtio.c_cc[VEOF]     = 4;     // Ctrl-d
+        newtio.c_cc[VTIME]    = 0;     // inter-character timer unused
+        newtio.c_cc[VMIN]     = 1;     // blocking read until 1 character arrives
+        newtio.c_cc[VSWTC]    = 0;     // '\0'
+        newtio.c_cc[VSTART]   = 0;     // Ctrl-q 
+        newtio.c_cc[VSTOP]    = 0;     // Ctrl-s
+        newtio.c_cc[VSUSP]    = 0;     // Ctrl-z
+        newtio.c_cc[VEOL]     = 0;     // '\0'
+        newtio.c_cc[VREPRINT] = 0;     // Ctrl-r
+        newtio.c_cc[VDISCARD] = 0;     // Ctrl-u
+        newtio.c_cc[VWERASE]  = 0;     // Ctrl-w
+        newtio.c_cc[VLNEXT]   = 0;     // Ctrl-v
+        newtio.c_cc[VEOL2]    = 0;     // '\0' 
+
+	tcflush(_fd, TCIFLUSH);
+
+        if(tcsetattr(_fd, TCSANOW, &newtio)!= 0)
+        {
+            ostringstream err; err << "SerialPort - failed to apply changes. errno: " << errno;
+            disconnect();
+            THROW_RUNTIME_ERROR(err.str());
+        }
+
+/*
         termios options;
+
+	bzero(&options, sizeof(options));
 
         if( tcgetattr(_fd, &options) != 0)
         {
@@ -409,6 +400,7 @@ void    SerialPort::applySettings(void)
             disconnect();
             THROW_RUNTIME_ERROR(err.str());
         }
+*/
     }
 }
 

@@ -1,7 +1,7 @@
 ARCH        := $(shell uname -m)
 PLATFORM    := $(shell uname)
 
-ARCH_FLAGS  := -m32
+#ARCH_FLAGS  := -m32
 OUT_DIR     := x32
 LIBS_DIR    :=
 INCS_DIR    :=
@@ -15,8 +15,8 @@ endif
 LIBS_DIR    := ${LIBS_DIR} -L/usr/local/lib
 INCS_DIR    := ${INCS_DIR} -I/usr/local/include
 
-CXX         := g++ -std=c++0x ${ARCH_FLAGS}
-LD          := g++ -std=c++0x ${ARCH_FLAGS}
+CXX         := g++ -std=c++11 ${ARCH_FLAGS}
+LD          := g++ -std=c++11 ${ARCH_FLAGS}
 AR          := ar rcs
 RANLIB      := ranlib
 
