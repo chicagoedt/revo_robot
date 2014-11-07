@@ -1,5 +1,5 @@
 TrajectoryPlannerROS:
-    max_vel_x: 0.8
+    max_vel_x: 1.5
     min_vel_x: 0.1
     max_rotational_vel: 0.5
     min_in_place_rotational_vel: 0.1
@@ -16,5 +16,5 @@ TrajectoryPlannerROS:
 
     controller_frequency: 10
 
-    yaw_goal_tolerance: 1.0
-    xy_goal_tolerance: 0.7
+    yaw_goal_tolerance: 0.5
+    xy_goal_tolerance: 0.2
