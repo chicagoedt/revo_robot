@@ -1,4 +1,4 @@
-<sdf version='1.4'>
+<sdf version='1.5'>
   <model name='scipio_simulation'>
     <link name='base_link'>
       <pose>0 0 0 0 -0 0</pose>
@@ -24,11 +24,11 @@
         </geometry>
       </collision>
       <visual name='base_link_visual'>
-        <pose>0 0 0 0 -0 0</pose>
+        <pose>0.053 0 0 0 -0 0</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
-            <uri>model://scipio_simulation/meshes/base_link.STL</uri>
+            <uri>model://scipio_simulation/meshes/base_link.DAE</uri>
           </mesh>
         </geometry>
       </visual>
@@ -37,6 +37,7 @@
         <angular>0</angular>
       </velocity_decay>
     </link>
+
     <link name='back_left_wheel_link'>
       <pose>0.26746 -0.17757 0.18923 3.0728 -6.245e-17 -1.5708</pose>
       <inertial>
@@ -68,6 +69,12 @@
             <uri>model://scipio_simulation/meshes/back_left_wheel_link.STL</uri>
           </mesh>
         </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
       </visual>
       <velocity_decay>
         <linear>0</linear>
@@ -90,6 +97,7 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
+
     <link name='back_right_wheel_link'>
       <pose>0.26746 0.17757 0.18923 -3.0192 5.55112e-17 1.5708</pose>
       <inertial>
@@ -121,6 +129,12 @@
             <uri>model://scipio_simulation/meshes/back_right_wheel_link.STL</uri>
           </mesh>
         </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
       </visual>
       <velocity_decay>
         <linear>0</linear>
@@ -143,6 +157,7 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
+
     <link name='front_left_wheel_link'>
       <pose>-0.26746 -0.17757 0.18923 3.0516 -5.55112e-17 -1.5708</pose>
       <inertial>
@@ -174,6 +189,12 @@
             <uri>model://scipio_simulation/meshes/front_left_wheel_link.STL</uri>
           </mesh>
         </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
       </visual>
       <velocity_decay>
         <linear>0</linear>
@@ -196,6 +217,7 @@
         <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
+
     <link name='front_right_wheel_link'>
       <pose>-0.26746 0.17757 0.18923 -3.1282 5.81132e-17 1.5708</pose>
       <inertial>
@@ -227,6 +249,12 @@
             <uri>model://scipio_simulation/meshes/front_right_wheel_link.STL</uri>
           </mesh>
         </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
       </visual>
       <velocity_decay>
         <linear>0</linear>
