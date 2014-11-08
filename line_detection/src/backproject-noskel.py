@@ -45,32 +45,37 @@ from line_detection.cfg import LineDetectionConfig
 ## TODO conform to PEP8 style standard and consider using Flake8 to check it. 
 ###########################################################################################################################
 
-global_threshold = 160
-global_threshold_factor = 2
-adaptive_threshold_block_size = 191
-adaptive_threshold_C = 30
-blur_size = 49
-canny_threshold = 100
-max_erode_iterations = 100
-bandpass_low_cutoff = 1
-bandpass_high_cutoff = 30
-
-#hsv threshold variables 
-hue_low = 20
-hue_high = 50
-
-saturation_low = 0
-saturation_high = 255
-
-value_low = 0
-value_high = 255
-
-backprojection_threshold = 50
-
-training_file_name = 'training_for_backprojection_1.png'
-
 
 class line_detection:
+
+    # this is where we define our variables in the class.
+    # these are changed dynamically using dynamic_reconfig and affect
+    # the image processing algorithm. A lot of these are not used in the
+    # current algorithm.
+    global_threshold = 160
+    global_threshold_factor = 2
+    adaptive_threshold_block_size = 191
+    adaptive_threshold_C = 30
+    blur_size = 49
+    canny_threshold = 100
+    max_erode_iterations = 100
+    bandpass_low_cutoff = 1
+    bandpass_high_cutoff = 30
+
+    #hsv threshold variables 
+    hue_low = 20
+    hue_high = 50
+
+    saturation_low = 0
+    saturation_high = 255
+
+    value_low = 0
+    value_high = 255
+
+    backprojection_threshold = 50
+
+    training_file_name = 'training_for_backprojection_1.png'
+
 
     def __init__(self):
 
@@ -382,13 +387,13 @@ class line_detection:
 
         # TODO make this more efficient by moving it outside instead of creating a new object every time
         rospack = rospkg.RosPack() #to find package path
-        training_file_path = rospack.get_path('line_detection') + '/misc/training_images/' + training_file_name
+        training_file_path = rospack.get_path('line_detection') + '/misc/training_images/' + self.training_file_name
         backprojection_training = cv2.imread(training_file_path)
         backprojection_training = cv2.cvtColor(backprojection_training, cv2.COLOR_BGR2HSV)
         
     # begin HISTOGRAM BACKPROJECTION
         # calculating object histogram
-        roihist = cv2.calcHist([backprojection_training],[0, 1], None, [180, 256], [hue_low, hue_high, 0, 256] )
+        roihist = cv2.calcHist([backprojection_training],[0, 1], None, [180, 256], [self.hue_low, self.hue_high, 0, 256] )
 
         # plt.hist(roihist.ravel(),256,[40,256]); plt.show() #roi histogram (starting from value 1, skipping zero values)
 
@@ -397,7 +402,7 @@ class line_detection:
 
         # plt.hist(roihist.ravel(),256,[40,256]); plt.show() #roi histogram (starting from value 1, skipping zero values)
 
-        dst = cv2.calcBackProject([hsv],[0,1],roihist,[hue_low,hue_high,0,256],1)
+        dst = cv2.calcBackProject([hsv],[0,1],roihist,[self.hue_low,self.hue_high,0,256],1)
 
         # Now convolute with circular disc
         disc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE,(5,5))
@@ -407,7 +412,7 @@ class line_detection:
         dst = 255 - dst 
 
         # threshold the backprojection stuff to only grab the more probable ones
-        ret,thresh = cv2.threshold(dst,backprojection_threshold,0,cv2.THRESH_TOZERO)
+        ret,thresh = cv2.threshold(dst,self.backprojection_threshold,0,cv2.THRESH_TOZERO)
         
         # AND the remaining backprojection pixels with the original gray image (we will only use gray so far so
         # we don't need to use BGR or HSV. If we did, then we could've merged thresh into a 3-channel image then AND'ed 
@@ -424,8 +429,8 @@ class line_detection:
 
     ## begin hsv threshold 
         # define range of blue color in HSV
-        # lower_grass = np.array([hue_low, saturation_low, value_low])
-        # upper_grass = np.array([hue_high, saturation_high, value_high])
+        # lower_grass = np.array([self.hue_low, self.saturation_low, self.value_low])
+        # upper_grass = np.array([self.hue_high, self.saturation_high, self.value_high])
 
         # # Threshold the HSV image to get only blue colors
         # mask = cv2.inRange(hsv, lower_grass, upper_grass)
@@ -451,8 +456,8 @@ class line_detection:
         # #TODO improve mask for bandpass filter
         # # create a mask (square with a smaller square hole in it)
         # mask = np.zeros((rows,cols,2),np.uint8)
-        # mask[crow-bandpass_high_cutoff:crow+bandpass_high_cutoff, ccol-bandpass_high_cutoff:ccol+bandpass_high_cutoff] = 1
-        # mask[crow-bandpass_low_cutoff:crow+bandpass_low_cutoff, ccol-bandpass_low_cutoff:ccol+bandpass_low_cutoff] = 0
+        # mask[crow-self.bandpass_high_cutoff:crow+self.bandpass_high_cutoff, ccol-self.bandpass_high_cutoff:ccol+self.bandpass_high_cutoff] = 1
+        # mask[crow-self.bandpass_low_cutoff:crow+self.bandpass_low_cutoff, ccol-self.bandpass_low_cutoff:ccol+self.bandpass_low_cutoff] = 0
 
 
         # # apply mask and inverse DFT
@@ -482,9 +487,9 @@ class line_detection:
         #plt.hist(gray_image.ravel(),256,[0,256]); plt.show() # original image histogram
         #plt.hist(roi.ravel(),256,[0,256]); plt.show() #roi histogram
         
-        blur = cv2.GaussianBlur(after_backprojection, (blur_size, blur_size), 0) # perform gaussian blur on grayscale image
-        # blur = cv2.medianBlur(roi, blur_size) # perform median blur on grayscale image
-        # blur = cv2.bilateralFilter(roi,blur_size,150,150)
+        blur = cv2.GaussianBlur(after_backprojection, (self.blur_size, self.blur_size), 0) # perform gaussian blur on grayscale image
+        # blur = cv2.medianBlur(roi, self.blur_size) # perform median blur on grayscale image
+        # blur = cv2.bilateralFilter(roi, self.blur_size,150,150)
 
         # global threshold (to zero out below threshold and leave other stuff as is)
         # first returned object is ignored
@@ -492,7 +497,7 @@ class line_detection:
         # find (normalized to 1) mean of image brightness
         normalized_brightness = cv2.mean(gray_roi)[0] / 255
         # print "normalized brightness: ", normalized_brightness
-        retval, global_thresh = cv2.threshold(blur, global_threshold * normalized_brightness * global_threshold_factor, 0, cv2.THRESH_TOZERO)
+        retval, global_thresh = cv2.threshold(blur, self.global_threshold * normalized_brightness * self.global_threshold_factor, 0, cv2.THRESH_TOZERO)
 
         # equalize histogram (globally)
         equ = cv2.equalizeHist(global_thresh) 
@@ -512,7 +517,7 @@ class line_detection:
         # perform adaptive threshold
         # cv2.imshow('before adaptive threshold', equ)
         # cv2.waitKey(1)
-        # thresh = cv2.adaptiveThreshold(equ, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, adaptive_threshold_block_size, adaptive_threshold_C - 30)
+        # thresh = cv2.adaptiveThreshold(equ, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, self.adaptive_threshold_block_size, self.adaptive_threshold_C - 30)
         final_image = equ
         # cv2.imshow("after adaptive threshold", thresh)
         ## DEBUG: prints out side by side for comparison (analyzing effect of histogram equalization)
@@ -525,7 +530,7 @@ class line_detection:
         # element = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
         # done = False
         # # iteratively erode, dilate, subtract, then OR the image until it's 1 pixel thick
-        # while(not done and count < 50 + max_erode_iterations):
+        # while(not done and count < 50 + self.max_erode_iterations):
         #     eroded = cv2.erode(thresh,element)
         #     temp = cv2.dilate(eroded,element)
         #     temp = cv2.subtract(thresh,temp)
@@ -539,7 +544,7 @@ class line_detection:
         #     count = count + 1
 
 
-        # canny_image = cv2.Canny(equ, canny_threshold, canny_threshold*2) # perform canny edge detection on blurred image
+        # canny_image = cv2.Canny(equ, self.canny_threshold, self.canny_threshold*2) # perform canny edge detection on blurred image
         # contours, hierarchy = cv2.findContours(equ, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE) # find contours from canny image
         
         # cv2.drawContours(equ, contours, -1, (255,255,0), 3) # draws contours on canny image
@@ -594,48 +599,29 @@ class line_detection:
 
     ## end image_callback()
 
-def reconfigure_callback(config, level):
+    def reconfigure_callback(self, config, level):
 
-    # TODO fix this ugly hack by refactoring entire file into a class
-    global global_threshold
-    global global_threshold_factor
-    global adaptive_threshold_block_size
-    global adaptive_threshold_C
-    global blur_size
-    global canny_threshold
-    global max_erode_iterations
-    global bandpass_low_cutoff
-    global bandpass_high_cutoff
-    global hue_low
-    global hue_high
-    global saturation_low
-    global saturation_high
-    global value_low
-    global value_high
-    global backprojection_threshold
-    global training_file_name
+        # TODO check if the keys exist in the config dictionary or else error
+        # TODO also check if invalid values
 
-    # TODO check if the keys exist in the config dictionary or else error
-    # TODO also check if invalid values
-
-    global_threshold = config['global_threshold']
-    global_threshold_factor = config['global_threshold_factor']
-    adaptive_threshold_block_size = config['adaptive_threshold_block_size']
-    adaptive_threshold_C = config['adaptive_threshold_C']
-    blur_size = config['blur_size']
-    canny_threshold = config['canny_threshold']
-    max_erode_iterations = config['max_erode_iterations']
-    bandpass_low_cutoff = config['bandpass_low_cutoff']
-    bandpass_high_cutoff = config['bandpass_high_cutoff']
-    hue_low = config['hue_low']
-    hue_high = config['hue_high']
-    saturation_low = config['saturation_low']
-    saturation_high = config['saturation_high']
-    value_low = config['value_low']
-    value_high = config['value_high']
-    backprojection_threshold = config['backprojection_threshold']
-    training_file_name = config['training_file_name']
-    return config
+        self.global_threshold = config['global_threshold']
+        self.global_threshold_factor = config['global_threshold_factor']
+        self.adaptive_threshold_block_size = config['adaptive_threshold_block_size']
+        self.adaptive_threshold_C = config['adaptive_threshold_C']
+        self.blur_size = config['blur_size']
+        self.canny_threshold = config['canny_threshold']
+        self.max_erode_iterations = config['max_erode_iterations']
+        self.bandpass_low_cutoff = config['bandpass_low_cutoff']
+        self.bandpass_high_cutoff = config['bandpass_high_cutoff']
+        self.hue_low = config['hue_low']
+        self.hue_high = config['hue_high']
+        self.saturation_low = config['saturation_low']
+        self.saturation_high = config['saturation_high']
+        self.value_low = config['value_low']
+        self.value_high = config['value_high']
+        self.backprojection_threshold = config['backprojection_threshold']
+        self.training_file_name = config['training_file_name']
+        return config
 
 def main(args):
     # TODO make this file into a class
@@ -645,7 +631,7 @@ def main(args):
     # start the line_detector node and start listening
     rospy.init_node('backprojectgrass_noskel')
     # starts dynamic_reconfigure server
-    srv = Server(LineDetectionConfig, reconfigure_callback)
+    srv = Server(LineDetectionConfig, ld.reconfigure_callback)
     rospy.spin()
     cv2.destroyAllWindows()
 
