@@ -2,7 +2,7 @@ include ../../makefile.inc
 
 LIBS		:= ${LIBS} -lncurses 
 LIBS_DIR	:= ${LIBS_DIR}
-INCS_DIR	:= ${INCS_DIR} -I../roboteqCom -I../serialconnector -I../serialconnector
+INCS_DIR	:= ${INCS_DIR} -I../roboteqCom -I../serialconnector
 CFLAGS		:= ${CFLAGS} 
 LDFLAGS		:= ${LDFLAGS}
 

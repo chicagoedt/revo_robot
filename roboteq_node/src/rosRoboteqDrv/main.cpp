@@ -36,7 +36,7 @@ int main(int argc, char **argv)
         catch(std::exception& ex)
         {
             keepRunnning--;
-            istringstream a2i; a2i << "Restarting... " << keepRunnning << " out of " << MAX_RETRY;
+            std::ostringstream a2i; a2i << "Restarting... " << keepRunnning << " out of " << MAX_RETRY;
             ROS_ERROR_STREAM_NAMED(NODE_NAME,"Exception. Error: " << ex.what());
             roboteqDrv.Shutdown();
             boost::this_thread::sleep(boost::posix_time::milliseconds(sleepTime));
@@ -45,7 +45,7 @@ int main(int argc, char **argv)
         catch(...)
         {
             keepRunnning--;
-            istringstream a2i; a2i << "Restarting... " << keepRunnning << " out of " << MAX_RETRY;
+            std::ostringstream a2i; a2i << "Restarting... " << keepRunnning << " out of " << MAX_RETRY;
             ROS_ERROR_STREAM_NAMED(NODE_NAME,"Exception. ???");
             roboteqDrv.Shutdown();
             boost::this_thread::sleep(boost::posix_time::milliseconds(sleepTime));
