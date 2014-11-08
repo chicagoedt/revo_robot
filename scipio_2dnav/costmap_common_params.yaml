@@ -5,9 +5,17 @@ raytrace_range: 3.5
 footprint: [[0.4826, 0.4572], [0.4826, -0.4572], [-0.4826, -0.4572], [-0.4826, 0.4572]]
 #robot_radius: ir_of_robot
 inflation_radius: 0.55 
+static_map: false
 
-observation_sources: laser 
+map_type: voxel
+origin_z: 0.0
+z_resolution: 1
+z_voxels: 32
+unknown_threshold: 10
+mark_threshold: 0
 
-laser: {sensor_frame: laser, data_type: LaserScan, topic: /scan, marking: true, clearing: true}
+observation_sources: laser_scan_sensor #point_cloud_sensor
+
+laser_scan_sensor: {sensor_frame: laser_scan_link, data_type: LaserScan, topic: /scan, marking: true, clearing: true}
 
 #point_cloud_sensor: {sensor_frame: frame_name, data_type: PointCloud, topic: topic_name, marking: true, clearing: true}

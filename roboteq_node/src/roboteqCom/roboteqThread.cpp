@@ -39,10 +39,10 @@ void    RoboteqThread::Join(void)
 {
     if( _running )
     {
+        _running = false;
+
         if( pthread_join(_thread, NULL) != 0 )
             THROW_RUNTIME_ERROR("Couldn't join thread");
-
-        _running = false;
     }
 }
 

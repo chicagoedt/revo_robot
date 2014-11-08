@@ -1,0 +1,11 @@
+\subsubsection parameters ROS parameters
+
+Reads and maintains the following parameters on the ROS server
+
+- \b "~min_ang" : \b [double] The angle of the first range measurement [rad]. min: -1.38230076758, default: -1.41371669412, max: -1.44513262065
+- \b "~max_ang" : \b [double] The angle of the first range measurement [rad]. min: 1.38230076758, default: 1.41371669412, max: 1.44513262065
+- \b "~intensity" : \b [bool] Whether or not the TiM3xx returns intensity values. min: False, default: True, max: True
+- \b "~skip" : \b [int] The number of scans to skip between each measured scan. min: 0, default: 0, max: 9
+- \b "~frame_id" : \b [str] The TF frame in which laser scans will be returned. min: , default: laser, max: 
+- \b "~time_offset" : \b [double] An offset to add to the time stamp before publication of a scan [s]. min: -0.25, default: -0.001, max: 0.25
+

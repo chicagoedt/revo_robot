@@ -28,7 +28,7 @@ add_executable(joystick_teleop src/joystick_teleop.cpp)
 target_link_libraries(joystick_teleop ${catkin_LIBRARIES})
 set_target_properties(joystick_teleop PROPERTIES COMPILE_FLAGS -g)
 
-add_dependencies(roboteq_node ${catkin_EXPORTED_TARGETS})
 
-add_dependencies(joystick_teleop ${catkin_EXPORTED_TARGETS})
+  add_dependencies(joystick_teleop ${catkin_EXPORTED_TARGETS})
+
 

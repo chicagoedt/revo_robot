@@ -28,7 +28,6 @@ namespace oxoocoffee
 
         protected:
             virtual void Run(void)   = 0;
-            virtual void Join(void)  = 0;
     };
 
     class RoboteqThread

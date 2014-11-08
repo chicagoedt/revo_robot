@@ -55,7 +55,6 @@ include_directories(
 
 ## Declare a cpp executable
 add_executable(robot_tf_publisher src/broadcaster/tf_broadcaster.cpp)
-#add_executable(robot_tf_listener src/listener/tf_listener.cpp src/listener/TFListener.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -64,4 +63,3 @@ add_executable(robot_tf_publisher src/broadcaster/tf_broadcaster.cpp)
 ## Specify libraries to link a library or executable target against
 
 target_link_libraries(robot_tf_publisher ${catkin_LIBRARIES})
-#target_link_libraries(robot_tf_listener  ${catkin_LIBRARIES})

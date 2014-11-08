@@ -1,6 +1,8 @@
 base_controller/doc/*
 base_controller/doc/html/*
 
+./CMakeLists.txt
+
 *.log
 *.rviz
 
@@ -18,6 +20,8 @@ roboteq_node/src/roboteqCom/roboteqCom
 roboteq_node/src/roboteqDbg/roboteqDbg
 line_detection/calibration_data/calibrationdata/left*
 sick_tim3xx/cfg/SickTim3xx.cfgc
+gazebo_config/build/*
+gazebo_config/lib/*
 *.o
 *.orig
 *.jpeg
