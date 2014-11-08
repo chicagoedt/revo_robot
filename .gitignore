@@ -1,6 +1,8 @@
 base_controller/doc/*
 base_controller/doc/html/*
 
+./CMakeLists.txt
+
 *.log
 *.rviz
 
