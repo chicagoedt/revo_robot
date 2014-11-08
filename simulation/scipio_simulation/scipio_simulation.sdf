@@ -1,0 +1,281 @@
+<sdf version='1.5'>
+  <model name='scipio_simulation'>
+    <link name='base_link'>
+      <pose>0 0 0 0 -0 0</pose>
+      <inertial>
+        <pose>0.00808696 0.174209 -5.1079e-07 0 -0 0</pose>
+        <mass>30.6648</mass>
+        <inertia>
+          <ixx>2.53655</ixx>
+          <ixy>-0.0102253</ixy>
+          <ixz>1.17409e-05</ixz>
+          <iyy>4.29926</iyy>
+          <iyz>1.93444e-07</iyz>
+          <izz>2.13276</izz>
+        </inertia>
+      </inertial>
+      <collision name='base_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://scipio_simulation/meshes/base_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='base_link_visual'>
+        <pose>0.053 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://scipio_simulation/meshes/base_link.DAE</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+
+    <link name='back_left_wheel_link'>
+      <pose>0.26746 -0.17757 0.18923 3.0728 -6.245e-17 -1.5708</pose>
+      <inertial>
+        <pose>0.24702 -3.7896e-07 7.5693e-06 0 -0 0</pose>
+        <mass>11.018</mass>
+        <inertia>
+          <ixx>0.20289</ixx>
+          <ixy>2.1691e-07</ixy>
+          <ixz>-4.2814e-06</ixz>
+          <iyy>0.1147</iyy>
+          <iyz>3.8435e-08</iyz>
+          <izz>0.1147</izz>
+        </inertia>
+      </inertial>
+      <collision name='back_left_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://scipio_simulation/meshes/back_left_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='back_left_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://scipio_simulation/meshes/back_left_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='back_left_wheel_joint' type='revolute'>
+      <child>back_left_wheel_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>3.67321e-06 1 -5.89806e-17</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+
+    <link name='back_right_wheel_link'>
+      <pose>0.26746 0.17757 0.18923 -3.0192 5.55112e-17 1.5708</pose>
+      <inertial>
+        <pose>0.24702 -2.4732e-06 -7.1639e-06 0 -0 0</pose>
+        <mass>11.018</mass>
+        <inertia>
+          <ixx>0.20289</ixx>
+          <ixy>1.3965e-06</ixy>
+          <ixz>4.0531e-06</ixz>
+          <iyy>0.1147</iyy>
+          <iyz>-2.2566e-07</iyz>
+          <izz>0.1147</izz>
+        </inertia>
+      </inertial>
+      <collision name='back_right_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://scipio_simulation/meshes/back_right_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='back_right_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://scipio_simulation/meshes/back_right_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='back_right_wheel_joint' type='revolute'>
+      <child>back_right_wheel_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>-3.67321e-06 1 -5.55112e-17</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+
+    <link name='front_left_wheel_link'>
+      <pose>-0.26746 -0.17757 0.18923 3.0516 -5.55112e-17 -1.5708</pose>
+      <inertial>
+        <pose>0.24702 -6.9913e-07 7.5465e-06 0 -0 0</pose>
+        <mass>11.018</mass>
+        <inertia>
+          <ixx>0.20289</ixx>
+          <ixy>3.9801e-07</ixy>
+          <ixz>-4.2684e-06</ixz>
+          <iyy>0.1147</iyy>
+          <iyz>6.9259e-08</iyz>
+          <izz>0.1147</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_left_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://scipio_simulation/meshes/front_left_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='front_left_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://scipio_simulation/meshes/front_left_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='front_left_wheel_joint' type='revolute'>
+      <child>front_left_wheel_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>3.67321e-06 1 -5.55112e-17</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+
+    <link name='front_right_wheel_link'>
+      <pose>-0.26746 0.17757 0.18923 -3.1282 5.81132e-17 1.5708</pose>
+      <inertial>
+        <pose>0.24702 -8.6541e-07 -7.5292e-06 0 -0 0</pose>
+        <mass>11.018</mass>
+        <inertia>
+          <ixx>0.20289</ixx>
+          <ixy>4.8698e-07</ixy>
+          <ixz>4.2592e-06</ixz>
+          <iyy>0.1147</iyy>
+          <iyz>-8.183e-08</iyz>
+          <izz>0.1147</izz>
+        </inertia>
+      </inertial>
+      <collision name='front_right_wheel_link_collision'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://scipio_simulation/meshes/front_right_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='front_right_wheel_link_visual'>
+        <pose>0 0 0 0 -0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://scipio_simulation/meshes/front_right_wheel_link.STL</uri>
+          </mesh>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Grey</name>
+          </script>
+        </material>
+      </visual>
+      <velocity_decay>
+        <linear>0</linear>
+        <angular>0</angular>
+      </velocity_decay>
+    </link>
+    <joint name='front_right_wheel_joint' type='revolute'>
+      <child>front_right_wheel_link</child>
+      <parent>base_link</parent>
+      <axis>
+        <xyz>-3.67321e-06 1 -5.9848e-17</xyz>
+        <limit>
+          <lower>-1e+16</lower>
+          <upper>1e+16</upper>
+        </limit>
+        <dynamics>
+          <spring_reference>0</spring_reference>
+          <spring_stiffness>0</spring_stiffness>
+        </dynamics>
+        <use_parent_model_frame>1</use_parent_model_frame>
+      </axis>
+    </joint>
+  </model>
+</sdf>
