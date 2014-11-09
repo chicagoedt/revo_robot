@@ -332,7 +332,29 @@ class line_detection:
         self.value_high = config['value_high']
         self.backprojection_threshold = config['backprojection_threshold']
         self.training_file_name = config['training_file_name']
+
+        self.validate_parameters()
+
         return config
+
+    # makes sure the parameters are valid and don't crash the
+    # openCV calls. Changes them to valid values if invalid.
+    def validate_parameters(self):
+        
+        # these parameters need validation:
+
+        # blur_size can be an odd number only
+        if self.blur_size % 2 == 0:
+            self.blur_size -= 1
+
+        # hue, saturation, and value parameters cannot have
+        # larger or equal low limits than high limits
+        if self.hue_low >= self.hue_high:
+            self.hue_low = self.hue_high - 1
+        if self.saturation_low >= self.saturation_high:
+            self.saturation_low = self.saturation_high - 1
+        if self.value_low >= self.value_high:
+            self.value_low = self.value_high - 1
 
 
 def main(args):
