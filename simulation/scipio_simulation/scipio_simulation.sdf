@@ -1,4 +1,5 @@
-<sdf version='1.5'>
+<?xml version='1.0'?>
+<sdf version='1.4'>
   <model name='scipio_simulation'>
     <link name='base_link'>
       <pose>0 0 0 0 -0 0</pose>
@@ -90,11 +91,6 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
 
@@ -150,11 +146,6 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
 
@@ -210,11 +201,6 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
 
@@ -270,12 +256,118 @@
           <lower>-1e+16</lower>
           <upper>1e+16</upper>
         </limit>
-        <dynamics>
-          <spring_reference>0</spring_reference>
-          <spring_stiffness>0</spring_stiffness>
-        </dynamics>
-        <use_parent_model_frame>1</use_parent_model_frame>
       </axis>
     </joint>
+
+      <link name='imu_link'>
+         <inertial>
+            <pose>0 0 0 0 0 0</pose>
+            <mass>0.001</mass>
+            <inertia>
+                <ixx>1e-09</ixx>
+                <ixy>0</ixy>
+                <ixz>0</ixz>
+                <iyy>1e-09</iyy>
+                <iyz>0</iyz>
+                <izz>1e-09</izz>
+            </inertia>
+          </inertial>
+      </link>
+      <joint name='imu_joint' type='revolute'>
+          <child>imu_link</child>
+          <parent>base_link</parent>
+          <axis>
+              <xyz>0 0 1</xyz>
+       	      <limit>
+                 <lower>0</lower>
+                 <upper>0</upper>
+              </limit>
+          </axis>
+      </joint>
+
+      <link name='gps_link'>
+         <inertial>
+            <pose>0 0 0 0 0 0</pose>
+            <mass>0.001</mass>
+            <inertia>
+                <ixx>1e-09</ixx>
+                <ixy>0</ixy>
+                <ixz>0</ixz>
+                <iyy>1e-09</iyy>
+                <iyz>0</iyz>
+                <izz>1e-09</izz>
+            </inertia>
+          </inertial>
+      </link>
+      <joint name='gps_joint' type='revolute'>
+	  <pose>0 0 0 0 0 0</pose>
+          <child>gps_link</child>
+          <parent>base_link</parent>
+          <axis>
+              <xyz>0 0 1</xyz>
+              <limit>
+                 <lower>0</lower>
+                 <upper>0</upper>
+              </limit>
+          </axis>
+      </joint>
+
+
+     <plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
+   	<updateRate>35.0</updateRate>
+   	<robotNamespace>/</robotNamespace>
+   	<leftFrontJoint>back_right_wheel_joint</leftFrontJoint>
+   	<rightFrontJoint>back_left_wheel_joint</rightFrontJoint>
+   	<leftRearJoint>front_right_wheel_joint</leftRearJoint>
+   	<rightRearJoint>front_left_wheel_joint</rightRearJoint>
+   	<wheelSeparation>0.854431</wheelSeparation>
+   	<wheelDiameter>0.379476</wheelDiameter>
+   	<robotBaseFrame>base_footprint</robotBaseFrame>
+   	<torque>40</torque>
+   	<commandTopic>cmd_vel</commandTopic>
+	<odometryTopic>raw_odom</odometryTopic>
+	<odometryFrame>odom</odometryFrame>
+     </plugin> 
+
+	<plugin name="gps_controller" filename="libhector_gazebo_ros_gps.so">
+		<updateRate>40</updateRate>
+		<robotNamespace>/</robotNamespace>
+		<bodyName>gps_link</bodyName>
+		<frameId>base_footprint</frameId>
+		<topicName>fix</topicName>
+		<velocityTopicName>/navsat/vel</velocityTopicName>
+		<referenceLatitude>49.9</referenceLatitude>
+		<referenceLongitude>8.9</referenceLongitude>
+		<referenceHeading>0</referenceHeading>
+		<referenceAltitude>0</referenceAltitude>
+		<drift>0.0000 0.0000 0.0000</drift>
+	</plugin>
+<!--
+    <plugin name="novatel_gps_sim" filename="libhector_gazebo_ros_gps.so">
+            <alwaysOn>1</alwaysOn>
+            <frameId>gps</frameId>
+            <updateRate>20</updateRate>
+            <bodyName>base_footprint</bodyName>
+            <topicName>fix</topicName>
+            <velocityTopicName>fix_velocity</velocityTopicName>
+            <drift>0 0 0</drift>
+            <gaussianNoise>0 0 0</gaussianNoise>
+            <velocityDrift>0 0 0</velocityDrift>
+            <velocityGaussianNoise>0 0 0</velocityGaussianNoise>
+        </plugin>
+-->
+	<plugin name="imu_controller" filename="libhector_gazebo_ros_imu.so">
+		<robotNamespace>/</robotNamespace>
+		<updateRate>50.0</updateRate>
+		<bodyName>base_footprint</bodyName>
+		<topicName>imu/data</topicName>
+		<accelDrift>0.00 0.00 0.00</accelDrift>
+		<accelGaussianNoise>0.00 0.00 0.00</accelGaussianNoise>
+		<rateDrift>0.00 0.00 0.00</rateDrift>
+		<rateGaussianNoise>0.00 0.00 0.00 </rateGaussianNoise>
+		<headingDrift>0.00</headingDrift>
+		<headingGaussianNoise>0.00</headingGaussianNoise>
+	</plugin>
+
   </model>
 </sdf>

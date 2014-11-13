@@ -1,6 +1,8 @@
 base_controller/doc/*
 base_controller/doc/html/*
 
+*._.DS_Store
+
 ./CMakeLists.txt
 
 *.log
