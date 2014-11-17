@@ -8,7 +8,7 @@
 
   <node name="robot_tf_publisher" pkg="robot_setup_tf" type="robot_tf_publisher"/>
 
-  <param name="robot_description" textfile="$(find scipio_simulation)/scipio_simulation.sdf" />
+  <param name="robot_description" textfile="$(find scipio_simulation)/sdf/scipio_simulation.sdf" />
   <node
     name="spawn_model"
     pkg="gazebo_ros"
