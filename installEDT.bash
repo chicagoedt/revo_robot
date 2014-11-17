@@ -1,11 +1,11 @@
-rosdep install --from-paths ./ --ignore-src --rosdistro indigo
+rosdep install --from-paths ./ --ignore-src --rosdistro indigo -y
 
 cd .git/hooks
 
 echo "#!/bin/bash" >> post-receive
-echo "rosdep install --from-paths src --ignore-src --rosdistro indigo" >> post-receive
+echo "rosdep install --from-paths src --ignore-src --rosdistro indigo -y" >> post-receive
 echo "#!/bin/bash" >> post-update
-echo "rosdep install --from-paths src --ignore-src --rosdistro indigo" >> post-update
+echo "rosdep install --from-paths src --ignore-src --rosdistro indigo -y" >> post-update
 
 sudo chmod +x post-receive
 sudo chmod +x post-update
@@ -28,6 +28,6 @@ source ~/.bashrc
 
 echo "Executing 'roscd'..." 
 roscd
-echo "You should now be in the /devel/ folder.
+echo "You should now be in the /devel/ folder."
 
 echo "Finished Installing EDT's IGVC Repository."
