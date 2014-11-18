@@ -89,8 +89,18 @@ wget http://wiki.chicagoedt.org/images/c/c8/0_Grass0081_L.jpg
 wget http://wiki.chicagoedt.org/images/c/c9/1_igvc_lines.png
 
 roscd scipio_simulation/..
-
-cp -r scipio_simulation ~/.gazebo/models/
-cp -r grass ~/.gazebo/models/
+if [ ! -d ~/.gazebo/models/ ]; then
+        mkdir -p ~/.gazebo/models/
+        cp -r scipio_simulation ~/.gazebo/models
+        cp -r grass ~/.gazebo/models/
+        echo "Made directory"
+else
+        cp -r scipio_simulation ~/.gazebo/models
+        ls -l ~/.gazebo/models/scipio_simulation
+        echo "Tried to copy to scipio_simulation"
+        cp -r grass ~/.gazebo/models/
+        ls -l ~/.gazebo/models/grass
+        echo "Tried to copy to grass"
+fi
 
 echo "Finished Installing EDT's IGVC Repository."
