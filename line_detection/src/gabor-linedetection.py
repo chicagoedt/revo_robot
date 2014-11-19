@@ -2,6 +2,7 @@
 import sys
 import numpy as np
 import cv2
+import math
 #import time
 import rospy
 import sensor_msgs
@@ -183,7 +184,7 @@ class line_detection:
         # apply Gabor filter
         gabor_kernel = cv2.getGaborKernel( (self.gabor_ksize, self.gabor_ksize),
                                           self.gabor_sigma,
-                                          self.gabor_theta,
+                                          self.gabor_theta * math.pi / 180,
                                           self.gabor_lambd,
                                           self.gabor_gamma)
         final_image = cv2.filter2D(gray_roi, -1, gabor_kernel)
