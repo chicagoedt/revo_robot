@@ -93,6 +93,7 @@ if [ ! -d ~/.gazebo/models/ ]; then
         mkdir -p ~/.gazebo/models/
         cp -r scipio_simulation ~/.gazebo/models
         cp -r grass ~/.gazebo/models/
+	cp -r lcsr_camera_models ~/.gazebo/models
         echo "Made directory"
 else
         cp -r scipio_simulation ~/.gazebo/models
@@ -101,6 +102,7 @@ else
         cp -r grass ~/.gazebo/models/
         ls -l ~/.gazebo/models/grass
         echo "Tried to copy to grass"
+	cp -r lcsr_camera_models ~/.gazebo/models
 fi
 
 echo "Finished Installing EDT's IGVC Repository."

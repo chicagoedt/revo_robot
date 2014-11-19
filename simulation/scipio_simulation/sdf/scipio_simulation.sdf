@@ -259,6 +259,113 @@
       </axis>
     </joint>
 
+    <joint name="bumblebee_mount_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>bumblebee_mount_link</child>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>-1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <link name='bumblebee_mount_link'>
+      <pose>0.2 0 0.85 2.0 0 1.57</pose>
+      <inertial>
+        <mass>0.687646</mass>
+        <inertia>
+          <ixx>0.000101</ixx>
+          <ixy>0.0</ixy>
+          <ixz>0.0</ixz>
+          <iyy>0.000767</iyy>
+          <iyz>0.0</iyz>
+          <izz>0.000739</izz>
+        </inertia>
+      </inertial>
+      <collision name='bumblebee_mount_link_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lcsr_camera_models/cameras/bumblebee/bumblebee2.dae</uri>
+          </mesh>
+        </geometry>
+      </collision>
+      <visual name='bumblebee_mount_link_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+          <mesh>
+            <scale>1 1 1</scale>
+            <uri>model://lcsr_camera_models/cameras/bumblebee/bumblebee2.dae</uri>
+          </mesh>
+        </geometry>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay>
+         <linear>0</linear>
+         <angular>0</angular>
+      </velocity_decay>
+      <self_collide>0</self_collide>
+
+    <sensor name='stereo_camera' type='multicamera'>
+       <update_rate>48</update_rate>
+       <camera name='left'>
+          <pose>0.06 0 0 -5.76279e-13 -1.5707 -1.5707</pose>
+          <horizontal_fov>1.15192</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.05</near>
+              <far>300</far>
+            </clip>
+            <noise>
+              <type>gaussian</type>
+              <mean>0</mean>
+              <stddev>0.007</stddev>
+            </noise>
+        </camera>
+        <camera name='right'>
+          <pose>-0.06 0 0 -5.76279e-13 -1.5707 -1.5707</pose>
+            <horizontal_fov>1.15192</horizontal_fov>
+            <image>
+              <width>640</width>
+              <height>480</height>
+              <format>R8G8B8</format>
+            </image>
+            <clip>
+              <near>0.05</near>
+              <far>300</far>
+            </clip>
+            <noise>
+              <type>gaussian</type>
+              <mean>0</mean>
+              <stddev>0.007</stddev>
+            </noise>
+         </camera>
+
+       <plugin name='stereo_camera_controller' filename='libgazebo_ros_multicamera.so'>
+          <alwaysOn>true</alwaysOn>
+          <cameraName>stereo_camera</cameraName>
+          <imageTopicName>image_raw</imageTopicName>
+          <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+          <frameName>bumblebee_mount_link</frameName>
+          <hackBaseline>0.12</hackBaseline>
+          <distortionK1>0.0</distortionK1>
+          <distortionK2>0.0</distortionK2>
+          <distortionK3>0.0</distortionK3>
+          <distortionT1>0.0</distortionT1>
+          <distortionT2>0.0</distortionT2>
+        </plugin>
+       <pose>0 0 0 0 0 0</pose>
+      </sensor>
+     </link>
+
       <link name='imu_link'>
          <inertial>
             <pose>0 0 0 0 0 0</pose>
