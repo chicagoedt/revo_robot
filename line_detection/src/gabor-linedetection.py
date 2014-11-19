@@ -30,15 +30,7 @@ class line_detection:
     # these are changed dynamically using dynamic_reconfig and affect
     # the image processing algorithm. A lot of these are not used in the
     # current algorithm.
-    global_threshold = 160
-    global_threshold_factor = 2
-    adaptive_threshold_block_size = 191
-    adaptive_threshold_C = 30
     blur_size = 49
-    canny_threshold = 100
-    max_erode_iterations = 100
-    bandpass_low_cutoff = 1
-    bandpass_high_cutoff = 30
 
     # hsv threshold variables
     hue_low = 20
@@ -181,7 +173,7 @@ class line_detection:
         # first remove grass (backprojection)
         # then blur out smaller dots (low-pass filter using median blur)
         # finally, apply a Gabor filter to find edge
-        
+
         # run backprojection to remove grass
         backprojection_image =\
             self.get_backprojection_mask(roi, self.training_file_name)
@@ -204,115 +196,6 @@ class line_detection:
                                           self.gabor_lambd,
                                           self.gabor_gamma)
         final_image = cv2.filter2D(gray_roi, -1, gabor_kernel)
-
-        # use green color in HSV to mask out all the uninteresting points
-        
-        # backprojection_image =\
-        #     self.get_backprojection_mask(roi, self.training_file_name)
-
-        # threshold the backprojection to only grab the more probable ones
-        # ret, thresh = cv2.threshold(backprojection_image,
-        #                             self.backprojection_threshold,
-        #                             0,
-        #                             cv2.THRESH_TOZERO)
-
-        # bitwise AND the remaining backprojection pixels with the original
-        # gray image (we will only use gray so far so we don't need to use BGR
-        # or HSV. If we did, then we could've merged thresh into a 3-channel
-        # image then AND'ed with our original BGR or HSV)
-        # after_backprojection = cv2.bitwise_and(gray_roi, thresh)
-
-        # perform gaussian blur on grayscale image
-        # blur = cv2.GaussianBlur(after_backprojection,
-        #                         (self.blur_size,
-        #                          self.blur_size),
-        #                         0)
-        # perform median blur on grayscale image
-        # blur = cv2.medianBlur(roi, self.blur_size)
-        # blur = cv2.bilateralFilter(roi, self.blur_size,150,150)
-
-        # global threshold (to zero out below threshold and leave other stuff
-        # as is), using normalized brightness
-        # first returned object (retval) is ignored
-
-        # find (normalized to 1) mean of image brightness
-        # normalized_brightness = cv2.mean(gray_roi)[0] / 255
-        # retval, global_thresh = cv2.threshold(blur,
-        #                                       self.global_threshold
-        #                                       * normalized_brightness
-        #                                       * self.global_threshold_factor,
-        #                                       0,
-        #                                       cv2.THRESH_TOZERO)
-
-        # equalize histogram (globally)
-        # equ = cv2.equalizeHist(global_thresh)
-        # TODO fix up histogram (maybe too many 0-value pixels in the histogram
-        # that skew it?)
-        
-        ## CLAHE not available before OpenCV 3.0
-        # perform CLAHE (adaptive histogram equalization) to fix contrast
-        #clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
-        #equ = clahe.apply(roi)
-
-        #testing Laplacian filter (not useful)
-        # laplacian = cv2.Laplacian(equ,cv2.CV_64F)
-        # cv2.imshow('laplacian', laplacian)
-
-        # perform adaptive threshold
-        # thresh = cv2.adaptiveThreshold(equ,
-        #                                255,
-        #                                cv2.ADAPTIVE_THRESH_MEAN_C,
-        #                                cv2.THRESH_BINARY,
-        #                                self.adaptive_threshold_block_size,
-        #                                self.adaptive_threshold_C - 30)
-        # final_image = equ
-        ## DEBUG: prints out side by side for comparison (analyzing effect of
-        ## histogram equalization)
-        # res = np.hstack((roi,equ)) #stacking images side-by-side
-
-        ## skeletonize image
-        # count = 0
-        # size = np.size(thresh)
-        # skel = np.zeros(thresh.shape,np.uint8)
-        # element = cv2.getStructuringElement(cv2.MORPH_CROSS,(3,3))
-        # done = False
-        # # iteratively erode, dilate, subtract, then OR the image until it's 1
-        # # pixel thick
-        # while(not done and count < 50 + self.max_erode_iterations):
-        #     eroded = cv2.erode(thresh,element)
-        #     temp = cv2.dilate(eroded,element)
-        #     temp = cv2.subtract(thresh,temp)
-        #     skel = cv2.bitwise_or(skel,temp)
-        #     thresh = eroded.copy()
-     
-        #     zeros = size - cv2.countNonZero(thresh)
-        #     if zeros==size:
-        #         done = True
-
-        #     count = count + 1
-
-        # perform canny edge detection on blurred image
-        # canny_image = cv2.Canny(equ,
-        #                         self.canny_threshold,
-        #                         self.canny_threshold * 2)
-        # find contours from canny image
-        # contours, hierarchy = cv2.findContours(equ,
-        #                                        cv2.RETR_TREE,
-        #                                        cv2.CHAIN_APPROX_SIMPLE)
-        
-        # draws contours on canny image
-        # cv2.drawContours(equ, contours, -1, (255,255,0), 3)
-
-        # skel = cv2.cvtColor(skel, cv2.COLOR_BGR2GRAY)
-        # final_image = skel
-        
-        # print final_image.dtype
-        # print final_image.shape
-        # print final_image
-
-        # use this to record end time
-        # end_time = time.time()
-        # print "time elapsed: ", (end_time - start_time)
         
         #### Create CompressedImage to publish ####
         final_image_message = CompressedImage()
@@ -330,18 +213,8 @@ class line_detection:
     def reconfigure_callback(self, config, level):
 
         # TODO check if the keys exist in the config dictionary or else error
-        # TODO also check if invalid values
 
-        self.global_threshold = config['global_threshold']
-        self.global_threshold_factor = config['global_threshold_factor']
-        self.adaptive_threshold_block_size =\
-            config['adaptive_threshold_block_size']
-        self.adaptive_threshold_C = config['adaptive_threshold_C']
         self.blur_size = config['blur_size']
-        self.canny_threshold = config['canny_threshold']
-        self.max_erode_iterations = config['max_erode_iterations']
-        self.bandpass_low_cutoff = config['bandpass_low_cutoff']
-        self.bandpass_high_cutoff = config['bandpass_high_cutoff']
         self.hue_low = config['hue_low']
         self.hue_high = config['hue_high']
         self.saturation_low = config['saturation_low']
@@ -381,10 +254,9 @@ class line_detection:
         if self.value_low >= self.value_high:
             self.value_low = self.value_high - 1
 
-        # TODO might have to validate gabor parameters here as well
+        # gabor filter parameters don't need validation
 
 def main(args):
-    # TODO make this file into a class
     # create a line_detection object
     ld = line_detection()
 
