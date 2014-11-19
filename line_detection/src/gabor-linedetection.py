@@ -178,11 +178,27 @@ class line_detection:
         horizon = img.shape[0] / 2
         roi = img[horizon:, :]  # refer to how Python uses colons in lists
 
-        # convert BGR image (by default using imshow) to GRAY
-        gray_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+        # first remove grass (backprojection)
+        # then blur out smaller dots (low-pass filter using median blur)
+        # finally, apply a Gabor filter to find edge
+        
+        # run backprojection to remove grass
+        backprojection_image =\
+            self.get_backprojection_mask(roi, self.training_file_name)
+
+        # threshold the backprojection to only grab the more probable ones
+        ret, thresh = cv2.threshold(backprojection_image,
+                                    self.backprojection_threshold,
+                                    0,
+                                    cv2.THRESH_TOZERO)
+
+        # no need to convert to grayscale because
+        # cv2.threshold already does that
+
+        gray_roi = cv2.medianBlur(thresh, self.blur_size)
 
         # apply Gabor filter
-        gabor_kernel = cv2.getGaborKernel( (self.gabor_ksize, self.gabor_ksize),
+        gabor_kernel = cv2.getGaborKernel((self.gabor_ksize, self.gabor_ksize),
                                           self.gabor_sigma,
                                           self.gabor_theta * math.pi / 180,
                                           self.gabor_lambd,
