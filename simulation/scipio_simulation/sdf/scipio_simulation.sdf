@@ -273,7 +273,7 @@
     </joint>
 
     <link name='bumblebee_mount_link'>
-      <pose>0.2 0 0.85 2.0 0 1.57</pose>
+      <pose>0.2 0 0.85 2.04 0 1.57</pose>
       <inertial>
         <mass>0.687646</mass>
         <inertia>

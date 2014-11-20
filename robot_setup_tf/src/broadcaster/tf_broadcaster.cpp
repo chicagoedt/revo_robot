@@ -18,6 +18,8 @@ int main(int argc, char** argv)
 	tf::TransformBroadcaster broadcaster;
 	
 	ros::Rate r(20);
+	
+	
 
 	while(n.ok()) //Check if we can not loop, just send transform data one time, instead of constantly updating a static value. 
 	{
@@ -35,8 +37,11 @@ int main(int argc, char** argv)
   		        ros::Time::now(),"base_link", "laser"));
 
 			broadcaster.sendTransform(
-				tf::StampedTransform(tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0.1905, 0.0, 0.6112)),
-  		        ros::Time::now(),"base_link", "stereo_camera"));
+				tf::StampedTransform(tf::Transform(tf::createQuaternionFromRPY(-2.13, 0, -1.57), tf::Vector3(0.2, 0.0, 0.85)),
+  		        ros::Time::now(),"base_link", "bumblebee_mount_link"));
+			//broadcaster.sendTransform(
+			//	tf::StampedTransform(tf::Transform(tf::createQuaternionFromRPY(2.0, 0, 1.57), tf::Vector3(0.2, 0.0, 0.85)),
+  		        //ros::Time::now(),"base_link", "bumblebee_mount_link"));
 
 		r.sleep();
 	}
