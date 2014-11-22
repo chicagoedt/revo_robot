@@ -51,6 +51,12 @@ class line_detection:
     gabor_lambd = 27
     gabor_gamma = 4
 
+    hough_rho = 1
+    hough_theta = 0.01745329251
+    hough_threshold = 50
+    hough_min_line_length = 50
+    hough_max_line_gap = 10
+
     training_file_name = 'training_for_backprojection_1.png'
     package_path = ''
 
@@ -175,19 +181,29 @@ class line_detection:
         # finally, apply a Gabor filter to find edge
 
         # run backprojection to remove grass
-        backprojection_image =\
-            self.get_backprojection_mask(roi, self.training_file_name)
+        # backprojection_image =\
+        #     self.get_backprojection_mask(roi, self.training_file_name)
 
         # threshold the backprojection to only grab the more probable ones
-        ret, thresh = cv2.threshold(backprojection_image,
-                                    self.backprojection_threshold,
-                                    0,
-                                    cv2.THRESH_TOZERO)
+        # ret, thresh = cv2.threshold(backprojection_image,
+        #                             self.backprojection_threshold,
+        #                             0,
+        #                             cv2.THRESH_TOZERO)
+        # final_image = thresh
 
         # no need to convert to grayscale because
         # cv2.threshold already does that
 
-        gray_roi = cv2.medianBlur(thresh, self.blur_size)
+        # gray_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+        # # threshold the backprojection to only grab the more probable ones
+        ret, thresh = cv2.threshold(roi,
+                                    self.backprojection_threshold,
+                                    0,
+                                    cv2.THRESH_TOZERO)
+        # gray_roi = cv2.medianBlur(gray_roi, self.blur_size)
+        # final_image = thresh
+        # gray_roi = cv2.medianBlur(thresh, self.blur_size)
+        # gray_roi = cv2.GaussianBlur(thresh, (self.blur_size, self.blur_size), 0)
 
         # apply Gabor filter
         gabor_kernel = cv2.getGaborKernel((self.gabor_ksize, self.gabor_ksize),
@@ -195,7 +211,20 @@ class line_detection:
                                           self.gabor_theta * math.pi / 180,
                                           self.gabor_lambd,
                                           self.gabor_gamma)
-        final_image = cv2.filter2D(gray_roi, -1, gabor_kernel)
+        gabor_image = cv2.filter2D(thresh, -1, gabor_kernel)
+
+        # apply hough line transform
+        lines = cv2.HoughLinesP(gabor_image,
+                                # 1,np.pi/180,100,100,10)
+                                self.hough_rho,
+                                self.hough_theta, self.hough_threshold,
+                                self.hough_min_line_length,
+                                self.hough_max_line_gap)
+        if lines is not None:
+            for x1, y1, x2, y2 in lines[0]:
+                cv2.line(gabor_image, (x1, y1), (x2, y2), 255, 10)
+
+        final_image = gabor_image
         
         #### Create CompressedImage to publish ####
         final_image_message = CompressedImage()
@@ -231,6 +260,12 @@ class line_detection:
         self.gabor_lambd = config['gabor_lambd']
         self.gabor_gamma = config['gabor_gamma']
 
+        self.hough_rho = config['hough_rho']
+        self.hough_theta = config['hough_theta']
+        self.hough_threshold = config['hough_threshold']
+        self.hough_min_line_length = config['hough_min_line_length']
+        self.hough_max_line_gap = config['hough_max_line_gap']
+
         self.validate_parameters()
 
         return config
@@ -255,6 +290,18 @@ class line_detection:
             self.value_low = self.value_high - 1
 
         # gabor filter parameters don't need validation
+
+        # hough parameters cannot be nonzero
+        if self.hough_rho <= 0:
+            self.hough_rho = 1
+        if self.hough_theta <= 0:
+            self.hough_theta = 0.01
+        if self.hough_threshold <= 0:
+            self.hough_threshold = 1
+        if self.hough_min_line_length <= 0:
+            self.hough_min_line_length = 1
+        if self.hough_max_line_gap <= 0:
+            self.hough_max_line_gap = 1
 
 def main(args):
     # create a line_detection object
