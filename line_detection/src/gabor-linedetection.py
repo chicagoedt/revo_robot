@@ -62,6 +62,14 @@ class line_detection:
     training_file_name = 'training_for_backprojection_1.png'
     package_path = ''
 
+    image_height = 0
+    image_width = 0
+
+    roi_top_left_x = 0
+    roi_top_left_y = 0
+    roi_width = 2000
+    roi_height = 2000
+
     def __init__(self):
 
         # initialize ROS stuff
@@ -199,9 +207,15 @@ class line_detection:
             print "error! img is empty!"
             return
 
-        # assuming our region of interest is only in bottom half of image
-        horizon = img.shape[0] / 2
-        roi = img[horizon:, :]  # refer to how Python uses colons in lists
+        self.image_height = img.shape[0]
+        self.image_width = img.shape[1]
+        roi = img[
+            self.roi_top_left_y:self.roi_top_left_y + self.roi_height,
+            self.roi_top_left_x:self.roi_top_left_x + self.roi_width
+        ]
+
+        # use entire image as roi (don't cut any parts out)
+        # roi = img
 
         # first remove grass (backprojection)
         # then blur out smaller dots (low-pass filter using median blur)
@@ -293,6 +307,11 @@ class line_detection:
         self.hough_min_line_length = config['hough_min_line_length']
         self.hough_max_line_gap = config['hough_max_line_gap']
 
+        self.roi_top_left_x = config['roi_top_left_x']
+        self.roi_top_left_y = config['roi_top_left_y']
+        self.roi_width = config['roi_width']
+        self.roi_height = config['roi_height']
+
         self.validate_parameters()
 
         return config
@@ -329,6 +348,19 @@ class line_detection:
             self.hough_min_line_length = 1
         if self.hough_max_line_gap <= 0:
             self.hough_max_line_gap = 1
+
+        # now check if ROI parameters are out of bounds
+
+        if self.roi_width > self.image_width - self.roi_top_left_x:
+            self.roiwidth = self.image_width - self.roi_top_left_x
+        if self.roi_top_left_x < 0:
+            self.roi_top_left_x = 0
+
+        if self.roi_height > self.image_height - self.roi_top_left_y:
+            self.roi_height = self.image_height - self.roi_top_left_y
+        if self.roi_top_left_y < 0:
+            self.roi_top_left_y = 0
+
 
 def main(args):
     # create a line_detection object
