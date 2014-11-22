@@ -7,9 +7,11 @@ import math
 import rospy
 import sensor_msgs
 from sensor_msgs.msg import CompressedImage
+from sensor_msgs.msg import Image
 import rospkg
 from dynamic_reconfigure.server import Server
 from line_detection.cfg import LineDetectionConfig
+from cv_bridge import CvBridge, CvBridgeError
 
 ###############################################################################
 ## Chicago Engineering Design Team
@@ -77,18 +79,23 @@ class line_detection:
         self.line_image_pub = rospy.Publisher('line_image/compressed',
                                               sensor_msgs.msg.CompressedImage)
 
+        # self.line_image_pub = rospy.Publisher('line_image',
+        #                                       sensor_msgs.msg.Image)
+
         # subscriber for ROS image topic
-        self.image_sub = rospy.Subscriber("/camera/image_raw/compressed",
-                                          CompressedImage, self.image_callback,
-                                          queue_size=1)
+        # self.image_sub = rospy.Subscriber("/camera/image_raw/compressed",
+        #                                   CompressedImage, self.image_callback,
+        #                                   queue_size=1)
 
         # this returns the path to the current package
         rospack = rospkg.RosPack()
         self.package_path = rospack.get_path('line_detection')
 
         # use this for uncompressed raw format
-        # self.image_sub = rospy.Subscriber("/camera/image_raw", Image,
-        #                                    self.image_callback, queue_size=1)
+        self.image_sub = rospy.Subscriber("/camera/image_raw", Image,
+                                           self.image_callback, queue_size=1)
+        self.bridge = CvBridge()
+
         
         # use this if you need to use the camera_info topic (has intrinsic
         #                                                     parameters)
@@ -167,10 +174,30 @@ class line_detection:
 
         # use this to record start time for each frame
         #start_time = time.time()
+        
+        if(image.encoding != 'mono8'):
+            print "image is not mono8! Aborting!"
+            return
+        
+        #### direct conversion from ROS CompressedImage to CV2 ####
+        # np_arr = np.fromstring(image.data, np.uint8)
+        # img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
+        # img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_GRAYSCALE)
 
         #### direct conversion from ROS Image to CV2 ####
-        np_arr = np.fromstring(image.data, np.uint8)
-        img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
+
+        # first, we need to convert image from sensor_msgs/Image to numpy (or
+        # cv2). For this, we use cv_bridge
+        try:
+            # img = self.bridge.imgmsg_to_cv2(image, "bgr8")
+            img = self.bridge.imgmsg_to_cv2(image,
+                                            desired_encoding="passthrough")
+        except CvBridgeError, e:
+            print e
+
+        if img is None:
+            print "error! img is empty!"
+            return
 
         # assuming our region of interest is only in bottom half of image
         horizon = img.shape[0] / 2
