@@ -1,0 +1,8 @@
+<launch>
+        <node pkg="gps_common" type="utm_odometry_node" name="gps_utm" respawn="true">
+                <remap from="vo" to="gps/utm"/>
+                <param name="frame_id" value="utm"/>
+        </node>
+</launch>
+
+

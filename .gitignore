@@ -1,6 +1,13 @@
 base_controller/doc/*
 base_controller/doc/html/*
 
+simulation/grass/meshes/images/
+simulation/scipio_simulation/meshes/
+
+
+*/.DS_Store
+*/._.DS_Store
+
 ./CMakeLists.txt
 
 *.log

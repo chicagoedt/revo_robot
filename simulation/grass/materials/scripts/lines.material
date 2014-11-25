@@ -1,0 +1,23 @@
+material grass/lines
+{
+     technique
+     {
+         pass
+         {
+             lighting off
+ 
+             ambient 0.3 0.3 0.3 1
+             diffuse 0.2 0.2 0.2 1
+             specular 0 0 0 0
+             emissive 0 0 0 1
+ 
+             scene_blend alpha_blend
+             depth_write off
+ 
+             texture_unit
+             {
+                 texture igvc_lines_4000x4000cm.png
+             }
+         }
+     }
+}
