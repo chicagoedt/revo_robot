@@ -1,6 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(base_controller)
-;df;s'df;s'df;s';fls'd;fls'd;fl'sf;l's;dlfa';flda';lf HAAHAHAHAHHA THIS WILL BREAK FUNNY OMG
 find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs message_generation)
 
 add_message_files(
