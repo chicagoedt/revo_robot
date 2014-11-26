@@ -11,5 +11,6 @@
   <author email="krgebis@gmail.com">Krystian-L0g1x</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>navigation</run_depend>
 
 </package>

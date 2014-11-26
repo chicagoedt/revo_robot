@@ -1,6 +1,0 @@
-<package>
-  <description brief="scipio_simulation">scipio_simulation</description>
-  <depend package="gazebo" />
-  <author>me</author>
-  <license>BSD</license>
-</package>

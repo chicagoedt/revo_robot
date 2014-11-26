@@ -1,5 +1,6 @@
-Software_IGVC
+Software_IGVC [![Build Status](http://jenkins.chicagoedt.org/job/Software_IGVC_Upstream/badge/icon)](http://jenkins.chicagoedt.org/job/Software_IGVC_Upstream/)
 =============
+
 
 Master -> Development -> Simulation
 
