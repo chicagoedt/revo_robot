@@ -1,6 +1,8 @@
 <?xml version='1.0'?>
 <sdf version='1.4'>
   <model name='scipio_simulation'>
+    <static>false</static>
+    <pose>0 0 0.1 0 0 1.57</pose>
     <link name='base_link'>
       <pose>0 0 0 0 -0 0</pose>
       <inertial>
@@ -466,7 +468,7 @@
 	<plugin name="imu_controller" filename="libhector_gazebo_ros_imu.so">
 		<robotNamespace>/</robotNamespace>
 		<updateRate>50.0</updateRate>
-		<bodyName>base_footprint</bodyName>
+		<bodyName>base_link</bodyName>
 		<topicName>imu/data</topicName>
 		<accelDrift>0.00 0.00 0.00</accelDrift>
 		<accelGaussianNoise>0.00 0.00 0.00</accelGaussianNoise>
