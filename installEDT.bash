@@ -111,6 +111,6 @@ fi
 
 roscd 
 cd ..
-catkin_make
+catkin_make run_tests
 
 echo "Finished Installing EDT's IGVC Repository."
