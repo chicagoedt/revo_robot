@@ -2,11 +2,18 @@
 
 <launch>
 
+    <param name="/use_sim_time" value="true" />
+
+    <node pkg="rviz" type="rviz" name="rviz" required="true"/>
+
+<!--
+    <node pkg="tf" type="static_transform_publisher" name="bl_bb" args="0.2 0 0.85 0.61881542577 -0.618322842568 0.342459777206 -0.342732595743 base_link bumblebee_mount_link 20" />
+    <node pkg="tf" type="static_transform_publisher" name="bl_l" args="0.4014 0 0.1686 0 0 0 1 base_link laser 20" />
+    <node pkg="tf" type="static_transform_publisher" name="bf_bl" args="0 0 0 0 0 0 1 base_footprint base_link 20" />
+-->
+
     <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true" output="screen">
 
-      <!-- Enter the magnetic declination for your location. If you don't
-           know it, see http://www.ngdc.noaa.gov/geomag-web/ (make sure to
-           convert the value to radians). -->
       <param name="magnetic_declination_radians" value="0"/>
       <param name="roll_offset" value="0"/>
       <param name="pitch_offset" value="0"/>
@@ -17,34 +24,46 @@
 
     </node>
 
-    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization_node" clear_params="true">
+
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true">
 
       <param name="frequency" value="15"/>  
       <param name="sensor_timeout" value="0.1"/>  
       <param name="odom0" value="/raw_odom"/>
-      <param name="odom1" value="/odometry/gps"/> 
-      <param name="imu0" value="/imu/data"/> 
+      <!--  <param name="odom1" value="/odometry/gps"/> -->
+      <param name="imu0" value="/imu/data"/>
 
-				<!--   x       y      z     roll   pitch yaw    vx     vy     vz     vrl    vp    vy    ax    ay    az     -->
-      <rosparam param="odom0_config">[true, true, false, false, false, true, false, false, false, false, false, false, false, false, false]</rosparam>
+      <param name="two_d_mode" value="true"/>
+
+      <rosparam param="odom0_config">[true, true, false, 
+                                     false, false, false, 
+                                     false, false, false, 
+                                     false, false, true,
+                                     false, false, false]</rosparam>
   
-      <rosparam param="odom1_config">[true, true, false, false, false, false, false, false, false, false, false, false, false, false, false]</rosparam>
+      <rosparam param="odom1_config">[true, true, false, 
+                                     false, false, false, 
+                                     false, false, false, 
+                                     false, false, false,
+                                     false, false, false]</rosparam>
 
-      <rosparam param="imu0_config">[false, false, false, false, false, true, false, false, false, false, false, false, false, false, false]</rosparam> 
+      <rosparam param="imu0_config">[false, false, false, 
+                                     false, false, true, 
+                                     false, false, false, 
+                                     false, false, true,
+                                     false, false, false]</rosparam> 
 
       <param name="odom0_differential" value="true"/>
       <param name="odom1_differential" value="false"/> 
       <param name="imu0_differential" value="true"/>
 
-      <param name="debug"           value="false"/>
-      <param name="debug_out_file"  value="/home/tmoore/Desktop/debug_ekf_localization.txt"/>
+      <param name="imu0_remove_gravitational_acceleration" value="true"/>
 
-      <param name="map_frame" value="map"/>
+      <param name="debug"           value="true"/>
+      <param name="debug_out_file"  value="~/Desktop/debug_ekf_localization.txt"/>
+
       <param name="odom_frame" value="odom"/>
       <param name="base_link_frame" value="base_footprint"/>
-      <param name="world_frame" value="odom"/>
-
-      <param name="two_d_mode" value="false"/>
 
       <rosparam param="process_noise_covariance">[0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
                                                   0.0, 0.05, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
@@ -65,3 +84,4 @@
     </node>
 	 
 </launch>
+
