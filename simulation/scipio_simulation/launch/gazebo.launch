@@ -6,6 +6,8 @@
     <arg name="world_name" value="$(find scipio_simulation)/worlds/igvc_final.world"/>
   </include>
 
+  <include file="$(find scipio_2dnav)/move_base.launch"/>
+
   <node name="robot_tf_publisher" pkg="robot_setup_tf" type="robot_tf_publisher"/>
 
   <param name="robot_description" textfile="$(find scipio_simulation)/sdf/scipio_simulation.sdf" />

@@ -3,9 +3,9 @@
 <launch>
 
     <param name="/use_sim_time" value="true" />
-
+<!--
     <node pkg="rviz" type="rviz" name="rviz" required="true"/>
-
+-->
 <!--
     <node pkg="tf" type="static_transform_publisher" name="bl_bb" args="0.2 0 0.85 0.61881542577 -0.618322842568 0.342459777206 -0.342732595743 base_link bumblebee_mount_link 20" />
     <node pkg="tf" type="static_transform_publisher" name="bl_l" args="0.4014 0 0.1686 0 0 0 1 base_link laser 20" />
@@ -35,9 +35,9 @@
 
       <param name="two_d_mode" value="true"/>
 
-      <rosparam param="odom0_config">[true, true, false, 
+      <rosparam param="odom0_config">[false, false, false, 
                                      false, false, false, 
-                                     false, false, false, 
+                                     true, false, false, 
                                      false, false, true,
                                      false, false, false]</rosparam>
   
@@ -53,9 +53,9 @@
                                      false, false, true,
                                      false, false, false]</rosparam> 
 
-      <param name="odom0_differential" value="true"/>
+      <param name="odom0_differential" value="false"/>
       <param name="odom1_differential" value="false"/> 
-      <param name="imu0_differential" value="true"/>
+      <param name="imu0_differential" value="false"/>
 
       <param name="imu0_remove_gravitational_acceleration" value="true"/>
 
