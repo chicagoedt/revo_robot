@@ -1,12 +1,18 @@
-Software_IGVC
+Software_IGVC [![Build Status](http://jenkins.chicagoedt.org/job/Software_IGVC_Upstream/badge/icon)](http://jenkins.chicagoedt.org/job/Software_IGVC_Upstream/)
 =============
 
-Master -> Development -> Simulation
+Instructions
+------------
+1) Fork this repo if you already havent
 
-Master:       Major Stable releases, code changes work both in real life and simulation 110%
+2) Make a directory for your catkin workspace: i like to call mine 'l0g1x_ws' instead of 'catkin_ws' and then go inside it
 
-Development:  Where most of the real-life code changes/testing will happen. 
+2)  git clone https://github.com/yourGithubName/Software_IGVC.git src   (dont forget the 'src' at the end)
 
-Simulation:   ONLY branch to contain any RViz/Gazebo related things. Once we get things to work here, 
-              we then merge only the non-Rviz/Gazebo Related changes into the development branch for 
-              real-life testing.
+3) cd src
+
+4) source installEDT.bash
+
+5) Your RMC workspace is now setup along with anything else you will need to develop for RMC. 
+
+6) roslaunch rmc_simulation gazebo.launch       <--- Try this to get gazebo up and running with RMC model

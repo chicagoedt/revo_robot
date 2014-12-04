@@ -12,7 +12,7 @@
     </node>
   </group>
 
-  <node pkg="line_detection" name="line_detector" type="line_detection.py" output="screen">
+  <node pkg="line_detection" name="backproject-skeletonize" type="backproject-skeletonize.py" output="screen">
   </node>
 
   <node pkg="image_view" name="image_view_rect" type="image_view" output="screen">

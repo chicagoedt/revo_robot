@@ -1,3 +1,5 @@
+sudo apt-get update
+rosdep update
 rosdep install --from-paths ./ --ignore-src --rosdistro indigo -y
 
 cd .git/hooks
@@ -78,7 +80,9 @@ rm Back_left_wheel_link.DAE.zip
 
 roscd scipio_simulation/..
 
-cd grass/materials/textures/
+cd grass/materials/
+mkdir textures
+cd textures
 wget http://wiki.chicagoedt.org/images/6/63/Igvc_lines_4000x4000cm.png
 mv Igvc_lines_4000x4000cm.png igvc_lines_4000x4000cm.png
 
@@ -104,5 +108,9 @@ else
         echo "Tried to copy to grass"
 	cp -rf lcsr_camera_models ~/.gazebo/models
 fi
+
+roscd 
+cd ..
+catkin_make run_tests
 
 echo "Finished Installing EDT's IGVC Repository."

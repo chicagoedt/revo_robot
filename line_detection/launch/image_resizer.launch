@@ -1,0 +1,8 @@
+<launch>
+
+  <node pkg="line_detection" name="image_resizer" type="image-resizer.py" output="screen">
+  </node>
+
+  <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure" output="screen" />
+  
+</launch>
