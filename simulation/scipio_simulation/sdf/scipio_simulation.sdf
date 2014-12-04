@@ -26,7 +26,7 @@
         </geometry>
       </collision>
       <visual name='base_link_visual'>
-        <pose>0.049 0.09 0 0 -0 0</pose>
+        <pose>0.049 0.009 0 0 -0 0</pose>
         <geometry>
           <mesh>
             <scale>1 1 1</scale>
