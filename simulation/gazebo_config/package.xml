@@ -10,5 +10,9 @@
   <author email="krgebis@gmail.com">Krystian-L0g1x</author>
 
   <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>robot_localization</build_depend>
+  <run_depend>robot_localization</run_depend>
+  <run_depend>hector_gazebo_plugins</run_depend>
+  <run_depend>teleop_twist_keyboard</run_depend>
 
 </package>

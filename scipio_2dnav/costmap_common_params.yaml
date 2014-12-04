@@ -16,6 +16,6 @@ mark_threshold: 0
 
 observation_sources: laser_scan_sensor #point_cloud_sensor
 
-laser_scan_sensor: {sensor_frame: laser_scan_link, data_type: LaserScan, topic: /scan, marking: true, clearing: true}
+laser_scan_sensor: {sensor_frame: laser, data_type: LaserScan, topic: /scan, marking: true, clearing: true}
 
-#point_cloud_sensor: {sensor_frame: frame_name, data_type: PointCloud, topic: topic_name, marking: true, clearing: true}
+point_cloud_sensor: {sensor_frame: bumblebee_mount_link, data_type: PointCloud2, topic: /points2, marking: true, clearing: true}

@@ -27,10 +27,16 @@ catkin_package(
 
 include_directories(include ${catkin_INCLUDE_DIRS})
 
+add_library(roboteq_node_lib src/rosRoboteqDrv/rosRoboteqDrv.cpp src/roboteqCom/roboteqCom.cpp src/roboteqCom/roboteqThread.cpp src/serialConnector/serialPort.cpp)
+target_link_libraries(roboteq_node_lib ${catkin_LIBRARIES})
+
 add_executable(roboteq_node src/rosRoboteqDrv/main.cpp src/rosRoboteqDrv/rosRoboteqDrv.cpp src/roboteqCom/roboteqCom.cpp src/roboteqCom/roboteqThread.cpp src/serialConnector/serialPort.cpp)
 target_link_libraries(roboteq_node ${catkin_LIBRARIES})
 set_target_properties(roboteq_node PROPERTIES COMPILE_FLAGS -g)
 
+add_dependencies(roboteq_node_lib ${catkin_EXPORTED_TARGETS})
 add_dependencies(roboteq_node ${catkin_EXPORTED_TARGETS})
 add_dependencies(roboteq_node roboteq_node_generate_messages_cpp)
 
+catkin_add_gtest(roboteq_utest test/roboteq_utest.cpp)
+target_link_libraries(roboteq_utest roboteq_node_lib)

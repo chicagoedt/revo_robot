@@ -2,9 +2,9 @@
   <master auto="start"/>
 
   <node pkg="move_base" type="move_base" respawn="true" name="move_base" output="screen">
-<!--
-    <remap from="/cmd_vel" to="/husky/cmd_vel" />
--->
+
+    <remap from="/odom" to="/odometry/filtered" />
+
     <param name="controller_frequency" value="10.0"/>
     <rosparam file="$(find scipio_2dnav)/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find scipio_2dnav)/costmap_common_params.yaml" command="load" ns="local_costmap" />
