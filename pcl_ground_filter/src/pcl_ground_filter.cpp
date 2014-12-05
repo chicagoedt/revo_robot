@@ -8,16 +8,11 @@
 #include <tf/transform_listener.h>
 
 #include <iostream>
-#include <pcl/ModelCoefficients.h>
 #include <pcl/io/pcd_io.h>
 #include <pcl/point_types.h>
-#include <pcl/sample_consensus/method_types.h>
-#include <pcl/sample_consensus/model_types.h>
-#include <pcl/segmentation/sac_segmentation.h>
 #include <pcl/conversions.h>
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl/PCLPointCloud2.h>
-#include <pcl/filters/extract_indices.h>
 #include <pcl/filters/passthrough.h>
 
 using std::string;
@@ -88,7 +83,7 @@ void publishPCLPointCloud(PCL2 &pc, ros::Publisher &pub) {
 
 
 void processPC(PCLPointCloud &pc) {       
-
+  // Remove points with z-values above max_z and below min_z
   filterByHeight(pc, min_z, max_z);
   PCL2 nongroundPCL2;
 
