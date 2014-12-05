@@ -42,7 +42,6 @@ private:
   ros::Subscriber pcl2_sub_;
   ros::Publisher obstacles_pub_;
   ros::Publisher nonobstacles_pub_;
-  //dynamic_reconfigure::Server<automow_filtering::automow_filteringConfig> server_;
   int mode_;
   string vehicle_frame_;
   double min_z, max_z;
@@ -55,9 +54,9 @@ public:
   GroundFilter(ros::NodeHandle n) :
     n_(n),
     mode_(SACMODEL_PERPENDICULAR_PLANE),
-    vehicle_frame_("base_link"),
-    min_z(0.1f),
-    max_z(0.75f),
+    vehicle_frame_("odom"),
+    min_z(0.0f),
+    max_z(1.2f),
     paused(false),
     first_cloud(true),
     z_filter(true),
@@ -69,9 +68,7 @@ public:
   {
     pcl2_sub_ = n_.subscribe("/stereo_camera/points2", 10, &GroundFilter::pcl2Callback, this);
     obstacles_pub_ = n_.advertise<PointCloud2>("/ground_filter/obstacles", 1);
-    //nonobstacles_pub_ = n_.advertise<PointCloud2>("/ground_filter/non_obstacles", 1);
-    //server_.setCallback(boost::bind(&GroundFilter::onConfigure, this, _1, _2));
-    n_.getParam(string("vehicle_fame"), vehicle_frame_);
+    n_.getParam(string("vehicle_frame"), vehicle_frame_);
     n_.getParam("resolution", resolution);
     n_.getParam("min_z", min_z);
     n_.getParam("max_z", max_z);
@@ -84,86 +81,21 @@ public:
 void publishPCLPointCloud(PCL2 &pc, ros::Publisher &pub) {
   PointCloud2 pc_out;
   pcl_conversions::fromPCL(pc, pc_out);
-  pc_out.header.frame_id = "bumblebee_mount_link";
+  pc_out.header.frame_id = vehicle_frame_;
   
   pub.publish(pc_out);
 }
 
-void segmentWithRANSAC(PCLPointCloud &pc, PCLPointCloud &ground, PCLPointCloud &nonground) {
-  //int max_iterations = 400;
-  //float distance_threshold = 0.1;
-  //float eps_angle = 0.15;
-  // Remove data way below or above the ground
-  filterByHeight(pc, min_z, max_z);
-  // Set the headers
-  ground.header = pc.header;
-  nonground.header = pc.header;
 
-  // Create the coefficients and inliers storage
-  pcl::ModelCoefficients::Ptr coefficients (new pcl::ModelCoefficients);
-  pcl::PointIndices::Ptr inliers (new pcl::PointIndices);
-
-  // Create the segmentation object
-  pcl::SACSegmentation<pcl::PointXYZ> seg;
-  seg.setOptimizeCoefficients (true);
-  seg.setModelType (pcl:: SACMODEL_PERPENDICULAR_PLANE);
-  seg.setMethodType (pcl::SAC_RANSAC);
-  seg.setMaxIterations(max_iterations); // 400
-  seg.setDistanceThreshold (distance_threshold);
-  seg.setAxis(Eigen::Vector3f(0,0,1));
-  seg.setEpsAngle(eps_angle*M_PI/180.0); // 15 degrees (must convert to rads)
-  
-  // Filter until the cloud is too small or I "find" the ground plane
-  pcl::PointCloud<pcl::PointXYZ> filter_pc(pc);
-  pcl::ExtractIndices<pcl::PointXYZ> extract;
-  bool found_ground = false;
-  while (filter_pc.size() > 10 && !found_ground) {
-    seg.setInputCloud(filter_pc.makeShared());
-    seg.segment(*inliers, *coefficients);
-    if (inliers->indices.size() == 0) {
-      ROS_WARN("No plane found in the pointcloud!");
-      break;
-    }
-    // if (std::abs(coefficients->values.at(3)) < 0.07) {
-    // ROS_INFO("True");
-    // } else {
-    // ROS_INFO("False");
-    // }
-    // Get the indices using the extractor
-    extract.setInputCloud(filter_pc.makeShared());
-    extract.setIndices(inliers);
-    extract.setNegative(false);
-    pcl::PointCloud<pcl::PointXYZ> cloud_out;
-    extract.filter(cloud_out);
-    ground += cloud_out;
-    if(inliers->indices.size() != filter_pc.size()){
-      extract.setNegative(true);
-      pcl::PointCloud<pcl::PointXYZ> cloud_out2;
-      extract.filter(cloud_out2);
-      nonground += cloud_out2;
-      filter_pc = cloud_out2;
-    }
-    found_ground = true;
-  }
-}
-
-void processPC(PCLPointCloud &pc) {
-  //float min_z = 0.1;
-  //float max_z = 0.75;        
+void processPC(PCLPointCloud &pc) {       
 
   filterByHeight(pc, min_z, max_z);
-  PCLPointCloud ground, nonground;
   PCL2 nongroundPCL2;
-  segmentWithRANSAC(pc, ground, nonground);
 
-  // Krystian added this line to check if we even get anything. We do, but theres something wrong with transform.
   pcl::toPCLPointCloud2(pc,nongroundPCL2); // convert from pcl::PointCloud to pcl::PCLPointCloud2
 
-  // pcl::toPCLPointCloud2(nonground,nongroundPCL2); // convert from pcl::PointCloud to pcl::PCLPointCloud2
   // Publish the nonground pc to obstacles
   publishPCLPointCloud(nongroundPCL2, obstacles_pub_);
-  // Publish ground to the nonobstacles
-  //publishPCLPointCloud(ground, nonobstacles_pub_);
 }
 /* Takes in sensor_msgs::PointCloud2, converts it to sensor_msgs::PointCloud2, performs transform,
 // Then re-converts it back to a sensor_msgs::PointCloud2 object, then converts it into a 
@@ -218,10 +150,6 @@ int main(int argc, char **argv)
 
   ros::NodeHandle nh;
   GroundFilter gf(nh);
-
-  // Subscribe to the messages we need
-  //ros::Subscriber pcl2Sub = nh.subscribe("stereo_camera/points2", 10, &pcl2Callback);
-
 
   ros::Rate rate(10);
   while(ros::ok())
