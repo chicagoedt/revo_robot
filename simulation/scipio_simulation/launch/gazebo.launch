@@ -10,6 +10,13 @@
 
   <include file="$(find scipio_2dnav)/move_base.launch"/>
 
+  <node name="rviz" pkg="rviz" type="rviz"/>
+  <node name="voxel_grid_2_point_cloud" pkg="costmap_2d" type="costmap_2d_cloud">
+    <remap from="voxel_grid" to="/move_base/local_costmap/obstacle_layer/voxel_grid"/>
+    <remap from="voxel_marked_cloud" to="/move_base/local_costmap/obstacle_layer/marked_cloud"/>
+    <remap from="voxel_unknown_cloud" to="/move_base/local_costmap/obstacle_layer/unknown_cloud"/>
+  </node>
+
   <node name="robot_tf_publisher" pkg="robot_setup_tf" type="robot_tf_publisher"/>
 
   <param name="robot_description" textfile="$(find scipio_simulation)/sdf/scipio_simulation.sdf" />
