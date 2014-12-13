@@ -28,8 +28,11 @@ from cv_bridge import CvBridge, CvBridgeError
 
 class line_detection:
 
-    use_mono = False
-    use_compressed_format = True
+    # TODO test for different values of mono and compressed that might crash 
+    use_mono = rospy.get_param("/gabor_linedetection/use_mono")
+    use_compressed_format = rospy.get_param("/gabor_linedetection/use_compressed_format")
+    subscriber_image_topic = rospy.get_param("/gabor_linedetection/subscriber_image_topic")
+    publisher_image_topic = rospy.get_param("/gabor_linedetection/publisher_image_topic")
 
     # this is where we define our variables in the class.
     # these are changed dynamically using dynamic_reconfig and affect
@@ -62,7 +65,9 @@ class line_detection:
     hough_min_line_length = 50
     hough_max_line_gap = 10
 
-    training_file_name = 'training_for_backprojection_1.png'
+    # training_file_name = 'training_for_backprojection_1.png'
+    training_file_name = rospy.get_param("/gabor_linedetection/training_file_name")
+
     package_path = ''
 
     image_height = 0
@@ -87,8 +92,10 @@ class line_detection:
 
         # publisher for image of line pixels (only for debugging, not used in
         # map)
-        self.line_image_pub = rospy.Publisher('line_image/compressed',
-                                              sensor_msgs.msg.CompressedImage)
+        self.line_image_pub = rospy.Publisher(self.publisher_image_topic +
+                                              '/compressed',
+                                              sensor_msgs.msg.CompressedImage,
+                                              queue_size=1)
 
         # self.line_image_pub = rospy.Publisher('line_image',
         #                                       sensor_msgs.msg.Image)
@@ -99,12 +106,14 @@ class line_detection:
 
         if self.use_compressed_format:
         # subscriber for ROS image topic
-            self.image_sub = rospy.Subscriber("/camera/image_raw/compressed",
+            self.image_sub = rospy.Subscriber(self.subscriber_image_topic +
+                                             "/compressed",
                                               CompressedImage, self.image_callback,
                                               queue_size=1)
         else:
             # use this for uncompressed raw format
-            self.image_sub = rospy.Subscriber("/camera/image_raw", Image,
+            self.image_sub = rospy.Subscriber(self.subscriber_image_topic,
+                                           Image,
                                            self.image_callback, queue_size=1)
 
 
@@ -289,7 +298,6 @@ class line_detection:
         self.value_low = config['value_low']
         self.value_high = config['value_high']
         self.backprojection_threshold = config['backprojection_threshold']
-        self.training_file_name = config['training_file_name']
 
         # gabor filter parameters
         self.gabor_ksize = config['gabor_ksize']
