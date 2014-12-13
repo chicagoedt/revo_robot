@@ -28,6 +28,9 @@ from cv_bridge import CvBridge, CvBridgeError
 
 class line_detection:
 
+    use_mono = False
+    use_compressed_format = True
+
     # this is where we define our variables in the class.
     # these are changed dynamically using dynamic_reconfig and affect
     # the image processing algorithm. A lot of these are not used in the
@@ -90,18 +93,21 @@ class line_detection:
         # self.line_image_pub = rospy.Publisher('line_image',
         #                                       sensor_msgs.msg.Image)
 
-        # subscriber for ROS image topic
-        # self.image_sub = rospy.Subscriber("/camera/image_raw/compressed",
-        #                                   CompressedImage, self.image_callback,
-        #                                   queue_size=1)
-
         # this returns the path to the current package
         rospack = rospkg.RosPack()
         self.package_path = rospack.get_path('line_detection')
 
-        # use this for uncompressed raw format
-        self.image_sub = rospy.Subscriber("/camera/image_raw", Image,
+        if self.use_compressed_format:
+        # subscriber for ROS image topic
+            self.image_sub = rospy.Subscriber("/camera/image_raw/compressed",
+                                              CompressedImage, self.image_callback,
+                                              queue_size=1)
+        else:
+            # use this for uncompressed raw format
+            self.image_sub = rospy.Subscriber("/camera/image_raw", Image,
                                            self.image_callback, queue_size=1)
+
+
         self.bridge = CvBridge()
 
         
@@ -183,25 +189,28 @@ class line_detection:
         # use this to record start time for each frame
         #start_time = time.time()
         
-        if(image.encoding != 'mono8'):
+
+        if(self.use_mono and image.encoding != 'mono8'):
             print "image is not mono8! Aborting!"
             return
         
-        #### direct conversion from ROS CompressedImage to CV2 ####
-        # np_arr = np.fromstring(image.data, np.uint8)
-        # img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
-        # img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_GRAYSCALE)
-
-        #### direct conversion from ROS Image to CV2 ####
-
-        # first, we need to convert image from sensor_msgs/Image to numpy (or
-        # cv2). For this, we use cv_bridge
-        try:
-            # img = self.bridge.imgmsg_to_cv2(image, "bgr8")
-            img = self.bridge.imgmsg_to_cv2(image,
-                                            desired_encoding="passthrough")
-        except CvBridgeError, e:
-            print e
+        if self.use_compressed_format:
+            #### direct conversion from ROS CompressedImage to CV2 ####
+            np_arr = np.fromstring(image.data, np.uint8)
+            if self.use_mono:
+                img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_GRAYSCALE)
+            else:
+                img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
+        else:
+            #### direct conversion from ROS Image to CV2 ####
+            # first, we need to convert image from sensor_msgs/Image to numpy (or
+            # cv2). For this, we use cv_bridge
+            try:
+                # img = self.bridge.imgmsg_to_cv2(image, "bgr8")
+                img = self.bridge.imgmsg_to_cv2(image,
+                                                desired_encoding="passthrough")
+            except CvBridgeError, e:
+                print e
 
         if img is None:
             print "error! img is empty!"
@@ -211,31 +220,19 @@ class line_detection:
         self.image_width = img.shape[1]
         roi = img[
             self.roi_top_left_y:self.roi_top_left_y + self.roi_height,
-            self.roi_top_left_x:self.roi_top_left_x + self.roi_width
+            self.roi_top_left_x:self.roi_top_left_x + self.roi_width,
+            :
         ]
 
         # use entire image as roi (don't cut any parts out)
         # roi = img
 
-        # first remove grass (backprojection)
-        # then blur out smaller dots (low-pass filter using median blur)
-        # finally, apply a Gabor filter to find edge
-
-        # run backprojection to remove grass
-        # backprojection_image =\
-        #     self.get_backprojection_mask(roi, self.training_file_name)
-
-        # threshold the backprojection to only grab the more probable ones
-        # ret, thresh = cv2.threshold(backprojection_image,
-        #                             self.backprojection_threshold,
-        #                             0,
-        #                             cv2.THRESH_TOZERO)
-        # final_image = thresh
+        if not self.use_mono:
+            # run backprojection to remove grass
+            roi = self.get_backprojection_mask(roi, self.training_file_name)
 
         # no need to convert to grayscale because
         # cv2.threshold already does that
-
-        # gray_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         # # threshold the backprojection to only grab the more probable ones
         ret, thresh = cv2.threshold(roi,
                                     self.backprojection_threshold,
