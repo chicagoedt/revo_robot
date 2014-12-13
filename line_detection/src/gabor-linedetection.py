@@ -109,12 +109,13 @@ class line_detection:
             self.image_sub = rospy.Subscriber(self.subscriber_image_topic +
                                              "/compressed",
                                               CompressedImage, self.image_callback,
-                                              queue_size=1)
+                                              queue_size=1, buff_size=2**24)
         else:
             # use this for uncompressed raw format
             self.image_sub = rospy.Subscriber(self.subscriber_image_topic,
                                            Image,
-                                           self.image_callback, queue_size=1)
+                                           self.image_callback, queue_size=1,
+                                           buff_size=2**24)
 
 
         self.bridge = CvBridge()
