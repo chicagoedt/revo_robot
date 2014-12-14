@@ -7,6 +7,7 @@
     <param name="subscriber_image_topic" type="str" value="/camera/image_raw" />
     <param name="publisher_image_topic" type="str" value="/line_image" />
     <param name="training_file_name" type="str" value="training_for_backprojection_1.png" />
+    <param name="buffer_size" type="int" value="52428800" />
 
   </node>
 

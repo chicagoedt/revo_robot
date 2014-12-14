@@ -33,7 +33,7 @@ class line_detection:
     use_compressed_format = rospy.get_param("/gabor_linedetection/use_compressed_format")
     subscriber_image_topic = rospy.get_param("/gabor_linedetection/subscriber_image_topic")
     publisher_image_topic = rospy.get_param("/gabor_linedetection/publisher_image_topic")
-
+    buffer_size = rospy.get_param("/gabor_linedetection/buffer_size")
     # this is where we define our variables in the class.
     # these are changed dynamically using dynamic_reconfig and affect
     # the image processing algorithm. A lot of these are not used in the
@@ -109,13 +109,13 @@ class line_detection:
             self.image_sub = rospy.Subscriber(self.subscriber_image_topic +
                                              "/compressed",
                                               CompressedImage, self.image_callback,
-                                              queue_size=1, buff_size=2**24)
+                                              queue_size=1, buff_size=self.buffer_size)
         else:
             # use this for uncompressed raw format
             self.image_sub = rospy.Subscriber(self.subscriber_image_topic,
                                            Image,
                                            self.image_callback, queue_size=1,
-                                           buff_size=2**24)
+                                           buff_size=self.buffer_size)
 
 
         self.bridge = CvBridge()
