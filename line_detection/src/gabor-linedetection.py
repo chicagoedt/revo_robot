@@ -228,11 +228,17 @@ class line_detection:
 
         self.image_height = img.shape[0]
         self.image_width = img.shape[1]
+
         roi = img[
             self.roi_top_left_y:self.roi_top_left_y + self.roi_height,
             self.roi_top_left_x:self.roi_top_left_x + self.roi_width,
             :
         ]
+
+        # in case roi settings aren't correct, just use the entire image
+        if roi.size <= 0:
+            rospy.logerr("Incorrect roi settings! Will use the entire image instead!")
+            roi = img
 
         # use entire image as roi (don't cut any parts out)
         # roi = img
