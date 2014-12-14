@@ -356,16 +356,17 @@ class line_detection:
             self.hough_max_line_gap = 1
 
         # now check if ROI parameters are out of bounds
+        # only do this if image dimensions have been set
+        if self.image_width > 0 and self.image_height > 0:
+            if self.roi_width > self.image_width - self.roi_top_left_x:
+                self.roi_width = self.image_width - self.roi_top_left_x
+            if self.roi_top_left_x < 0:
+                self.roi_top_left_x = 0
 
-        if self.roi_width > self.image_width - self.roi_top_left_x:
-            self.roiwidth = self.image_width - self.roi_top_left_x
-        if self.roi_top_left_x < 0:
-            self.roi_top_left_x = 0
-
-        if self.roi_height > self.image_height - self.roi_top_left_y:
-            self.roi_height = self.image_height - self.roi_top_left_y
-        if self.roi_top_left_y < 0:
-            self.roi_top_left_y = 0
+            if self.roi_height > self.image_height - self.roi_top_left_y:
+                self.roi_height = self.image_height - self.roi_top_left_y
+            if self.roi_top_left_y < 0:
+                self.roi_top_left_y = 0
 
 
 def main(args):
