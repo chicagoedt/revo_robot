@@ -28,9 +28,7 @@ from cv_bridge import CvBridge, CvBridgeError
 
 class line_detection:
 
-    # TODO test for different values of mono and compressed that might crash 
     use_mono = rospy.get_param(rospy.get_namespace() + "gabor_linedetection/use_mono")
-    # print rospy.resolve_name('~use_mono')
     use_compressed_format = rospy.get_param(rospy.get_namespace() + "gabor_linedetection/use_compressed_format")
     subscriber_image_topic = rospy.get_param(rospy.get_namespace() + "gabor_linedetection/subscriber_image_topic")
     publisher_image_topic = rospy.get_param(rospy.get_namespace() + "gabor_linedetection/publisher_image_topic")
@@ -202,7 +200,7 @@ class line_detection:
         
 
         if(self.use_mono and image.encoding != 'mono8'):
-            print "image is not mono8! Aborting!"
+            rospy.logerr("image is not mono8! Aborting!")
             return
         
         if self.use_compressed_format:
@@ -221,10 +219,10 @@ class line_detection:
                 img = self.bridge.imgmsg_to_cv2(image,
                                                 desired_encoding="passthrough")
             except CvBridgeError, e:
-                print e
+                rospy.logerr(e)
 
         if img is None:
-            print "error! img is empty!"
+            rospy.logerr("error! img is empty!")
             return
 
         self.image_height = img.shape[0]
