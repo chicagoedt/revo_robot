@@ -304,7 +304,7 @@ class line_detection:
         self.gabor_ksize = config['gabor_ksize']
         self.gabor_sigma = config['gabor_sigma']
         self.gabor_theta = config['gabor_theta']
-        self.gabor_lambd = config['gabor_lambd']
+        self.gabor_lambda = config['gabor_lambda']
         self.gabor_gamma = config['gabor_gamma']
 
         self.hough_rho = config['hough_rho']
