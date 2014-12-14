@@ -29,11 +29,12 @@ from cv_bridge import CvBridge, CvBridgeError
 class line_detection:
 
     # TODO test for different values of mono and compressed that might crash 
-    use_mono = rospy.get_param("/gabor_linedetection/use_mono")
-    use_compressed_format = rospy.get_param("/gabor_linedetection/use_compressed_format")
-    subscriber_image_topic = rospy.get_param("/gabor_linedetection/subscriber_image_topic")
-    publisher_image_topic = rospy.get_param("/gabor_linedetection/publisher_image_topic")
-    buffer_size = rospy.get_param("/gabor_linedetection/buffer_size")
+    use_mono = rospy.get_param(rospy.get_namespace() + "gabor_linedetection/use_mono")
+    # print rospy.resolve_name('~use_mono')
+    use_compressed_format = rospy.get_param(rospy.get_namespace() + "gabor_linedetection/use_compressed_format")
+    subscriber_image_topic = rospy.get_param(rospy.get_namespace() + "gabor_linedetection/subscriber_image_topic")
+    publisher_image_topic = rospy.get_param(rospy.get_namespace() + "gabor_linedetection/publisher_image_topic")
+    buffer_size = rospy.get_param(rospy.get_namespace() + "gabor_linedetection/buffer_size")
     # this is where we define our variables in the class.
     # these are changed dynamically using dynamic_reconfig and affect
     # the image processing algorithm. A lot of these are not used in the
@@ -66,7 +67,7 @@ class line_detection:
     hough_max_line_gap = 10
 
     # training_file_name = 'training_for_backprojection_1.png'
-    training_file_name = rospy.get_param("/gabor_linedetection/training_file_name")
+    training_file_name = rospy.get_param(rospy.get_namespace() + "gabor_linedetection/training_file_name")
 
     package_path = ''
 
@@ -380,7 +381,8 @@ def main(args):
     ld = line_detection()
 
     # start the line_detector node and start listening
-    rospy.init_node('generic_linedetection')
+    rospy.init_node("line_detection", anonymous=True)
+
     # starts dynamic_reconfigure server
     srv = Server(LineDetectionConfig, ld.reconfigure_callback)
     rospy.spin()
