@@ -3,10 +3,7 @@
 
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="use_sim_time" value="true"/>
-    <arg name="world_name" value="$(find scipio_simulation)/worlds/igvc_final.world"/>
   </include>
-
-  <include file="$(find scipio_2dnav)/move_base.launch"/>
 
   <node name="robot_tf_publisher" pkg="robot_setup_tf" type="robot_tf_publisher"/>
 
@@ -19,7 +16,11 @@
     output="screen">
   </node>
 
-  <!-- New configuration which uses only imu and wheel odom, no gps until Tom fixes bug -->
+<!-- Commenting out temporarily to try to config
+  <include file="$(find gazebo_config)/gazeboekf.launch"/>
+-->
+
   <include file="$(find gazebo_config)/gazeboekf-new.launch"/>
+
 </launch>
 

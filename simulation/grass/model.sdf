@@ -33,12 +33,13 @@
     </link>
 
     <link name="lines_link">
-      <pose>0 0 0.08 0 0 0</pose>
+      <pose>0 0 0.075 0 0 0</pose>
       <must_be_base_link>1</must_be_base_link>
+<!--
       <collision name="lines_collision">
         <geometry>
 	  <box>
-            <size>38 38 0.002</size>
+            <size>38 38 0.0001</size>
           </box>
         </geometry>
         <surface>
@@ -50,11 +51,12 @@
           </friction>
         </surface>
       </collision>
+    -->
       <visual name="lines_visual">
         <cast_shadows>false</cast_shadows>
         <geometry>
           <box>
-            <size>38 38 0.002</size>
+            <size>38 38 0.0001</size>
           </box>
         </geometry>
         <material>
