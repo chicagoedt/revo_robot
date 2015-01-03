@@ -91,7 +91,9 @@ class line_detection:
 
         # publisher for image of line pixels (only for debugging, not used in
         # map)
-        self.line_image_pub = rospy.Publisher(self.publisher_image_topic +
+        self.line_image_pub = rospy.Publisher(rospy.get_namespace() +
+                                              "/gabor_linedetection/" +
+                                              self.publisher_image_topic +
                                               '/compressed',
                                               sensor_msgs.msg.CompressedImage,
                                               queue_size=1)
