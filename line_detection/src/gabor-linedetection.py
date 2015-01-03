@@ -28,6 +28,11 @@ from cv_bridge import CvBridge, CvBridgeError
 
 class line_detection:
 
+    use_mono = rospy.get_param(rospy.get_namespace() + "gabor_linedetection/use_mono")
+    use_compressed_format = rospy.get_param(rospy.get_namespace() + "gabor_linedetection/use_compressed_format")
+    subscriber_image_topic = rospy.get_param(rospy.get_namespace() + "gabor_linedetection/subscriber_image_topic")
+    publisher_image_topic = rospy.get_param(rospy.get_namespace() + "gabor_linedetection/publisher_image_topic")
+    buffer_size = rospy.get_param(rospy.get_namespace() + "gabor_linedetection/buffer_size")
     # this is where we define our variables in the class.
     # these are changed dynamically using dynamic_reconfig and affect
     # the image processing algorithm. A lot of these are not used in the
@@ -59,7 +64,9 @@ class line_detection:
     hough_min_line_length = 50
     hough_max_line_gap = 10
 
-    training_file_name = 'training_for_backprojection_1.png'
+    # training_file_name = 'training_for_backprojection_1.png'
+    training_file_name = rospy.get_param(rospy.get_namespace() + "gabor_linedetection/training_file_name")
+
     package_path = ''
 
     image_height = 0
@@ -84,24 +91,34 @@ class line_detection:
 
         # publisher for image of line pixels (only for debugging, not used in
         # map)
-        self.line_image_pub = rospy.Publisher('line_image/compressed',
-                                              sensor_msgs.msg.CompressedImage)
+        self.line_image_pub = rospy.Publisher(rospy.get_namespace() +
+                                              "/gabor_linedetection/" +
+                                              self.publisher_image_topic +
+                                              '/compressed',
+                                              sensor_msgs.msg.CompressedImage,
+                                              queue_size=1)
 
         # self.line_image_pub = rospy.Publisher('line_image',
         #                                       sensor_msgs.msg.Image)
-
-        # subscriber for ROS image topic
-        # self.image_sub = rospy.Subscriber("/camera/image_raw/compressed",
-        #                                   CompressedImage, self.image_callback,
-        #                                   queue_size=1)
 
         # this returns the path to the current package
         rospack = rospkg.RosPack()
         self.package_path = rospack.get_path('line_detection')
 
-        # use this for uncompressed raw format
-        self.image_sub = rospy.Subscriber("/camera/image_raw", Image,
-                                           self.image_callback, queue_size=1)
+        if self.use_compressed_format:
+        # subscriber for ROS image topic
+            self.image_sub = rospy.Subscriber(self.subscriber_image_topic +
+                                             "/compressed",
+                                              CompressedImage, self.image_callback,
+                                              queue_size=1, buff_size=self.buffer_size)
+        else:
+            # use this for uncompressed raw format
+            self.image_sub = rospy.Subscriber(self.subscriber_image_topic,
+                                           Image,
+                                           self.image_callback, queue_size=1,
+                                           buff_size=self.buffer_size)
+
+
         self.bridge = CvBridge()
 
         
@@ -183,59 +200,63 @@ class line_detection:
         # use this to record start time for each frame
         #start_time = time.time()
         
-        if(image.encoding != 'mono8'):
-            print "image is not mono8! Aborting!"
+
+        if(self.use_mono and image.encoding != 'mono8'):
+            rospy.logerr("image is not mono8! Aborting!")
             return
         
-        #### direct conversion from ROS CompressedImage to CV2 ####
-        # np_arr = np.fromstring(image.data, np.uint8)
-        # img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
-        # img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_GRAYSCALE)
-
-        #### direct conversion from ROS Image to CV2 ####
-
-        # first, we need to convert image from sensor_msgs/Image to numpy (or
-        # cv2). For this, we use cv_bridge
-        try:
-            # img = self.bridge.imgmsg_to_cv2(image, "bgr8")
-            img = self.bridge.imgmsg_to_cv2(image,
-                                            desired_encoding="passthrough")
-        except CvBridgeError, e:
-            print e
+        if self.use_compressed_format:
+            #### direct conversion from ROS CompressedImage to CV2 ####
+            np_arr = np.fromstring(image.data, np.uint8)
+            if self.use_mono:
+                img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_GRAYSCALE)
+            else:
+                img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
+        else:
+            #### direct conversion from ROS Image to CV2 ####
+            # first, we need to convert image from sensor_msgs/Image to numpy (or
+            # cv2). For this, we use cv_bridge
+            try:
+                # img = self.bridge.imgmsg_to_cv2(image, "bgr8")
+                img = self.bridge.imgmsg_to_cv2(image,
+                                                desired_encoding="passthrough")
+            except CvBridgeError, e:
+                rospy.logerr(e)
 
         if img is None:
-            print "error! img is empty!"
+            rospy.logerr("error! img is empty!")
             return
 
         self.image_height = img.shape[0]
         self.image_width = img.shape[1]
-        roi = img[
+
+        # if mono, don't take 3rd dimension since there's only one channel
+        if self.use_mono:
+            roi = img[
             self.roi_top_left_y:self.roi_top_left_y + self.roi_height,
-            self.roi_top_left_x:self.roi_top_left_x + self.roi_width
-        ]
+            self.roi_top_left_x:self.roi_top_left_x + self.roi_width,
+            ]
+        else:
+            roi = img[
+                self.roi_top_left_y:self.roi_top_left_y + self.roi_height,
+                self.roi_top_left_x:self.roi_top_left_x + self.roi_width,
+                :
+            ]
+
+        # in case roi settings aren't correct, just use the entire image
+        if roi.size <= 0:
+            rospy.logerr("Incorrect roi settings! Will use the entire image instead!")
+            roi = img
 
         # use entire image as roi (don't cut any parts out)
         # roi = img
 
-        # first remove grass (backprojection)
-        # then blur out smaller dots (low-pass filter using median blur)
-        # finally, apply a Gabor filter to find edge
-
-        # run backprojection to remove grass
-        # backprojection_image =\
-        #     self.get_backprojection_mask(roi, self.training_file_name)
-
-        # threshold the backprojection to only grab the more probable ones
-        # ret, thresh = cv2.threshold(backprojection_image,
-        #                             self.backprojection_threshold,
-        #                             0,
-        #                             cv2.THRESH_TOZERO)
-        # final_image = thresh
+        if not self.use_mono:
+            # run backprojection to remove grass
+            roi = self.get_backprojection_mask(roi, self.training_file_name)
 
         # no need to convert to grayscale because
         # cv2.threshold already does that
-
-        # gray_roi = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         # # threshold the backprojection to only grab the more probable ones
         ret, thresh = cv2.threshold(roi,
                                     self.backprojection_threshold,
@@ -292,13 +313,12 @@ class line_detection:
         self.value_low = config['value_low']
         self.value_high = config['value_high']
         self.backprojection_threshold = config['backprojection_threshold']
-        self.training_file_name = config['training_file_name']
 
         # gabor filter parameters
         self.gabor_ksize = config['gabor_ksize']
         self.gabor_sigma = config['gabor_sigma']
         self.gabor_theta = config['gabor_theta']
-        self.gabor_lambd = config['gabor_lambd']
+        self.gabor_lambda = config['gabor_lambda']
         self.gabor_gamma = config['gabor_gamma']
 
         self.hough_rho = config['hough_rho']
@@ -350,16 +370,17 @@ class line_detection:
             self.hough_max_line_gap = 1
 
         # now check if ROI parameters are out of bounds
+        # only do this if image dimensions have been set
+        if self.image_width > 0 and self.image_height > 0:
+            if self.roi_width > self.image_width - self.roi_top_left_x:
+                self.roi_width = self.image_width - self.roi_top_left_x
+            if self.roi_top_left_x < 0:
+                self.roi_top_left_x = 0
 
-        if self.roi_width > self.image_width - self.roi_top_left_x:
-            self.roiwidth = self.image_width - self.roi_top_left_x
-        if self.roi_top_left_x < 0:
-            self.roi_top_left_x = 0
-
-        if self.roi_height > self.image_height - self.roi_top_left_y:
-            self.roi_height = self.image_height - self.roi_top_left_y
-        if self.roi_top_left_y < 0:
-            self.roi_top_left_y = 0
+            if self.roi_height > self.image_height - self.roi_top_left_y:
+                self.roi_height = self.image_height - self.roi_top_left_y
+            if self.roi_top_left_y < 0:
+                self.roi_top_left_y = 0
 
 
 def main(args):
@@ -367,7 +388,8 @@ def main(args):
     ld = line_detection()
 
     # start the line_detector node and start listening
-    rospy.init_node('generic_linedetection')
+    rospy.init_node("line_detection", anonymous=True)
+
     # starts dynamic_reconfigure server
     srv = Server(LineDetectionConfig, ld.reconfigure_callback)
     rospy.spin()
