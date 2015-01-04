@@ -28,7 +28,7 @@ from cv_bridge import CvBridge, CvBridgeError
 
 class line_detection:
 
-    node_name = "backproject_brightestpixel_lanedetection"
+    node_name = "backproject_lanedetection"
 
     use_mono = rospy.get_param(rospy.get_namespace() + node_name + "/use_mono")
     use_compressed_format = rospy.get_param(rospy.get_namespace() + node_name + "/use_compressed_format")
@@ -203,7 +203,7 @@ class line_detection:
         #start_time = time.time()
         
 
-        if(self.use_mono and image.encoding != 'mono8'):
+        if(self.use_mono and not self.use_compressed_format and image.encoding != 'mono8'):
             rospy.logerr("image is not mono8! Aborting!")
             return
         
