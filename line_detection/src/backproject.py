@@ -29,6 +29,9 @@ from cv_bridge import CvBridge, CvBridgeError
 class line_detection:
 
     node_name = "backproject_lanedetection"
+    namespace = rospy.get_namespace()
+    if namespace == "/":
+        namespace = ""
 
     use_mono = rospy.get_param(rospy.get_namespace() + node_name + "/use_mono")
     use_compressed_format = rospy.get_param(rospy.get_namespace() + node_name + "/use_compressed_format")
@@ -93,8 +96,8 @@ class line_detection:
 
         # publisher for image of line pixels (only for debugging, not used in
         # map)
-        self.line_image_pub = rospy.Publisher(rospy.get_namespace() +
-                                              "/" + self.node_name + "/" +
+        self.line_image_pub = rospy.Publisher( self.namespace +
+                                              "/" + self.node_name +
                                               self.publisher_image_topic +
                                               '/compressed',
                                               sensor_msgs.msg.CompressedImage,
