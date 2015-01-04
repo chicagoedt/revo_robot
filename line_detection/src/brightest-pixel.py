@@ -190,37 +190,19 @@ class line_detection:
         # use entire image as roi (don't cut any parts out)
         # roi = img
 
+        # get indices of max pixels along each row
         brightest_pixel_indices = np.argmax(roi, axis=1)
+        # get the values of max pixels along each row
         brightest_pixel_values = np.amax(roi, axis=1)
 
         # make an empty image
         brightest_pixels = np.zeros(roi.shape)
 
         count = 0
-
+        # now fill the image only with the brightest_pixels
         for index in brightest_pixel_indices:
             brightest_pixels[count, index] = brightest_pixel_values[count]
             count+=1
-
-        # now fill the image only with the brightest_pixels
-        # print "indices: "
-        # print brightest_pixel_indices
-        # print "values: "
-        # print brightest_pixel_values
-        # brightest_pixels[brightest_pixel_indices] = brightest_pixel_values
-
-
-
-        # print roi.shape
-        # print roi[:,0].size
-        # print roi[0,:].size
-
-        # gray_roi = cv2.medianBlur(gray_roi, self.blur_size)
-        # final_image = thresh
-        # gray_roi = cv2.medianBlur(thresh, self.blur_size)
-        # gray_roi = cv2.GaussianBlur(thresh, (self.blur_size, self.blur_size), 0)
-
-
 
         final_image = brightest_pixels
         
