@@ -123,9 +123,9 @@ int main(int argc, char** argv)
 	ros::NodeHandle nh;
 	image_transport::ImageTransport it(nh);
 	// publisher
-	pub = it.advertise("/lswms/line_image", 1);
+	pub = it.advertise("/lswms_lanedetection/line_image", 1);
     // subscriber
-    sub = it.subscribe("/brightestpixel_lanedetection/line_image", 1, imageCallback);
+    sub = it.subscribe("/lswms_lanedetection/subscriber", 1, imageCallback);
 
 	ros::spin();
 
