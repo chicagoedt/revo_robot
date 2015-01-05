@@ -280,8 +280,8 @@ class line_detection:
                                 # 1,np.pi/180,100,100,10)
                                 self.hough_rho,
                                 self.hough_theta, self.hough_threshold,
-                                self.hough_min_line_length,
-                                self.hough_max_line_gap)
+                                minLineLength = self.hough_min_line_length,
+                                maxLineGap = self.hough_max_line_gap)
         if lines is not None:
             for x1, y1, x2, y2 in lines[0]:
                 cv2.line(gabor_image, (x1, y1), (x2, y2), 255, 10)
