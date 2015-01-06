@@ -40,8 +40,8 @@ class line_detection:
 
     package_path = ''
     
-    roi_top_left_x = 0
-    roi_top_left_y = 0
+    roi_top_left_x = 16
+    roi_top_left_y = 143
     roi_width = 2000
     roi_height = 2000
 
@@ -60,6 +60,14 @@ class line_detection:
 
         #set hsv histogram plot ROS image publisher
         self.current_histogram_plot_pub = rospy.Publisher('/histogram_calculator/current_histogram_plot/compressed',
+                                              sensor_msgs.msg.CompressedImage,
+                                              queue_size=1)
+        # set cumulative average histogram ROS image publisher
+        self.cumulative_average_histogram_plot_pub = rospy.Publisher('/histogram_calculator/cumulative_average_histogram_plot/compressed',
+                                              sensor_msgs.msg.CompressedImage,
+                                              queue_size=1)
+        # set ROS image publisher that publishes whatever it subscribes to + ROI changes
+        self.input_image_pub = rospy.Publisher('/histogram_calculator/input_image/compressed',
                                               sensor_msgs.msg.CompressedImage,
                                               queue_size=1)
 
@@ -140,21 +148,24 @@ class line_detection:
         cv2.normalize(s, s, 0, 255, cv2.NORM_MINMAX)
         cv2.normalize(v, v, 0, 255, cv2.NORM_MINMAX)
 
+        # hue range is 0-179, so we resize it to 255 and fill with zeros
+        # just so it's the same size as other channels (easier to deal with)
+        h.resize((256,1))
+
         # prepare to plot current histogram
-        h_bins = np.arange(180).reshape(180,1)
-        sv_bins = np.arange(256).reshape(256,1)
+        bins = np.arange(256).reshape(256,1)
         current_histogram_plot = np.zeros((300,256,3))
 
         # plot hue
-        pts = np.int32(np.column_stack((h_bins,np.around(h))))  # prepare to plot
+        pts = np.int32(np.column_stack((bins,np.around(h))))  # prepare to plot
         cv2.polylines(current_histogram_plot,[pts],False,(0,0,255))  # plot hue points in red (bgr)
 
         # plot saturation
-        pts = np.int32(np.column_stack((sv_bins,np.around(s))))  # prepare to plot
+        pts = np.int32(np.column_stack((bins,np.around(s))))  # prepare to plot
         cv2.polylines(current_histogram_plot,[pts],False,(0,255,0))  # plot saturation points in green
 
         # plot value
-        pts = np.int32(np.column_stack((sv_bins,np.around(v))))  # prepare to plot
+        pts = np.int32(np.column_stack((bins,np.around(v))))  # prepare to plot
         cv2.polylines(current_histogram_plot,[pts],False,(255,0,0))  # plot saturation points in blue
 
         current_histogram_plot = np.flipud(current_histogram_plot)  # flip upside down
@@ -180,6 +191,52 @@ class line_detection:
             # new avg = (new value + (old avg. * timesteps)) / timesteps + 1
         # where timesteps is the number of frames processed so far and new avg. is the hsv histogram values
         # check wikipedia: https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
+        
+        # merge three channels together, this represents current histogram (new value)
+        hsv = np.column_stack((h, s, v))
+
+        # perform cumulative moving average on the histogram
+        self.cumulative_average_histogram = (hsv + (self.cumulative_average_histogram * self.frames_processed)) / (self.frames_processed+1)
+
+        ## now plot the moving average into a ROS image message and publish it
+        # prepare to plot moving average histogram
+        bins = np.arange(256).reshape(256,1)
+        cumulative_average_histogram_plot = np.zeros((300,256,3))
+
+        # plot hue
+        pts = np.int32(np.column_stack((bins,np.around(self.cumulative_average_histogram[:,0]))))  # prepare to plot
+        cv2.polylines(cumulative_average_histogram_plot,[pts],False,(0,0,255))  # plot hue points in red (bgr)
+
+        # plot saturation
+        pts = np.int32(np.column_stack((bins,np.around(self.cumulative_average_histogram[:,1]))))  # prepare to plot
+        cv2.polylines(cumulative_average_histogram_plot,[pts],False,(0,255,0))  # plot saturation points in green
+
+        # plot value
+        pts = np.int32(np.column_stack((bins,np.around(self.cumulative_average_histogram[:,2]))))  # prepare to plot
+        cv2.polylines(cumulative_average_histogram_plot,[pts],False,(255,0,0))  # plot saturation points in blue
+
+        cumulative_average_histogram_plot = np.flipud(cumulative_average_histogram_plot)  # flip upside down
+
+        #### Create CompressedImage to publish cumulative histogram (for debugging) ####
+        final_image_message = CompressedImage()
+        final_image_message.header.stamp = rospy.Time.now()
+        final_image_message.format = "jpeg"
+        final_image_message.data = np.array(cv2.imencode(
+                                            '.jpg',
+                                            cumulative_average_histogram_plot)[1]).tostring()
+        # publishes current histogram plot image
+        self.cumulative_average_histogram_plot_pub.publish(final_image_message)
+
+
+        #### Create CompressedImage to publish roi (for debugging) ####
+        final_image_message = CompressedImage()
+        final_image_message.header.stamp = rospy.Time.now()
+        final_image_message.format = "jpeg"
+        final_image_message.data = np.array(cv2.imencode(
+                                            '.jpg',
+                                            roi)[1]).tostring()
+        # publishes current histogram plot image
+        self.input_image_pub.publish(final_image_message)
 
         # increment number of frames since this frame is done
         self.frames_processed += 1
@@ -189,37 +246,10 @@ class line_detection:
     def reconfigure_callback(self, config, level):
 
         # TODO check if the keys exist in the config dictionary or else error
-
-        self.blur_size = config['blur_size']
-        self.hue_low = config['hue_low']
-        self.hue_high = config['hue_high']
-        self.saturation_low = config['saturation_low']
-        self.saturation_high = config['saturation_high']
-        self.value_low = config['value_low']
-        self.value_high = config['value_high']
-        self.backprojection_threshold = config['backprojection_threshold']
-
-        # gabor filter parameters
-        self.gabor_ksize = config['gabor_ksize']
-        self.gabor_sigma = config['gabor_sigma']
-        self.gabor_theta = config['gabor_theta']
-        self.gabor_lambda = config['gabor_lambda']
-        self.gabor_gamma = config['gabor_gamma']
-
-        self.hough_rho = config['hough_rho']
-        self.hough_theta = config['hough_theta']
-        self.hough_threshold = config['hough_threshold']
-        self.hough_min_line_length = config['hough_min_line_length']
-        self.hough_max_line_gap = config['hough_max_line_gap']
-        self.hough_thickness = config['hough_thickness']
-
         self.roi_top_left_x = config['roi_top_left_x']
         self.roi_top_left_y = config['roi_top_left_y']
         self.roi_width = config['roi_width']
         self.roi_height = config['roi_height']
-
-        self.dilate_size = config['dilate_size']
-        self.dilate_iterations = config['dilate_iterations']
 
         self.validate_parameters()
 
