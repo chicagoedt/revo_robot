@@ -16,13 +16,16 @@ from matplotlib import pyplot as plt
 
 ###############################################################################
 ## Chicago Engineering Design Team
-## Line Detection Example using Python OpenCV for autonomous robot Scipio
-##    (IGVC competition).
 ## @author Basheer Subei
 ## @email basheersubei@gmail.com
 #######################################################
 ##
-## Hough Transform node
+## Histogram Calculator node
+##
+## This ROS node reads image rosbags and calculates the moving average of the
+## HSV histograms, and writes it (every frame) to csv files.
+##
+## The histogram can then be used as input to the histogram backprojection node.
 ##
 ###############################################################################
 
@@ -90,6 +93,7 @@ class line_detection:
                                            self.image_callback, queue_size=1,
                                            buff_size=self.buffer_size)
         self.bridge = CvBridge()
+
     ## end __init__
 
     # this is what gets called when an image is recieved
@@ -134,8 +138,6 @@ class line_detection:
 
         # convert from BGR to HSV
         hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
-        # cv2.imshow("hsv", hsv)
-        # plt.hist(hsv.ravel(),256,[0,256], stacked=True); plt.show()
 
         # TODO check whether we need the third channel (V) or only H and S
         # calculate current (for this frame) histogram for 3 HSV channels
@@ -238,6 +240,24 @@ class line_detection:
         # publishes current histogram plot image
         self.input_image_pub.publish(final_image_message)
 
+        # now write the new cumulative histogram data to a file
+        # open files to write new data to
+        h_file = open(self.package_path + "/misc/training_images/h.txt", 'w')
+        s_file = open(self.package_path + "/misc/training_images/s.txt", 'w')
+        v_file = open(self.package_path + "/misc/training_images/v.txt", 'w')
+
+        # write h to "h.txt"
+        h_file.write(','.join(['%.5f' % val for val in self.cumulative_average_histogram[:,0] ]))
+        # write s to "s.txt"
+        s_file.write(','.join(['%.5f' % val for val in self.cumulative_average_histogram[:,1] ]))
+        # write v to "v.txt"
+        v_file.write(','.join(['%.5f' % val for val in self.cumulative_average_histogram[:,2] ]))
+
+        # done with writing, close files
+        h_file.close()
+        s_file.close()
+        v_file.close()
+    
         # increment number of frames since this frame is done
         self.frames_processed += 1
 
@@ -284,7 +304,7 @@ def main(args):
     # starts dynamic_reconfigure server
     srv = Server(LineDetectionConfig, ld.reconfigure_callback)
     rospy.spin()
-    cv2.destroyAllWindows()
+    # cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     main(sys.argv)
