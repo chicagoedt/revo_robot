@@ -241,23 +241,10 @@ class line_detection:
         self.input_image_pub.publish(final_image_message)
 
         # now write the new cumulative histogram data to a file
-        # open files to write new data to
-        h_file = open(self.package_path + "/misc/training_images/h.txt", 'w')
-        s_file = open(self.package_path + "/misc/training_images/s.txt", 'w')
-        v_file = open(self.package_path + "/misc/training_images/v.txt", 'w')
+        np.savetxt(self.package_path + "/misc/training_images/h.txt", self.cumulative_average_histogram[:,0])
+        np.savetxt(self.package_path + "/misc/training_images/s.txt", self.cumulative_average_histogram[:,1])
+        np.savetxt(self.package_path + "/misc/training_images/v.txt", self.cumulative_average_histogram[:,2])
 
-        # write h to "h.txt"
-        h_file.write(','.join(['%.5f' % val for val in self.cumulative_average_histogram[:,0] ]))
-        # write s to "s.txt"
-        s_file.write(','.join(['%.5f' % val for val in self.cumulative_average_histogram[:,1] ]))
-        # write v to "v.txt"
-        v_file.write(','.join(['%.5f' % val for val in self.cumulative_average_histogram[:,2] ]))
-
-        # done with writing, close files
-        h_file.close()
-        s_file.close()
-        v_file.close()
-    
         # increment number of frames since this frame is done
         self.frames_processed += 1
 
