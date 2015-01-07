@@ -33,7 +33,6 @@ class line_detection:
     if namespace == "/":
         namespace = ""
 
-    use_mono = rospy.get_param(rospy.get_namespace() + node_name + "/use_mono")
     use_compressed_format = rospy.get_param(rospy.get_namespace() + node_name + "/use_compressed_format")
     subscriber_image_topic = rospy.get_param(rospy.get_namespace() + node_name + "/subscriber_image_topic")
     publisher_image_topic = rospy.get_param(rospy.get_namespace() + node_name + "/publisher_image_topic")
@@ -202,21 +201,15 @@ class line_detection:
     # this is what gets called when an image is recieved
     def image_callback(self, image):
 
-        # use this to record start time for each frame
-        #start_time = time.time()
-        
-
-        if(self.use_mono and not self.use_compressed_format and image.encoding != 'mono8'):
-            rospy.logerr("image is not mono8! Aborting!")
+        # if we don't have a color image, return and throw error
+        if hasattr(image, 'encoding') and image.encoding == 'mono8':
+            rospy.logerr("error! image is not color!")
             return
-        
+
         if self.use_compressed_format:
             #### direct conversion from ROS CompressedImage to CV2 ####
             np_arr = np.fromstring(image.data, np.uint8)
-            if self.use_mono:
-                img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_GRAYSCALE)
-            else:
-                img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
+            img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
         else:
             #### direct conversion from ROS Image to CV2 ####
             # first, we need to convert image from sensor_msgs/Image to numpy (or
@@ -235,18 +228,11 @@ class line_detection:
         self.image_height = img.shape[0]
         self.image_width = img.shape[1]
 
-        # if mono, don't take 3rd dimension since there's only one channel
-        if self.use_mono:
-            roi = img[
+        roi = img[
             self.roi_top_left_y:self.roi_top_left_y + self.roi_height,
             self.roi_top_left_x:self.roi_top_left_x + self.roi_width,
-            ]
-        else:
-            roi = img[
-                self.roi_top_left_y:self.roi_top_left_y + self.roi_height,
-                self.roi_top_left_x:self.roi_top_left_x + self.roi_width,
-                :
-            ]
+            :
+        ]
 
         # in case roi settings aren't correct, just use the entire image
         if roi.size <= 0:
@@ -256,23 +242,16 @@ class line_detection:
         # use entire image as roi (don't cut any parts out)
         # roi = img
 
-        if not self.use_mono:
-            # run backprojection to remove grass
-            roi = self.get_backprojection_mask(roi, self.training_file_name)
+        # run backprojection to remove grass
+        mask = self.get_backprojection_mask(roi, self.training_file_name)
 
         # no need to convert to grayscale because
         # cv2.threshold already does that
         # # threshold the backprojection to only grab the more probable ones
-        ret, thresh = cv2.threshold(roi,
+        ret, thresh = cv2.threshold(mask,
                                     self.backprojection_threshold,
                                     0,
                                     cv2.THRESH_TOZERO)
-        # gray_roi = cv2.medianBlur(gray_roi, self.blur_size)
-        # final_image = thresh
-        # gray_roi = cv2.medianBlur(thresh, self.blur_size)
-        # gray_roi = cv2.GaussianBlur(thresh, (self.blur_size, self.blur_size), 0)
-
-
 
         final_image = thresh
         
