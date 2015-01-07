@@ -253,7 +253,10 @@ class line_detection:
                                     0,
                                     cv2.THRESH_TOZERO)
 
-        final_image = thresh
+        # stack the same threshold into the 3rd dimension just so thresh has
+        # the same size as the original colored roi
+        thresh = np.dstack((thresh, thresh, thresh))
+        final_image = cv2.bitwise_and(roi, thresh)  # only include pixels from thresh
         
         #### Create CompressedImage to publish ####
         final_image_message = CompressedImage()
