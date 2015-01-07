@@ -53,7 +53,7 @@ class line_detection:
     value_low = 0
     value_high = 255
 
-    backprojection_threshold = 50
+    backprojection_h_threshold = 50
 
     # gabor filter parameters
     gabor_ksize = 4
@@ -282,7 +282,7 @@ class line_detection:
         self.saturation_high = config['saturation_high']
         self.value_low = config['value_low']
         self.value_high = config['value_high']
-        self.backprojection_threshold = config['backprojection_threshold']
+        self.backprojection_h_threshold = config['backprojection_h_threshold']
 
         # gabor filter parameters
         self.gabor_ksize = config['gabor_ksize']

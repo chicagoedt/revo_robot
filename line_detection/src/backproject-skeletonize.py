@@ -65,7 +65,7 @@ saturation_high = 255
 value_low = 0
 value_high = 255
 
-backprojection_threshold = 50
+backprojection_h_threshold = 50
 
 training_file_name = 'training_for_backprojection_1.png'
 
@@ -407,7 +407,7 @@ class line_detection:
         dst = 255 - dst 
 
         # threshold the backprojection stuff to only grab the more probable ones
-        ret,thresh = cv2.threshold(dst,backprojection_threshold,0,cv2.THRESH_TOZERO)
+        ret,thresh = cv2.threshold(dst,backprojection_h_threshold,0,cv2.THRESH_TOZERO)
         
         # AND the remaining backprojection pixels with the original gray image (we will only use gray so far so
         # we don't need to use BGR or HSV. If we did, then we could've merged thresh into a 3-channel image then AND'ed 
@@ -612,7 +612,7 @@ def reconfigure_callback(config, level):
     global saturation_high
     global value_low
     global value_high
-    global backprojection_threshold
+    global backprojection_h_threshold
     global training_file_name
 
     # TODO check if the keys exist in the config dictionary or else error
@@ -633,7 +633,7 @@ def reconfigure_callback(config, level):
     saturation_high = config['saturation_high']
     value_low = config['value_low']
     value_high = config['value_high']
-    backprojection_threshold = config['backprojection_threshold']
+    backprojection_h_threshold = config['backprojection_h_threshold']
     training_file_name = config['training_file_name']
     return config
 

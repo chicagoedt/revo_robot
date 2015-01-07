@@ -63,7 +63,7 @@ class line_detection:
     value_low = 0
     value_high = 255
 
-    backprojection_threshold = 50
+    backprojection_h_threshold = 50
 
     training_file_name = 'training_for_backprojection_1.png'
     package_path = ''
@@ -194,7 +194,7 @@ class line_detection:
 
         # threshold the backprojection to only grab the more probable ones
         ret, thresh = cv2.threshold(backprojection_image,
-                                    self.backprojection_threshold,
+                                    self.backprojection_h_threshold,
                                     0,
                                     cv2.THRESH_TOZERO)
 
@@ -330,7 +330,7 @@ class line_detection:
         self.saturation_high = config['saturation_high']
         self.value_low = config['value_low']
         self.value_high = config['value_high']
-        self.backprojection_threshold = config['backprojection_threshold']
+        self.backprojection_h_threshold = config['backprojection_h_threshold']
         self.training_file_name = config['training_file_name']
 
         self.validate_parameters()

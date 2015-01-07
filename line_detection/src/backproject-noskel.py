@@ -72,7 +72,7 @@ class line_detection:
     value_low = 0
     value_high = 255
 
-    backprojection_threshold = 50
+    backprojection_h_threshold = 50
 
     training_file_name = 'training_for_backprojection_1.png'
 
@@ -412,7 +412,7 @@ class line_detection:
         dst = 255 - dst 
 
         # threshold the backprojection stuff to only grab the more probable ones
-        ret,thresh = cv2.threshold(dst,self.backprojection_threshold,0,cv2.THRESH_TOZERO)
+        ret,thresh = cv2.threshold(dst,self.backprojection_h_threshold,0,cv2.THRESH_TOZERO)
         
         # AND the remaining backprojection pixels with the original gray image (we will only use gray so far so
         # we don't need to use BGR or HSV. If we did, then we could've merged thresh into a 3-channel image then AND'ed 
@@ -619,7 +619,7 @@ class line_detection:
         self.saturation_high = config['saturation_high']
         self.value_low = config['value_low']
         self.value_high = config['value_high']
-        self.backprojection_threshold = config['backprojection_threshold']
+        self.backprojection_h_threshold = config['backprojection_h_threshold']
         self.training_file_name = config['training_file_name']
         return config
 
