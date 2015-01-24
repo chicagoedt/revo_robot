@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<launch>
+
+  <include file="$(find gazebo_ros)/launch/empty_world.launch">
+    <arg name="use_sim_time" value="true"/>
+    <arg name="world_name" value="$(find scipio_simulation)/worlds/igvc_final.world"/>
+  </include>
+
+  <include file="$(find scipio_2dnav)/move_base.launch"/>
+
+  <node name="robot_tf_publisher" pkg="robot_setup_tf" type="robot_tf_publisher"/>
+
+  <param name="robot_description" textfile="$(find scipio_simulation)/sdf/scipio_simulation.sdf" />
+  <node
+    name="spawn_model"
+    pkg="gazebo_ros"
+    type="spawn_model"
+    args="-sdf -param robot_description -model scipio_simulation"
+    output="screen">
+  </node>
+
+  <!-- New configuration which uses only imu and wheel odom, no gps until Tom fixes bug -->
+  <include file="$(find gazebo_config)/gazeboekf-new.launch"/>
+</launch>
+
