@@ -6,7 +6,9 @@
     <arg name="world_name" value="$(find scipio_simulation)/worlds/igvc_final.world"/>
   </include>
 
+<!--
   <node ns="stereo_camera" pkg="stereo_image_proc" name="stereo_image_proc" type="stereo_image_proc"/>
+-->
 
   <include file="$(find scipio_2dnav)/move_base.launch"/>
 

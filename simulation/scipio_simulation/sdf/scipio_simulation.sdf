@@ -265,7 +265,7 @@ This wont work yet because we also need a cylinder for the axel -->
         </limit>
       </axis>
     </joint>
-
+<!--
     <joint name="bumblebee_mount_joint" type="revolute">
       <parent>base_link</parent>
       <child>bumblebee_mount_link</child>
@@ -372,6 +372,103 @@ This wont work yet because we also need a cylinder for the axel -->
        <pose>0 0 0 0 0 0</pose>
       </sensor>
      </link>
+-->
+
+    <joint name="blackfly_mount_joint" type="revolute">
+      <parent>base_link</parent>
+      <child>blackfly_mount_link</child>
+      <pose>0 0 0 0 0 0</pose>
+      <axis>
+        <xyz>-1 0 0</xyz>
+        <limit>
+          <lower>0</lower>
+          <upper>0</upper>
+        </limit>
+      </axis>
+    </joint>
+
+    <link name='blackfly_mount_link'>
+      <pose>0.2 0 1.2 0 1.04719 0</pose>
+      <inertial>
+        <mass>1e-5</mass>
+        <inertia>
+          <ixx>1e-6</ixx>
+          <ixy>0</ixy>
+          <ixz>0</ixz>
+          <iyy>1e-6</iyy>
+          <iyz>0.0</iyz>
+          <izz>1e-6</izz>
+        </inertia>
+      </inertial>
+      <collision name='blackfly_mount_link_collision'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+	   <box>
+	     <size> 0.05 0.05 0.05 </size>
+	   </box>
+        </geometry>
+      </collision>
+      <visual name='blackfly_mount_link_visual'>
+        <pose>0 0 0 0 0 0</pose>
+        <geometry>
+           <box>
+             <size> 0.05 0.05 0.05 </size>
+           </box>
+        </geometry>
+        <material>
+          <script>
+            <uri>file://media/materials/scripts/gazebo.material</uri>
+            <name>Gazebo/Red</name>
+          </script>
+        </material>
+      </visual>
+      <gravity>1</gravity>
+      <velocity_decay>
+         <linear>0</linear>
+         <angular>0</angular>
+      </velocity_decay>
+      <self_collide>0</self_collide>
+
+    <sensor name='blackfly_camera' type='camera'>
+      <update_rate>20</update_rate>
+      <camera name="head">
+        <horizontal_fov>2.09</horizontal_fov>
+        <image>
+          <width>1280</width>
+          <height>960</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <!-- Noise is sampled independently per pixel on each frame.
+               That pixel's noise value is added to each of its color
+               channels, which at that point lie in the range [0,1]. -->
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+       <pose>0 0 0 0 0 0</pose>
+        <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>camera</cameraName>
+        <imageTopicName>image_raw</imageTopicName>
+        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+        <frameName>blackfly_mount_link</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+      </sensor>
+     </link>
+
 
       <link name='imu_link'>
          <inertial>
