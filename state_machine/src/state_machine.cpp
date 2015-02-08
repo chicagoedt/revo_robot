@@ -20,7 +20,7 @@ void StateMachineBase::run()
 
 	ROS_INFO("Established Connection with move_base ActionServer.");
 
-	_moveBaseGoal.target_pose.header.frame_id = "base_link";
+	_moveBaseGoal.target_pose.header.frame_id = "odom";
   	_moveBaseGoal.target_pose.header.stamp = ros::Time::now();
 
   	_moveBaseGoal.target_pose.pose.position.x = 1.0;
