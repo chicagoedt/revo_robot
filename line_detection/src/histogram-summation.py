@@ -219,7 +219,7 @@ class line_detection:
         self.input_image_pub.publish(final_image_message)
 
         # now write the new cumulative histogram data to a file
-        np.save(self.package_path + "/misc/training_images/histogram.txt", self.sum_histogram)
+        np.savetxt(self.package_path + "/misc/training_images/histogram.txt", self.sum_histogram)
 
         # increment number of frames since this frame is done
         self.frames_processed += 1

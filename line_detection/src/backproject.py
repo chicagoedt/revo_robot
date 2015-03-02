@@ -52,9 +52,7 @@ class line_detection:
     value_low = 0
     value_high = 255
 
-    backprojection_threshold = 200
     backprojection_kernel_size = 5
-
     package_path = ''
 
     image_height = 0
@@ -68,7 +66,7 @@ class line_detection:
     histogram_dimension = rospy.get_param(rospy.get_namespace() + node_name + "/histogram_dimension")
 
     # histogram = np.zeros((histogram_dimension,histogram_dimension,histogram_dimension))
-    histogram = np.zeros((180,256))
+    histogram = np.zeros((180,256), dtype=float)
 
     def __init__(self):
 
@@ -114,8 +112,9 @@ class line_detection:
 
         self.bridge = CvBridge()
 
-        self.histogram = np.load(self.package_path + "/misc/training_images/histogram.txt.npy")
-
+        # self.histogram = np.load(self.package_path + "/misc/training_images/histogram.txt.npy")
+        self.histogram = np.loadtxt(self.package_path + "/misc/training_images/histogram.txt")
+        cv2.normalize(self.histogram, self.histogram, 0, 255, cv2.NORM_MINMAX)
     # returns mask based on backprojection
     def get_backprojection_mask(self, image):
 
@@ -135,16 +134,7 @@ class line_detection:
                                   [self.hue_low, self.hue_high, self.saturation_low, self.saturation_high],
                                   1)
 
-        print backproject[50,50:100]
-        # TODO check if thresh is broken
-        ret, thresh = cv2.threshold(backproject,
-                            self.backprojection_threshold,
-                            0,
-                            cv2.THRESH_TOZERO)
-
-        dst = thresh
-
-        # dst = backproject
+        dst = backproject
         # Now convolute with circular disc
         disc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (self.backprojection_kernel_size, self.backprojection_kernel_size))
         cv2.filter2D(dst, -1, disc, dst)  # do we need this convolution???
@@ -223,7 +213,7 @@ class line_detection:
         self.saturation_high = config['saturation_high']
         self.value_low = config['value_low']
         self.value_high = config['value_high']
-        self.backprojection_threshold = config['backprojection_threshold']
+
         self.backprojection_kernel_size = config['backprojection_kernel_size']
         
         self.roi_top_left_x = config['roi_top_left_x']

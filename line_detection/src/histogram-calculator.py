@@ -24,8 +24,8 @@ from mpl_toolkits.mplot3d import Axes3D
 ##
 ## Histogram Calculator node
 ##
-## This ROS node reads image rosbags and calculates the moving average of the
-## HSV histograms, and writes it (every frame) to csv files.
+## This ROS node reads image rosbags and sums up the
+## HSV histograms, and writes it (every frame) to a text file.
 ##
 ## The histogram can then be used as input to the histogram backprojection node.
 ##
@@ -56,14 +56,10 @@ class line_detection:
 
     histogram_dimension = rospy.get_param(rospy.get_namespace() + node_name + "/histogram_dimension")
     
-    # initializes 3d histogram
-    # cumulative_average_histogram = np.zeros((histogram_dimension,histogram_dimension,histogram_dimension))
-    # cumulative_average_histogram = np.zeros((histogram_dimension,histogram_dimension), dtype=float)
-    cumulative_average_histogram = np.zeros((180,256), dtype=float)
-
-    # the V channel value at which to view the 2d projection of the 3d histogram.
-    # This value must be within the bounds of the 3d histogram array (less than histogram_dimension)
-    histogram_view_value = 25
+    # initializes 2d histogram
+    # cumulative_histogram = np.zeros((histogram_dimension,histogram_dimension,histogram_dimension))
+    # cumulative_histogram = np.zeros((histogram_dimension,histogram_dimension))
+    cumulative_histogram = np.zeros((180,256), dtype=float)
 
     # holds total number of frames we processed already
     frames_processed = 0
@@ -76,8 +72,8 @@ class line_detection:
         self.current_histogram_plot_pub = rospy.Publisher('/histogram_calculator/current_histogram_plot/compressed',
                                               sensor_msgs.msg.CompressedImage,
                                               queue_size=1)
-        # set cumulative average histogram ROS image publisher
-        self.cumulative_average_histogram_plot_pub = rospy.Publisher('/histogram_calculator/cumulative_average_histogram_plot/compressed',
+        # set cumulative histogram ROS image publisher
+        self.cumulative_histogram_plot_pub = rospy.Publisher('/histogram_calculator/cumulative_histogram_plot/compressed',
                                               sensor_msgs.msg.CompressedImage,
                                               queue_size=1)
         # set ROS image publisher that publishes whatever it subscribes to + ROI changes
@@ -158,15 +154,8 @@ class line_detection:
         histogram = cv2.calcHist([hsv],
             [0,1],
             None,
-            # [self.histogram_dimension,self.histogram_dimension],
             [180,256],
             [0,179,0,255])
-
-        # rospy.loginfo(histogram.shape)
-        # normalize the histogram counts in each bin so that they range from 0 to 255
-        # cv2.normalize(histogram, histogram, 0, 255, cv2.NORM_MINMAX)
-
-        # cv2.normalize(histogram, histogram, 256, 0, cv2.NORM_INF)
 
 
         # we'll just take a slice (at a V channel value) of the 3d histogram and plot it in 2d for debugging
@@ -185,23 +174,12 @@ class line_detection:
         self.current_histogram_plot_pub.publish(final_image_message)
 
 
-        # now that we're done getting and plotting the current histogram, we need to average the
-        # histogram for every frame we get and store it in cumulative_average_histogram and also publish that
-
-
-        # we need to calculate the cumulative moving average of the histogram
-        # for every new frame.
-        # the equation for cumulative moving average is:
-            # new avg = (new value + (old avg. * timesteps)) / timesteps + 1
-        # where timesteps is the number of frames processed so far and new avg. is the hsv histogram values
-        # check wikipedia: https://en.wikipedia.org/wiki/Moving_average#Cumulative_moving_average
-        
-        # perform cumulative moving average on the histogram
-        self.cumulative_average_histogram = (histogram + (self.cumulative_average_histogram * self.frames_processed)) / (self.frames_processed+1)
+        # just add the current histogram to the cumulative histogram
+        self.cumulative_histogram += histogram
 
         # we'll just take a slice (at a V channel value) of the 3d histogram and plot it in 2d for debugging
-        # cumulative_histogram_plot = self.cumulative_average_histogram[:,:,self.histogram_view_value]
-        cumulative_histogram_plot = self.cumulative_average_histogram
+        # cumulative_histogram_plot = self.cumulative_histogram[:,:,self.histogram_view_value]
+        cumulative_histogram_plot = self.cumulative_histogram
 
         # #### Create CompressedImage to publish cumulative histogram (for debugging) ####
         final_image_message = CompressedImage()
@@ -211,7 +189,7 @@ class line_detection:
                                             '.jpg',
                                             cumulative_histogram_plot)[1]).tostring()
         # publishes current histogram plot image
-        self.cumulative_average_histogram_plot_pub.publish(final_image_message)
+        self.cumulative_histogram_plot_pub.publish(final_image_message)
 
 
         #### Create CompressedImage to publish roi (for debugging) ####
@@ -225,7 +203,7 @@ class line_detection:
         self.input_image_pub.publish(final_image_message)
 
         # now write the new cumulative histogram data to a file
-        np.save(self.package_path + "/misc/training_images/histogram.txt", self.cumulative_average_histogram)
+        np.savetxt(self.package_path + "/misc/training_images/histogram.txt", self.cumulative_histogram)
 
         # increment number of frames since this frame is done
         self.frames_processed += 1
@@ -234,12 +212,10 @@ class line_detection:
 
     def reconfigure_callback(self, config, level):
 
-        # TODO check if the keys exist in the config dictionary or else error
         self.roi_top_left_x = config['roi_top_left_x']
         self.roi_top_left_y = config['roi_top_left_y']
         self.roi_width = config['roi_width']
         self.roi_height = config['roi_height']
-        self.histogram_view_value = config['histogram_view_value']
 
         self.validate_parameters()
 
@@ -263,10 +239,6 @@ class line_detection:
                 self.roi_height = self.image_height - self.roi_top_left_y
             if self.roi_top_left_y < 0:
                 self.roi_top_left_y = 0
-
-        # value channel index must be within bounds of 3d histogram
-        if self.histogram_view_value >= self.histogram_dimension:
-            self.histogram_view_value = self.histogram_dimension - 1
 
 def main(args):
     # create a line_detection object
