@@ -41,9 +41,8 @@ class line_detection:
     # these are changed dynamically using dynamic_reconfig and affect
     # the image processing algorithm. A lot of these are not used in the
     # current algorithm.
-    blur_size = 49
 
-    # hsv threshold variables
+    # hsv range of values to consider for backprojection
     hue_low = 20
     hue_high = 50
 
@@ -53,23 +52,8 @@ class line_detection:
     value_low = 0
     value_high = 255
 
-    backprojection_h_threshold = 50
-
-    # gabor filter parameters
-    gabor_ksize = 4
-    gabor_sigma = 7
-    gabor_theta = 0
-    gabor_lambd = 27
-    gabor_gamma = 4
-
-    hough_rho = 1
-    hough_theta = 0.01745329251
-    hough_threshold = 50
-    hough_min_line_length = 50
-    hough_max_line_gap = 10
-
-    # training_file_name = 'training_for_backprojection_1.png'
-    training_file_name = rospy.get_param(rospy.get_namespace() + node_name + "/training_file_name")
+    backprojection_threshold = 200
+    backprojection_kernel_size = 5
 
     package_path = ''
 
@@ -80,6 +64,11 @@ class line_detection:
     roi_top_left_y = 0
     roi_width = 2000
     roi_height = 2000
+
+    histogram_dimension = rospy.get_param(rospy.get_namespace() + node_name + "/histogram_dimension")
+
+    # histogram = np.zeros((histogram_dimension,histogram_dimension,histogram_dimension))
+    histogram = np.zeros((180,256))
 
     def __init__(self):
 
@@ -125,71 +114,39 @@ class line_detection:
 
         self.bridge = CvBridge()
 
-        
-        # use this if you need to use the camera_info topic (has intrinsic
-        #                                                     parameters)
-        # self.camera_info_sub = rospy.Subscriber("/camera/camera_info",
-        #                                          CameraInfo,
-        #                                          self.camera_info_callback,
-        #                                          queue_size=1 )
-    
-    # returns packprojection image as OpenCV image in HSV format
-    def get_backprojection_training_image(self, filename):
-        
-        training_file_path = (self.package_path
-                              + '/misc/training_images/'
-                              + filename)
-        # reads in the backprojection training image from file
-        backprojection_training = cv2.imread(training_file_path)
-        # converts it from BGR to HSV
-        backprojection_training = cv2.cvtColor(backprojection_training,
-                                               cv2.COLOR_BGR2HSV)
-        return backprojection_training
+        self.histogram = np.load(self.package_path + "/misc/training_images/histogram.txt.npy")
 
     # returns mask based on backprojection
-    def get_backprojection_mask(self, image, filename):
+    def get_backprojection_mask(self, image):
 
         # Convert BGR to HSV
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
-        # make HSV histogram and look for regions with lots of green Hue. For
-        # those regions find their range of HSV so that they can be masked out.
-        # Grass Hue ranges from 20:50 , Saturation ranges from 50:125 , Value
-        # ranges from 0:150.
-        # White lines Hue ranges from 120:150 , Saturation ranges from 0:50 ,
-        # Value ranges from 150:255.
-        # all above values are in OpenCV HSV ranges
-
-        # note that Values depend on overall brightness (need to use adaptive
-        # method or dynamic one).
-
-        backprojection_training = self.get_backprojection_training_image(
-            filename)
-        
         ## begin HISTOGRAM BACKPROJECTION
-        # calculating object histogram
-        roihist = cv2.calcHist([backprojection_training],
-                               [0, 1],
-                               None,
-                               [180, 256],
-                               [self.hue_low,
-                                self.hue_high,
-                                0,
-                                256]
-                               )
-
-        # normalize histogram and apply backprojection
-        cv2.normalize(roihist, roihist, 1, 255, cv2.NORM_MINMAX)
-
-        dst = cv2.calcBackProject([hsv], [0, 1], roihist,
-                                  [self.hue_low,
-                                   self.hue_high,
-                                   0,
-                                   256],
+        # backprojection on 3d histogram
+        # backproject = cv2.calcBackProject([hsv],
+        #                           [0,1,2],
+        #                           self.histogram,
+        #                           [self.hue_low, self.hue_high, self.saturation_low, self.saturation_high, self.value_low, self.value_high],
+        #                           1)
+        backproject = cv2.calcBackProject([hsv],
+                                  [0,1],
+                                  self.histogram,
+                                  [self.hue_low, self.hue_high, self.saturation_low, self.saturation_high],
                                   1)
 
+        print backproject[50,50:100]
+        # TODO check if thresh is broken
+        ret, thresh = cv2.threshold(backproject,
+                            self.backprojection_threshold,
+                            0,
+                            cv2.THRESH_TOZERO)
+
+        dst = thresh
+
+        # dst = backproject
         # Now convolute with circular disc
-        disc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+        disc = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (self.backprojection_kernel_size, self.backprojection_kernel_size))
         cv2.filter2D(dst, -1, disc, dst)  # do we need this convolution???
 
         # invert dst (because the backprojection chooses what we DON'T want)
@@ -239,25 +196,12 @@ class line_detection:
             rospy.logerr("Incorrect roi settings! Will use the entire image instead!")
             roi = img
 
-        # use entire image as roi (don't cut any parts out)
-        # roi = img
-
         # run backprojection to remove grass
-        mask = self.get_backprojection_mask(roi, self.training_file_name)
 
-        # no need to convert to grayscale because
-        # cv2.threshold already does that
-        # # threshold the backprojection to only grab the more probable ones
-        ret, thresh = cv2.threshold(mask,
-                                    self.backprojection_threshold,
-                                    0,
-                                    cv2.THRESH_TOZERO)
+        mask = self.get_backprojection_mask(roi)
+        mask = np.dstack((mask, mask, mask))
+        final_image = cv2.bitwise_and(roi, mask)  # only include pixels from thresh
 
-        # stack the same threshold into the 3rd dimension just so thresh has
-        # the same size as the original colored roi
-        thresh = np.dstack((thresh, thresh, thresh))
-        final_image = cv2.bitwise_and(roi, thresh)  # only include pixels from thresh
-        
         #### Create CompressedImage to publish ####
         final_image_message = CompressedImage()
         final_image_message.header.stamp = rospy.Time.now()
@@ -273,30 +217,15 @@ class line_detection:
 
     def reconfigure_callback(self, config, level):
 
-        # TODO check if the keys exist in the config dictionary or else error
-
-        self.blur_size = config['blur_size']
         self.hue_low = config['hue_low']
         self.hue_high = config['hue_high']
         self.saturation_low = config['saturation_low']
         self.saturation_high = config['saturation_high']
         self.value_low = config['value_low']
         self.value_high = config['value_high']
-        self.backprojection_h_threshold = config['backprojection_h_threshold']
-
-        # gabor filter parameters
-        self.gabor_ksize = config['gabor_ksize']
-        self.gabor_sigma = config['gabor_sigma']
-        self.gabor_theta = config['gabor_theta']
-        self.gabor_lambda = config['gabor_lambda']
-        self.gabor_gamma = config['gabor_gamma']
-
-        self.hough_rho = config['hough_rho']
-        self.hough_theta = config['hough_theta']
-        self.hough_threshold = config['hough_threshold']
-        self.hough_min_line_length = config['hough_min_line_length']
-        self.hough_max_line_gap = config['hough_max_line_gap']
-
+        self.backprojection_threshold = config['backprojection_threshold']
+        self.backprojection_kernel_size = config['backprojection_kernel_size']
+        
         self.roi_top_left_x = config['roi_top_left_x']
         self.roi_top_left_y = config['roi_top_left_y']
         self.roi_width = config['roi_width']
@@ -312,10 +241,6 @@ class line_detection:
         
         # these parameters need validation:
 
-        # blur_size can be an odd number only
-        if self.blur_size % 2 == 0:
-            self.blur_size -= 1
-
         # hue, saturation, and value parameters cannot have
         # larger or equal low limits than high limits
         if self.hue_low >= self.hue_high:
@@ -324,20 +249,6 @@ class line_detection:
             self.saturation_low = self.saturation_high - 1
         if self.value_low >= self.value_high:
             self.value_low = self.value_high - 1
-
-        # gabor filter parameters don't need validation
-
-        # hough parameters cannot be nonzero
-        if self.hough_rho <= 0:
-            self.hough_rho = 1
-        if self.hough_theta <= 0:
-            self.hough_theta = 0.01
-        if self.hough_threshold <= 0:
-            self.hough_threshold = 1
-        if self.hough_min_line_length <= 0:
-            self.hough_min_line_length = 1
-        if self.hough_max_line_gap <= 0:
-            self.hough_max_line_gap = 1
 
         # now check if ROI parameters are out of bounds
         # only do this if image dimensions have been set
@@ -351,7 +262,9 @@ class line_detection:
                 self.roi_height = self.image_height - self.roi_top_left_y
             if self.roi_top_left_y < 0:
                 self.roi_top_left_y = 0
-
+        # kernel size can be an odd number only
+        if self.backprojection_kernel_size % 2 == 0:
+            self.backprojection_kernel_size -= 1
 
 def main(args):
     # create a line_detection object

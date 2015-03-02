@@ -1,6 +1,6 @@
 <launch>
 
-  <node pkg="line_detection" name="histogram_calculator_lanedetection" type="histogram-calculator.py" output="screen">
+  <node pkg="line_detection" name="histogram_summation_lanedetection" type="histogram-summation.py" output="screen">
     
     <param name="use_compressed_format" type="bool" value="true" />
     <param name="subscriber_image_topic" type="str" value="/camera/image_raw" />
