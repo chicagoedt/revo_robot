@@ -15,18 +15,14 @@ from cv_bridge import CvBridge, CvBridgeError
 
 ###############################################################################
 ## Chicago Engineering Design Team
-## Line Detection Example using Python OpenCV for autonomous robot Scipio
+## Histogram Backprojection using Python OpenCV for autonomous robot Scipio
 ##    (IGVC competition).
 ## @author Basheer Subei
 ## @email basheersubei@gmail.com
 #######################################################
-##
-## Gabor Filter example
-##
-###############################################################################
 
 
-class line_detection:
+class backprojection:
 
     node_name = "backproject_lanedetection"
     namespace = rospy.get_namespace()
@@ -49,11 +45,7 @@ class line_detection:
     saturation_low = 0
     saturation_high = 255
 
-    value_low = 0
-    value_high = 255
-
     backprojection_kernel_size = 5
-    package_path = ''
 
     image_height = 0
     image_width = 0
@@ -72,14 +64,6 @@ class line_detection:
 
         # initialize ROS stuff
 
-        # set publisher and subscriber
-
-        # publisher for pointcloud data.
-        # the code for this is not implemented yet.
-        # self.line_pub = rospy.Publisher(
-        #    'line_data',
-        #    sensor_msgs.msg.PointCloud2)
-
         # publisher for image of line pixels (only for debugging, not used in
         # map)
         self.line_image_pub = rospy.Publisher( self.namespace +
@@ -88,13 +72,6 @@ class line_detection:
                                               '/compressed',
                                               sensor_msgs.msg.CompressedImage,
                                               queue_size=1)
-
-        # self.line_image_pub = rospy.Publisher('line_image',
-        #                                       sensor_msgs.msg.Image)
-
-        # this returns the path to the current package
-        rospack = rospkg.RosPack()
-        self.package_path = rospack.get_path('line_detection')
 
         if self.use_compressed_format:
         # subscriber for ROS image topic
@@ -123,11 +100,6 @@ class line_detection:
 
         ## begin HISTOGRAM BACKPROJECTION
         # backprojection on 3d histogram
-        # backproject = cv2.calcBackProject([hsv],
-        #                           [0,1,2],
-        #                           self.histogram,
-        #                           [self.hue_low, self.hue_high, self.saturation_low, self.saturation_high, self.value_low, self.value_high],
-        #                           1)
         backproject = cv2.calcBackProject([hsv],
                                   [0,1],
                                   self.histogram,
@@ -148,25 +120,8 @@ class line_detection:
     # this is what gets called when an image is recieved
     def image_callback(self, image):
 
-        # if we don't have a color image, return and throw error
-        if hasattr(image, 'encoding') and image.encoding == 'mono8':
-            rospy.logerr("error! image is not color!")
-            return
-
-        if self.use_compressed_format:
-            #### direct conversion from ROS CompressedImage to CV2 ####
-            np_arr = np.fromstring(image.data, np.uint8)
-            img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
-        else:
-            #### direct conversion from ROS Image to CV2 ####
-            # first, we need to convert image from sensor_msgs/Image to numpy (or
-            # cv2). For this, we use cv_bridge
-            try:
-                # img = self.bridge.imgmsg_to_cv2(image, "bgr8")
-                img = self.bridge.imgmsg_to_cv2(image,
-                                                desired_encoding="passthrough")
-            except CvBridgeError, e:
-                rospy.logerr(e)
+        # convert ROS image to OpenCV image
+        img = ROS_to_CV2_image(image)
 
         if img is None:
             rospy.logerr("error! img is empty!")
@@ -205,14 +160,36 @@ class line_detection:
 
     ## end image_callback()
 
+    def ROS_to_CV2_image(self, image):
+
+        # if we don't have a color image, return and throw error
+        if hasattr(image, 'encoding') and image.encoding == 'mono8':
+            rospy.logerr("error! image is not color!")
+            return
+
+        if self.use_compressed_format:
+            #### direct conversion from ROS CompressedImage to CV2 ####
+            np_arr = np.fromstring(image.data, np.uint8)
+            img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
+        else:
+            #### direct conversion from ROS Image to CV2 ####
+            # first, we need to convert image from sensor_msgs/Image to numpy (or
+            # cv2). For this, we use cv_bridge
+            try:
+                # img = self.bridge.imgmsg_to_cv2(image, "bgr8")
+                img = self.bridge.imgmsg_to_cv2(image,
+                                                desired_encoding="passthrough")
+            except CvBridgeError, e:
+                rospy.logerr(e)
+
+        return img
+
     def reconfigure_callback(self, config, level):
 
         self.hue_low = config['hue_low']
         self.hue_high = config['hue_high']
         self.saturation_low = config['saturation_low']
         self.saturation_high = config['saturation_high']
-        self.value_low = config['value_low']
-        self.value_high = config['value_high']
 
         self.backprojection_kernel_size = config['backprojection_kernel_size']
         
@@ -237,8 +214,6 @@ class line_detection:
             self.hue_low = self.hue_high - 1
         if self.saturation_low >= self.saturation_high:
             self.saturation_low = self.saturation_high - 1
-        if self.value_low >= self.value_high:
-            self.value_low = self.value_high - 1
 
         # now check if ROI parameters are out of bounds
         # only do this if image dimensions have been set
@@ -257,14 +232,14 @@ class line_detection:
             self.backprojection_kernel_size -= 1
 
 def main(args):
-    # create a line_detection object
-    ld = line_detection()
+    # create a backprojection object
+    bp = backprojection()
 
-    # start the line_detector node and start listening
-    rospy.init_node("line_detection", anonymous=True)
+    # start the backproject node and start listening
+    rospy.init_node("backproject", anonymous=True)
 
     # starts dynamic_reconfigure server
-    srv = Server(LineDetectionConfig, ld.reconfigure_callback)
+    srv = Server(LineDetectionConfig, bp.reconfigure_callback)
     rospy.spin()
     cv2.destroyAllWindows()
 

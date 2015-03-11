@@ -15,18 +15,13 @@ from cv_bridge import CvBridge, CvBridgeError
 
 ###############################################################################
 ## Chicago Engineering Design Team
-## Line Detection Example using Python OpenCV for autonomous robot Scipio
+## Brightest-Pixel filter using Python OpenCV for autonomous robot Scipio
 ##    (IGVC competition).
 ## @author Basheer Subei
 ## @email basheersubei@gmail.com
 #######################################################
-##
-## Gabor Filter example
-##
-###############################################################################
 
-
-class line_detection:
+class brightest_pixel:
 
     node_name = "brightestpixel_lanedetection"
     namespace = rospy.get_namespace()
@@ -42,35 +37,6 @@ class line_detection:
     # these are changed dynamically using dynamic_reconfig and affect
     # the image processing algorithm. A lot of these are not used in the
     # current algorithm.
-    blur_size = 49
-
-    # hsv threshold variables
-    hue_low = 20
-    hue_high = 50
-
-    saturation_low = 0
-    saturation_high = 255
-
-    value_low = 0
-    value_high = 255
-
-    # gabor filter parameters
-    gabor_ksize = 4
-    gabor_sigma = 7
-    gabor_theta = 0
-    gabor_lambd = 27
-    gabor_gamma = 4
-
-    hough_rho = 1
-    hough_theta = 0.01745329251
-    hough_threshold = 50
-    hough_min_line_length = 50
-    hough_max_line_gap = 10
-
-    # training_file_name = 'training_for_backprojection_1.png'
-    training_file_name = rospy.get_param(namespace + node_name + "/training_file_name")
-
-    package_path = ''
 
     image_height = 0
     image_width = 0
@@ -85,13 +51,6 @@ class line_detection:
         # initialize ROS stuff
 
         # set publisher and subscriber
-
-        # publisher for pointcloud data.
-        # the code for this is not implemented yet.
-        # self.line_pub = rospy.Publisher(
-        #    'line_data',
-        #    sensor_msgs.msg.PointCloud2)
-
         # publisher for image of line pixels (only for debugging, not used in
         # map)
         self.line_image_pub = rospy.Publisher( self.namespace +
@@ -100,13 +59,6 @@ class line_detection:
                                               '/compressed',
                                               sensor_msgs.msg.CompressedImage,
                                               queue_size=1)
-
-        # self.line_image_pub = rospy.Publisher('line_image',
-        #                                       sensor_msgs.msg.Image)
-
-        # this returns the path to the current package
-        rospack = rospkg.RosPack()
-        self.package_path = rospack.get_path('line_detection')
 
         if self.use_compressed_format:
         # subscriber for ROS image topic
@@ -121,44 +73,13 @@ class line_detection:
                                            self.image_callback, queue_size=1,
                                            buff_size=self.buffer_size)
 
-
         self.bridge = CvBridge()
 
-        
-        # use this if you need to use the camera_info topic (has intrinsic
-        #                                                     parameters)
-        # self.camera_info_sub = rospy.Subscriber("/camera/camera_info",
-        #                                          CameraInfo,
-        #                                          self.camera_info_callback,
-        #                                          queue_size=1 )
-    
     # this is what gets called when an image is recieved
     def image_callback(self, image):
 
-        # use this to record start time for each frame
-        #start_time = time.time()
-        
-        if(self.use_mono and not self.use_compressed_format and image.encoding != 'mono8'):
-            rospy.logerr("image is not mono8! Aborting!")
-            return
-        
-        if self.use_compressed_format:
-            #### direct conversion from ROS CompressedImage to CV2 ####
-            np_arr = np.fromstring(image.data, np.uint8)
-            if self.use_mono:
-                img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_GRAYSCALE)
-            else:
-                img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
-        else:
-            #### direct conversion from ROS Image to CV2 ####
-            # first, we need to convert image from sensor_msgs/Image to numpy (or
-            # cv2). For this, we use cv_bridge
-            try:
-                # img = self.bridge.imgmsg_to_cv2(image, "bgr8")
-                img = self.bridge.imgmsg_to_cv2(image,
-                                                desired_encoding="passthrough")
-            except CvBridgeError, e:
-                rospy.logerr(e)
+        # convert ROS image to OpenCV image
+        img = ROS_to_CV2_image(image)
 
         if img is None:
             rospy.logerr("error! img is empty!")
@@ -217,31 +138,31 @@ class line_detection:
 
     ## end image_callback()
 
+    def ROS_to_CV2_image(self, image):
+
+        # if we don't have a color image, return and throw error
+        if hasattr(image, 'encoding') and image.encoding == 'mono8':
+            rospy.logerr("error! image is not color!")
+            return
+
+        if self.use_compressed_format:
+            #### direct conversion from ROS CompressedImage to CV2 ####
+            np_arr = np.fromstring(image.data, np.uint8)
+            img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
+        else:
+            #### direct conversion from ROS Image to CV2 ####
+            # first, we need to convert image from sensor_msgs/Image to numpy (or
+            # cv2). For this, we use cv_bridge
+            try:
+                # img = self.bridge.imgmsg_to_cv2(image, "bgr8")
+                img = self.bridge.imgmsg_to_cv2(image,
+                                                desired_encoding="passthrough")
+            except CvBridgeError, e:
+                rospy.logerr(e)
+
+        return img
+
     def reconfigure_callback(self, config, level):
-
-        # TODO check if the keys exist in the config dictionary or else error
-
-        self.blur_size = config['blur_size']
-        self.hue_low = config['hue_low']
-        self.hue_high = config['hue_high']
-        self.saturation_low = config['saturation_low']
-        self.saturation_high = config['saturation_high']
-        self.value_low = config['value_low']
-        self.value_high = config['value_high']
-
-        # gabor filter parameters
-        self.gabor_ksize = config['gabor_ksize']
-        self.gabor_sigma = config['gabor_sigma']
-        self.gabor_theta = config['gabor_theta']
-        self.gabor_lambda = config['gabor_lambda']
-        self.gabor_gamma = config['gabor_gamma']
-
-        self.hough_rho = config['hough_rho']
-        self.hough_theta = config['hough_theta']
-        self.hough_threshold = config['hough_threshold']
-        self.hough_min_line_length = config['hough_min_line_length']
-        self.hough_max_line_gap = config['hough_max_line_gap']
-
         self.roi_top_left_x = config['roi_top_left_x']
         self.roi_top_left_y = config['roi_top_left_y']
         self.roi_width = config['roi_width']
@@ -256,33 +177,6 @@ class line_detection:
     def validate_parameters(self):
         
         # these parameters need validation:
-
-        # blur_size can be an odd number only
-        if self.blur_size % 2 == 0:
-            self.blur_size -= 1
-
-        # hue, saturation, and value parameters cannot have
-        # larger or equal low limits than high limits
-        if self.hue_low >= self.hue_high:
-            self.hue_low = self.hue_high - 1
-        if self.saturation_low >= self.saturation_high:
-            self.saturation_low = self.saturation_high - 1
-        if self.value_low >= self.value_high:
-            self.value_low = self.value_high - 1
-
-        # gabor filter parameters don't need validation
-
-        # hough parameters cannot be nonzero
-        if self.hough_rho <= 0:
-            self.hough_rho = 1
-        if self.hough_theta <= 0:
-            self.hough_theta = 0.01
-        if self.hough_threshold <= 0:
-            self.hough_threshold = 1
-        if self.hough_min_line_length <= 0:
-            self.hough_min_line_length = 1
-        if self.hough_max_line_gap <= 0:
-            self.hough_max_line_gap = 1
 
         # now check if ROI parameters are out of bounds
         # only do this if image dimensions have been set
@@ -299,14 +193,14 @@ class line_detection:
 
 
 def main(args):
-    # create a line_detection object
-    ld = line_detection()
+    # create a brightest_pixel object
+    bp = brightest_pixel()
 
     # start the line_detector node and start listening
-    rospy.init_node("line_detection", anonymous=True)
+    rospy.init_node("brightest_pixel", anonymous=True)
 
     # starts dynamic_reconfigure server
-    srv = Server(LineDetectionConfig, ld.reconfigure_callback)
+    srv = Server(LineDetectionConfig, bp.reconfigure_callback)
     rospy.spin()
     cv2.destroyAllWindows()
 
