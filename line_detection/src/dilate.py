@@ -10,9 +10,10 @@ from sensor_msgs.msg import CompressedImage
 from sensor_msgs.msg import Image
 import rospkg
 from dynamic_reconfigure.server import Server
-from line_detection.cfg import LineDetectionConfig
 from cv_bridge import CvBridge, CvBridgeError
-import lane_detection
+from lane_detection import lane_detection
+from line_detection.cfg import LineDetectionConfig
+
 ###############################################################################
 ## Chicago Engineering Design Team
 ## Dilate filter using Python OpenCV for autonomous robot Scipio
@@ -112,7 +113,8 @@ class dilate(lane_detection):
         self.line_image_pub.publish(final_image_message)
 
     ## end image_callback()
-
+    def __init__(self, namespace, node_name):
+        lane_detection.__init__(self, namespace, node_name)
     
 
 def main(args):
@@ -123,7 +125,7 @@ def main(args):
         namespace = ""
 
     # create a dilate object
-    d = dilate()
+    d = dilate(namespace, node_name)
 
     # start the line_detector node and start listening
     rospy.init_node("dilate_lanedetection", anonymous=True)

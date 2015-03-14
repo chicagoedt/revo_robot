@@ -18,12 +18,12 @@ from cv_bridge import CvBridge, CvBridgeError
 ## @email basheersubei@gmail.com
 
 
-class lane_detection:
+class lane_detection(object):
 
     def __init__(self, namespace, node_name):
 
         # grab parameters from launch file
-        self.use_mono = rospy.get_param( + node_name + "/use_mono")
+        self.use_mono = rospy.get_param(namespace + node_name + "/use_mono")
         self.use_compressed_format = rospy.get_param(namespace + node_name + "/use_compressed_format")
         self.subscriber_image_topic = rospy.get_param(namespace + node_name + "/subscriber_image_topic")
         self.publisher_image_topic = rospy.get_param(namespace + node_name + "/publisher_image_topic")
