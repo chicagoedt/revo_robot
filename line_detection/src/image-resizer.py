@@ -47,7 +47,7 @@ class ImageResizer(LaneDetection):
 
 
 def main(args):
-    node_name = "image_resizer_lanedetection"
+    node_name = "image_resizer"
     namespace = rospy.get_namespace()
     if namespace == "/":
         namespace = ""
@@ -56,7 +56,7 @@ def main(args):
     ir = ImageResizer(namespace, node_name)
 
     # start the line_detector node and start listening
-    rospy.init_node("image_resizer_lanedetection", anonymous=True)
+    rospy.init_node("image_resizer", anonymous=True)
 
     # starts dynamic_reconfigure server
     srv = Server(LineDetectionConfig, ir.reconfigure_callback)
