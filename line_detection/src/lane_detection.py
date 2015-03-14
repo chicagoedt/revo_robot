@@ -151,3 +151,49 @@ class lane_detection(object):
         if self.dilate_size % 2 == 0:
             self.dilate_size += 1
             rospy.logwarn("dilate_size should not be even! Changed to %d", self.dilate_size)
+    
+    def ROS_to_cv2_image(self, image):
+        if(self.use_mono and not self.use_compressed_format and image.encoding != 'mono8'):
+            rospy.logerr("image is not mono8! Aborting!")
+            return
+        
+        if self.use_compressed_format:
+            #### direct conversion from ROS CompressedImage to CV2 ####
+            np_arr = np.fromstring(image.data, np.uint8)
+            if self.use_mono:
+                img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_GRAYSCALE)
+            else:
+                img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
+        else:
+            #### direct conversion from ROS Image to CV2 ####
+            # first, we need to convert image from sensor_msgs/Image to numpy (or
+            # cv2). For this, we use cv_bridge
+            try:
+                img = self.bridge.imgmsg_to_cv2(image,
+                                                desired_encoding="passthrough")
+            except CvBridgeError, e:
+                rospy.logerr(e)
+        if img is None:
+            rospy.logerr("error! img is empty!")
+            return
+        self.image_height = img.shape[0]
+        self.image_width = img.shape[1]
+
+        # if mono, don't take 3rd dimension since there's only one channel
+        if self.use_mono:
+            roi = img[
+            self.roi_top_left_y:self.roi_top_left_y + self.roi_height,
+            self.roi_top_left_x:self.roi_top_left_x + self.roi_width,
+            ]
+        else:
+            roi = img[
+                self.roi_top_left_y:self.roi_top_left_y + self.roi_height,
+                self.roi_top_left_x:self.roi_top_left_x + self.roi_width,
+                :
+            ]
+
+        # in case roi settings aren't correct, just use the entire image
+        if roi.size <= 0:
+            rospy.logerr("Incorrect roi settings! Will use the entire image instead!")
+            roi = img
+        return roi
