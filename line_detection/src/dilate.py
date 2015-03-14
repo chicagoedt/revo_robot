@@ -52,7 +52,7 @@ class Dilate(LaneDetection):
 
 
 def main(args):
-    node_name = "dilate_lanedetection"
+    node_name = "dilate"
     namespace = rospy.get_namespace()
     if namespace == "/":
         namespace = ""
@@ -61,7 +61,7 @@ def main(args):
     d = Dilate(namespace, node_name)
 
     # start the line_detector node and start listening
-    rospy.init_node("dilate_lanedetection", anonymous=True)
+    rospy.init_node("dilate", anonymous=True)
 
     # starts dynamic_reconfigure server
     srv = Server(LineDetectionConfig, d.reconfigure_callback)

@@ -91,7 +91,7 @@ class Backproject(LaneDetection):
 
 
 def main(args):
-    node_name = "backproject_lanedetection"
+    node_name = "backproject"
     namespace = rospy.get_namespace()
     if namespace == "/":
         namespace = ""
@@ -100,7 +100,7 @@ def main(args):
     bp = Backproject(namespace, node_name)
 
     # start the line_detector node and start listening
-    rospy.init_node("backproject_lanedetection", anonymous=True)
+    rospy.init_node("backproject", anonymous=True)
 
     # starts dynamic_reconfigure server
     srv = Server(LineDetectionConfig, bp.reconfigure_callback)
