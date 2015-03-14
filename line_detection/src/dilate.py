@@ -2,23 +2,20 @@
 import sys
 import numpy as np
 import cv2
-import math
 import rospy
-from sensor_msgs.msg import CompressedImage
-from sensor_msgs.msg import Image
 from dynamic_reconfigure.server import Server
-from cv_bridge import CvBridge, CvBridgeError
-from lane_detection import lane_detection
+from lane_detection import LaneDetection
 from line_detection.cfg import LineDetectionConfig
 
 ###############################################################################
-## Chicago Engineering Design Team
-## Dilate filter using Python OpenCV for autonomous robot Scipio
-##    (IGVC competition).
-## @author Basheer Subei
-## @email basheersubei@gmail.com
+# Chicago Engineering Design Team
+# Dilate filter using Python OpenCV for autonomous robot Scipio
+#    (IGVC competition).
+# @author Basheer Subei
+# @email basheersubei@gmail.com
 
-class dilate(lane_detection):
+
+class Dilate(LaneDetection):
     image_height = 0
     image_width = 0
     roi_top_left_x = 0
@@ -29,25 +26,29 @@ class dilate(lane_detection):
     dilate_iterations = 0
 
     def __init__(self, namespace, node_name):
-        lane_detection.__init__(self, namespace, node_name)
+        LaneDetection.__init__(self, namespace, node_name)
 
     # this is what gets called when an image is recieved
-    def image_callback(self, ROS_image):
-        
-        cv2_image = lane_detection.ROS_to_cv2_image(self, ROS_image)
+    def image_callback(self, ros_image):
+
+        cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
 
         # dilate each pixel using kernel with dilate_size
         if self.dilate_size > 0 and self.dilate_iterations > 0:
             kernel = np.ones((self.dilate_size, self.dilate_size), np.uint8)
-            final_image = cv2.dilate(cv2_image, kernel, iterations = self.dilate_iterations)
+            final_image = cv2.dilate(cv2_image,
+                                     kernel,
+                                     iterations=self.dilate_iterations)
         else:
             rospy.logwarn("dilate parameters invalid! Won't perform dilate!")
             final_image = cv2_image
 
-        final_image_message = lane_detection.cv2_to_ROS_message(self, final_image)
+        final_image_message = LaneDetection.cv2_to_ros_message(
+            self, final_image
+        )
         # publishes final image message in ROS format
         self.line_image_pub.publish(final_image_message)
-    ## end image_callback()
+    # end image_callback()
 
 
 def main(args):
@@ -57,7 +58,7 @@ def main(args):
         namespace = ""
 
     # create a dilate object
-    d = dilate(namespace, node_name)
+    d = Dilate(namespace, node_name)
 
     # start the line_detector node and start listening
     rospy.init_node("dilate_lanedetection", anonymous=True)
