@@ -151,7 +151,16 @@ class lane_detection(object):
         if self.dilate_size % 2 == 0:
             self.dilate_size += 1
             rospy.logwarn("dilate_size should not be even! Changed to %d", self.dilate_size)
-    
+    def cv2_to_ROS_message(self, image):
+        #### Create CompressedImage to publish ####
+        final_image_message = CompressedImage()
+        final_image_message.header.stamp = rospy.Time.now()
+        final_image_message.format = "jpeg"
+        final_image_message.data = np.array(cv2.imencode(
+                                            '.jpg',
+                                            image)[1]).tostring()
+        return final_image_message
+
     def ROS_to_cv2_image(self, image):
         if(self.use_mono and not self.use_compressed_format and image.encoding != 'mono8'):
             rospy.logerr("image is not mono8! Aborting!")

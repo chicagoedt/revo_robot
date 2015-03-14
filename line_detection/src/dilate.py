@@ -44,15 +44,8 @@ class dilate(lane_detection):
             rospy.logwarn("dilate parameters invalid! Won't perform dilate!")
             final_image = cv2_image
 
-        #### Create CompressedImage to publish ####
-        final_image_message = CompressedImage()
-        final_image_message.header.stamp = rospy.Time.now()
-        final_image_message.format = "jpeg"
-        final_image_message.data = np.array(cv2.imencode(
-                                            '.jpg',
-                                            final_image)[1]).tostring()
-
-        # publishes image message with line pixels in it
+        final_image_message = lane_detection.cv2_to_ROS_message(self, final_image)
+        # publishes final image message in ROS format
         self.line_image_pub.publish(final_image_message)
     ## end image_callback()
 
