@@ -15,8 +15,6 @@ from line_detection.cfg import LineDetectionConfig
 
 
 class ImageResizer(LaneDetection):
-    image_height = 0
-    image_width = 0
     roi_top_left_x = 0
     roi_top_left_y = 0
     roi_width = 2000
