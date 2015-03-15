@@ -27,9 +27,10 @@ class Generic(LaneDetection):
     def image_callback(self, ros_image):
 
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
+        roi = LaneDetection.get_roi(self, cv2_image)
 
-        # do something with cv2_image and save it to final_image
-        final_image = cv2_image  # here we just set them equal which does nothing
+        # do something with roi and save it to final_image
+        final_image = roi  # here we just set them equal which does nothing
         final_image_message = LaneDetection.cv2_to_ros_message(
             self, final_image
         )

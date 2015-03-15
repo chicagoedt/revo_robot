@@ -30,14 +30,15 @@ class BrightestPixel(LaneDetection):
     def image_callback(self, ros_image):
 
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
+        roi = LaneDetection.get_roi(self, cv2_image)
 
         # get indices of max pixels along each row
-        brightest_pixel_indices = np.argmax(cv2_image, axis=1)
+        brightest_pixel_indices = np.argmax(roi, axis=1)
         # get the values of max pixels along each row
-        brightest_pixel_values = np.amax(cv2_image, axis=1)
+        brightest_pixel_values = np.amax(roi, axis=1)
 
         # make an empty image
-        brightest_pixels = np.zeros(cv2_image.shape)
+        brightest_pixels = np.zeros(roi.shape)
 
         count = 0
         # now fill the image only with the brightest_pixels

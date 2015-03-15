@@ -30,16 +30,17 @@ class Dilate(LaneDetection):
     def image_callback(self, ros_image):
 
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
+        roi = LaneDetection.get_roi(self, cv2_image)
 
         # dilate each pixel using kernel with dilate_size
         if self.dilate_size > 0 and self.dilate_iterations > 0:
             kernel = np.ones((self.dilate_size, self.dilate_size), np.uint8)
-            final_image = cv2.dilate(cv2_image,
+            final_image = cv2.dilate(roi,
                                      kernel,
                                      iterations=self.dilate_iterations)
         else:
             rospy.logwarn("dilate parameters invalid! Won't perform dilate!")
-            final_image = cv2_image
+            final_image = roi
 
         final_image_message = LaneDetection.cv2_to_ros_message(
             self, final_image

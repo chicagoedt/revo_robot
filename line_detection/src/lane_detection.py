@@ -208,15 +208,17 @@ class LaneDetection(object):
             return
         self.image_height = img.shape[0]
         self.image_width = img.shape[1]
+        return img
 
+    def get_roi(self, image):
         # if mono, don't take 3rd dimension since there's only one channel
         if self.use_mono:
-            roi = img[
+            roi = image[
                 self.roi_top_left_y:self.roi_top_left_y + self.roi_height,
                 self.roi_top_left_x:self.roi_top_left_x + self.roi_width,
             ]
         else:
-            roi = img[
+            roi = image[
                 self.roi_top_left_y:self.roi_top_left_y + self.roi_height,
                 self.roi_top_left_x:self.roi_top_left_x + self.roi_width,
                 :
@@ -226,5 +228,5 @@ class LaneDetection(object):
         if roi.size <= 0:
             rospy.logerr("Incorrect roi settings! Will use the entire image\
                          instead!")
-            roi = img
+            roi = image
         return roi

@@ -28,13 +28,14 @@ class Fitline(LaneDetection):
     def image_callback(self, ros_image):
 
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
+        roi = LaneDetection.get_roi(self, cv2_image)
 
         # given RGB images, it equalizes histogram for each channel separately!
         assert self.use_mono
 
         # extracts nonzero pixels and formats them as separate points
         # (each point is a vector of two elements, x and y)
-        points = np.float32(np.transpose(cv2_image.nonzero()))
+        points = np.float32(np.transpose(roi.nonzero()))
 
         # code from http://stackoverflow.com/a/14192660/341505
         # then apply fitline() function
@@ -44,18 +45,18 @@ class Fitline(LaneDetection):
 
         # Now find two extreme points on the line to draw line
         lefty = int((-x * vy / vx) + y)
-        righty = int(((cv2_image.shape[1] - x) * vy / vx) + y)
+        righty = int(((roi.shape[1] - x) * vy / vx) + y)
 
         # Finally draw the line
         cv2.line(
-            cv2_image,
-            (cv2_image.shape[1] - 1, righty),
+            roi,
+            (roi.shape[1] - 1, righty),
             (0, lefty),
             255,
             2
         )
 
-        final_image = cv2_image
+        final_image = roi
 
         final_image_message = LaneDetection.cv2_to_ros_message(
             self, final_image

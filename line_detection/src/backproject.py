@@ -42,12 +42,13 @@ class Backproject(LaneDetection):
     def image_callback(self, ros_image):
 
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
+        roi = LaneDetection.get_roi(self, cv2_image)
 
         # run backprojection to remove grass
-        mask = self.get_backprojection_mask(cv2_image)
+        mask = self.get_backprojection_mask(roi)
         mask = np.dstack((mask, mask, mask))
         # only include pixels from thresh
-        final_image = cv2.bitwise_and(cv2_image, mask)
+        final_image = cv2.bitwise_and(roi, mask)
 
         final_image_message = LaneDetection.cv2_to_ros_message(
             self, final_image
