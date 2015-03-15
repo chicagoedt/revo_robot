@@ -70,7 +70,6 @@ def main(args):
     # starts dynamic_reconfigure server
     srv = Server(LineDetectionConfig, bp.reconfigure_callback)
     rospy.spin()
-    cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     main(sys.argv)
