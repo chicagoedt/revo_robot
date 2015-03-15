@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import sys
-import cv2
 import rospy
 from dynamic_reconfigure.server import Server
 from lane_detection import LaneDetection
@@ -23,7 +22,7 @@ class Generic(LaneDetection):
     def __init__(self, namespace, node_name):
         LaneDetection.__init__(self, namespace, node_name)
 
-    # this is what gets called when an image is recieved
+    # this is what gets called when an image is received
     def image_callback(self, ros_image):
 
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)

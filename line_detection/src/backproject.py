@@ -38,7 +38,7 @@ class Backproject(LaneDetection):
         )
         cv2.normalize(self.histogram, self.histogram, 0, 255, cv2.NORM_MINMAX)
 
-    # this is what gets called when an image is recieved
+    # this is what gets called when an image is received
     def image_callback(self, ros_image):
 
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)

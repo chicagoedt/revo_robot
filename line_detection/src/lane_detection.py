@@ -181,8 +181,10 @@ class LaneDetection(object):
         return final_image_message
 
     def ros_to_cv2_image(self, image):
-        if (self.use_mono
-                and not self.use_compressed_format and
+        # if it's not compressed and isn't actually mono,
+        # but we expected mono, then error
+        if (self.use_mono and
+                not self.use_compressed_format and
                 image.encoding != 'mono8'):
             rospy.logerr("image is not mono8! Aborting!")
             return

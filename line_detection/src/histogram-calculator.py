@@ -47,7 +47,7 @@ class HistogramCalculator(LaneDetection):
             queue_size=1
         )
 
-    # this is what gets called when an image is recieved
+    # this is what gets called when an image is received
     def image_callback(self, ros_image):
 
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
