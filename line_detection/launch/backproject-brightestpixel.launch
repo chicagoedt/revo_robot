@@ -11,7 +11,7 @@
 
   </node>
 
-  <node pkg="line_detection" name="brightestpixel_lanedetection" type="brightest-pixel.py" output="screen">
+  <node pkg="line_detection" name="brightest_pixel" type="brightest-pixel.py" output="screen">
     
     <param name="use_mono" type="bool" value="true" />
     <param name="use_compressed_format" type="bool" value="true" />
