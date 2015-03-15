@@ -118,6 +118,8 @@ class LaneDetection(object):
         self.dilate_iterations = config['dilate_iterations']
         self.image_width = config['image_width']
         self.image_height = config['image_height']
+        self.skeletonize_max_iterations = config['skeletonize_max_iterations']
+
         # check that all these params are legal values
         self.validate_parameters()
         return config
