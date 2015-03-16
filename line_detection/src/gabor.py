@@ -20,6 +20,11 @@ class Gabor(LaneDetection):
     roi_top_left_y = 0
     roi_width = 2000
     roi_height = 2000
+    gabor_ksize = 4
+    gabor_sigma = 7
+    gabor_theta = 0
+    gabor_lambda = 27
+    gabor_gamma = 4.0
 
     def __init__(self, namespace, node_name):
         LaneDetection.__init__(self, namespace, node_name)
