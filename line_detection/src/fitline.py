@@ -69,8 +69,6 @@ class Fitline(LaneDetection):
 def main(args):
     node_name = "fitline"
     namespace = rospy.get_namespace()
-    if namespace == "/":
-        namespace = ""
 
     # create a fitline object
     f = Fitline(namespace, node_name)

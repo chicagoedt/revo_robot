@@ -57,8 +57,6 @@ class BrightestPixel(LaneDetection):
 def main(args):
     node_name = "brightest_pixel"
     namespace = rospy.get_namespace()
-    if namespace == "/":
-        namespace = ""
 
     # create a BrightestPixel object
     bp = BrightestPixel(namespace, node_name)

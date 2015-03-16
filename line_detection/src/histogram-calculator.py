@@ -99,8 +99,6 @@ class HistogramCalculator(LaneDetection):
 def main(args):
     node_name = "histogram_calculator"
     namespace = rospy.get_namespace()
-    if namespace == "/":
-        namespace = ""
 
     # create a HistogramCalculator object
     hc = HistogramCalculator(namespace, node_name)

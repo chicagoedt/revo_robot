@@ -55,8 +55,6 @@ class Gabor(LaneDetection):
 def main(args):
     node_name = "gabor"
     namespace = rospy.get_namespace()
-    if namespace == "/":
-        namespace = ""
 
     # create a gabor object
     g = Gabor(namespace, node_name)

@@ -21,6 +21,10 @@ class LaneDetection(object):
 
     def __init__(self, namespace, node_name):
 
+        # removes trailing slash in namespace
+        if (namespace.endswith("/")):
+            namespace = namespace[:-1]
+
         # grab parameters from launch file
         self.use_mono = rospy.get_param(
             namespace + node_name + "/use_mono",

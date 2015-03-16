@@ -61,8 +61,6 @@ class Hough(LaneDetection):
 def main(args):
     node_name = "hough"
     namespace = rospy.get_namespace()
-    if namespace == "/":
-        namespace = ""
 
     # create a hough object
     h = Hough(namespace, node_name)

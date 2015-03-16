@@ -62,8 +62,6 @@ class Skeletonize(LaneDetection):
 def main(args):
     node_name = "skeletonize"
     namespace = rospy.get_namespace()
-    if namespace == "/":
-        namespace = ""
 
     # create a Skeletonize object
     s = Skeletonize(namespace, node_name)
