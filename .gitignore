@@ -1,9 +1,12 @@
 base_controller/doc/*
 base_controller/doc/html/*
 
+rpg_*
+
 simulation/grass/meshes/images/
 simulation/scipio_simulation/meshes/
 
+robot_localization/
 
 */.DS_Store
 */._.DS_Store
