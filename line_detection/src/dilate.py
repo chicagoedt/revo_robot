@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import sys
+import numpy as np
 import cv2
 import rospy
 from dynamic_reconfigure.server import Server
@@ -8,33 +9,38 @@ from line_detection.cfg import LineDetectionConfig
 
 ###############################################################################
 # Chicago Engineering Design Team
-# Image Resizer using Python OpenCV for autonomous robot Scipio
-# (IGVC competition).
+# Dilate filter using Python OpenCV for autonomous robot Scipio
+#    (IGVC competition).
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 
 
-class ImageResizer(LaneDetection):
+class Dilate(LaneDetection):
     roi_top_left_x = 0
     roi_top_left_y = 0
     roi_width = 2000
     roi_height = 2000
+    dilate_size = 0
+    dilate_iterations = 0
 
     def __init__(self, namespace, node_name):
         LaneDetection.__init__(self, namespace, node_name)
 
-    # this is what gets called when an image is recieved
+    # this is what gets called when an image is received
     def image_callback(self, ros_image):
 
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
+        roi = LaneDetection.get_roi(self, cv2_image)
 
-        if (cv2_image.shape[0] > self.image_height or
-                cv2_image.shape[1] > self.image_width):
-            final_image = cv2.resize(
-                cv2_image, (self.image_width, self.image_height), 0, 0, 0
-            )
+        # dilate each pixel using kernel with dilate_size
+        if self.dilate_size > 0 and self.dilate_iterations > 0:
+            kernel = np.ones((self.dilate_size, self.dilate_size), np.uint8)
+            final_image = cv2.dilate(roi,
+                                     kernel,
+                                     iterations=self.dilate_iterations)
         else:
-            final_image = cv2_image
+            rospy.logwarn("dilate parameters invalid! Won't perform dilate!")
+            final_image = roi
 
         final_image_message = LaneDetection.cv2_to_ros_message(
             self, final_image
@@ -45,21 +51,20 @@ class ImageResizer(LaneDetection):
 
 
 def main(args):
-    node_name = "image_resizer"
+    node_name = "dilate"
     namespace = rospy.get_namespace()
     if namespace == "/":
         namespace = ""
 
-    # create an ImageResizer object
-    ir = ImageResizer(namespace, node_name)
+    # create a dilate object
+    d = Dilate(namespace, node_name)
 
     # start the line_detector node and start listening
-    rospy.init_node("image_resizer", anonymous=True)
+    rospy.init_node("dilate", anonymous=True)
 
     # starts dynamic_reconfigure server
-    srv = Server(LineDetectionConfig, ir.reconfigure_callback)
+    srv = Server(LineDetectionConfig, d.reconfigure_callback)
     rospy.spin()
-    cv2.destroyAllWindows()
 
 if __name__ == '__main__':
     main(sys.argv)
