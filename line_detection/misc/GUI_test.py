@@ -54,7 +54,7 @@ value_low = 0
 value_high = 255
 
 file_number = 1
-backprojection_threshold = 50
+backprojection_h_threshold = 50
 
 use_cam = False
 
@@ -209,7 +209,7 @@ def render_image():
     dst = 255 - dst 
 
     # threshold the backprojection stuff to only grab the more probable ones
-    ret,thresh = cv2.threshold(dst,backprojection_threshold,0,cv2.THRESH_TOZERO)
+    ret,thresh = cv2.threshold(dst,backprojection_h_threshold,0,cv2.THRESH_TOZERO)
     
     # AND the remaining backprojection pixels with the original gray image (we will only use gray so far so
     # we don't need to use BGR or HSV. If we did, then we could've merged thresh into a 3-channel image then AND'ed 
@@ -389,7 +389,7 @@ cv2.createTrackbar('hue_high_trackbar', 'final', hue_high, 179, nothing) # creat
 # cv2.createTrackbar('value_low_trackbar', 'final', value_low, 255, nothing) # create a trackbar for value_low (hsv threshold)
 # cv2.createTrackbar('value_high_trackbar', 'final', value_high, 255, nothing) # create a trackbar for value_high (hsv threshold)
 cv2.createTrackbar('file_number_trackbar', 'final', file_number, 7, nothing) # create a trackbar for file_number threshold
-cv2.createTrackbar('backprojection_threshold_trackbar', 'final', backprojection_threshold, 255, nothing) # create a trackbar for backprojection threshold
+cv2.createTrackbar('backprojection_h_threshold_trackbar', 'final', backprojection_h_threshold, 255, nothing) # create a trackbar for backprojection threshold
 
 
 
@@ -490,9 +490,9 @@ while 1:
     #     value_high = cv2.getTrackbarPos('value_high_trackbar', 'final')
     #     render_image()
 
-    # else if backprojection_threshold (trackbar) has changed, render image again
-    if (backprojection_threshold != cv2.getTrackbarPos('backprojection_threshold_trackbar', 'final')):
-        backprojection_threshold = cv2.getTrackbarPos('backprojection_threshold_trackbar', 'final')
+    # else if backprojection_h_threshold (trackbar) has changed, render image again
+    if (backprojection_h_threshold != cv2.getTrackbarPos('backprojection_h_threshold_trackbar', 'final')):
+        backprojection_h_threshold = cv2.getTrackbarPos('backprojection_h_threshold_trackbar', 'final')
         
         line_data = render_image()
         publish_line_data(line_data)
