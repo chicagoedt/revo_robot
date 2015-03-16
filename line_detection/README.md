@@ -17,4 +17,4 @@ Multiple nodes can be chained in launch files (their primary purpose is to test 
 Check the generic.launch and stereo-generic.launch files for the default parameters.
 
 ## Pitfalls (watch out! D:)
-If you've used and built an older version of `line_detection`, you might have trouble with the `dynamic_reconfigure` node crashing because of some `cfg` not found error. Unfortunately, it seems this problem persists until you remove your entire workspace and start fresh (perhaps even have to reinstall `ROS` completely [?]). It has to do with some weird cfg filename changes persisting even after attempting clean builds.
+If you've used and built very old versions (before LaneDetection class) of `line_detection` then tried to use the newer versions, you might have trouble with the `dynamic_reconfigure` node crashing because of some `cfg` not found error. Unfortunately, it seems this problem persists until you remove your entire workspace and start fresh (perhaps even have to reinstall `ROS` completely [?]). It has to do with some weird cfg filename changes persisting even after attempting clean builds. Just stay away from the old versions.
