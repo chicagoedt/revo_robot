@@ -1,6 +1,6 @@
 <launch>
 
-  <node pkg="line_detection" name="skeletonize" type="skeletonize.py" output="screen">
+  <node pkg="line_detection" name="fitline" type="fitline.py" output="screen">
     <param name="use_mono" type="bool" value="true" />
   </node>
 
