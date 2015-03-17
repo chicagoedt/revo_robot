@@ -30,6 +30,7 @@ class Hough(LaneDetection):
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
         roi = LaneDetection.get_roi(self, cv2_image)
 
+        assert self.use_mono
         # apply hough line transform
         lines = cv2.HoughLinesP(
             roi,
@@ -60,8 +61,6 @@ class Hough(LaneDetection):
 def main(args):
     node_name = "hough"
     namespace = rospy.get_namespace()
-    if namespace == "/":
-        namespace = ""
 
     # create a hough object
     h = Hough(namespace, node_name)

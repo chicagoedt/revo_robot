@@ -53,8 +53,6 @@ class Dilate(LaneDetection):
 def main(args):
     node_name = "dilate"
     namespace = rospy.get_namespace()
-    if namespace == "/":
-        namespace = ""
 
     # create a dilate object
     d = Dilate(namespace, node_name)

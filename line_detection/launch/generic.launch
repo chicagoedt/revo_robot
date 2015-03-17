@@ -1,5 +1,6 @@
 <launch>
 
+<!-- These are the default params for all the line_detection nodes. Just copy-paste this and modify to your liking -->
   <node pkg="line_detection" name="generic" type="generic.py" output="screen">
     <param name="use_mono" type="bool" value="false" />
     <param name="use_compressed_format" type="bool" value="true" />

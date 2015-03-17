@@ -42,8 +42,6 @@ class Generic(LaneDetection):
 def main(args):
     node_name = "generic"
     namespace = rospy.get_namespace()
-    if namespace == "/":
-        namespace = ""
 
     # create a gabor object
     g = Generic(namespace, node_name)

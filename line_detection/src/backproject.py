@@ -92,8 +92,6 @@ class Backproject(LaneDetection):
 def main(args):
     node_name = "backproject"
     namespace = rospy.get_namespace()
-    if namespace == "/":
-        namespace = ""
 
     # create a Backproject object
     bp = Backproject(namespace, node_name)

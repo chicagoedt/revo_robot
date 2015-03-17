@@ -54,8 +54,6 @@ class HistogramEqualization(LaneDetection):
 def main(args):
     node_name = "histogram_equalization"
     namespace = rospy.get_namespace()
-    if namespace == "/":
-        namespace = ""
 
     # create a HistogramEqualization object
     he = HistogramEqualization(namespace, node_name)

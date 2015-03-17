@@ -31,6 +31,7 @@ class Skeletonize(LaneDetection):
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
         roi = LaneDetection.get_roi(self, cv2_image)
 
+        assert self.use_mono
         # skeletonize image
         size = np.size(roi)
         skel = np.zeros(roi.shape, np.uint8)
@@ -61,8 +62,6 @@ class Skeletonize(LaneDetection):
 def main(args):
     node_name = "skeletonize"
     namespace = rospy.get_namespace()
-    if namespace == "/":
-        namespace = ""
 
     # create a Skeletonize object
     s = Skeletonize(namespace, node_name)

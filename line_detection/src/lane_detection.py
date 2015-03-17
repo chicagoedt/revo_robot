@@ -21,21 +21,30 @@ class LaneDetection(object):
 
     def __init__(self, namespace, node_name):
 
+        # removes trailing slash in namespace
+        if (namespace.endswith("/")):
+            namespace = namespace[:-1]
+
         # grab parameters from launch file
         self.use_mono = rospy.get_param(
-            namespace + node_name + "/use_mono"
+            namespace + node_name + "/use_mono",
+            False
         )
         self.use_compressed_format = rospy.get_param(
-            namespace + node_name + "/use_compressed_format"
+            namespace + node_name + "/use_compressed_format",
+            True
         )
         self.subscriber_image_topic = rospy.get_param(
-            namespace + node_name + "/subscriber_image_topic"
+            namespace + node_name + "/subscriber_image_topic",
+            "/camera/image_raw"
         )
         self.publisher_image_topic = rospy.get_param(
-            namespace + node_name + "/publisher_image_topic"
+            namespace + node_name + "/publisher_image_topic",
+            "/line_image"
         )
         self.buffer_size = rospy.get_param(
-            namespace + node_name + "/buffer_size"
+            namespace + node_name + "/buffer_size",
+            52428800
         )
         self.package_path = rospkg.RosPack().get_path('line_detection')
         # initialize ROS stuff

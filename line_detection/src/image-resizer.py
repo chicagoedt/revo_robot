@@ -47,8 +47,6 @@ class ImageResizer(LaneDetection):
 def main(args):
     node_name = "image_resizer"
     namespace = rospy.get_namespace()
-    if namespace == "/":
-        namespace = ""
 
     # create an ImageResizer object
     ir = ImageResizer(namespace, node_name)
