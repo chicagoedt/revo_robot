@@ -1,5 +1,11 @@
 sudo apt-get update
 rosdep update
+
+git clone https://github.com/cra-ros-pkg/robot_localization.git
+cd robot_localization
+rosmake
+cd ..
+
 rosdep install --from-paths ./ --ignore-src --rosdistro indigo -y
 
 cd .git/hooks
