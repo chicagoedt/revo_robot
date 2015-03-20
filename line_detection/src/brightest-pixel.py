@@ -5,6 +5,7 @@ import rospy
 from dynamic_reconfigure.server import Server
 from lane_detection import LaneDetection
 from line_detection.cfg import LineDetectionConfig
+from itertools import izip
 
 ###############################################################################
 # Chicago Engineering Design Team
@@ -31,19 +32,29 @@ class BrightestPixel(LaneDetection):
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
         roi = LaneDetection.get_roi(self, cv2_image)
 
-        # get indices of max pixels along each row
-        brightest_pixel_indices = np.argmax(roi, axis=1)
-        # get the values of max pixels along each row
-        brightest_pixel_values = np.amax(roi, axis=1)
+        # we can't deal with non-mono images yet
+        assert self.use_mono
 
+        # if there is a 3rd dimension (RGB channel, aka not mono),
+        # if (len(roi.shape) > 2 ):
+            
+
+        # get indices of max pixels along each row
+        indices = np.argmax(roi, axis=1)
+        rows = np.arange(roi.shape[0])
+        # get the values of max pixels along each row
+        # values = np.amax(roi, axis=1)
+        # print rows
+        # print indices
+        # print rows.shape
+        # print indices.shape
+        values = roi[rows, indices]
         # make an empty image
         brightest_pixels = np.zeros(roi.shape)
 
-        count = 0
         # now fill the image only with the brightest_pixels
-        for index in brightest_pixel_indices:
-            brightest_pixels[count, index] = brightest_pixel_values[count]
-            count += 1
+        for row, (col, pix) in enumerate(izip(indices, values)):
+            brightest_pixels[row, col] = pix
 
         final_image = brightest_pixels
         final_image_message = LaneDetection.cv2_to_ros_message(
