@@ -1,7 +1,7 @@
 # README for line_detection package
 
 ## Summary
-This package contains a bunch of computer vision nodes that use OpenCV and rospy. Each node is a subclass of a superclass called LaneDetection, which initializes publishers and subscribers, as well as dynamic_reconfigure callbacks, and converts ROS to CV2 and vice versa. All the nodes subscribe to a CompressedImage topic and publish to a CompressedImage topic. Some nodes will crash if given non-grayscale images.
+This package contains a bunch of computer vision nodes that use OpenCV and rospy. Each node is a subclass of a superclass called LaneDetection, which initializes publishers and subscribers, as well as dynamic_reconfigure callbacks, and converts ROS to CV2 and vice versa. All the nodes subscribe to a CompressedImage topic and publish to a CompressedImage topic. Some nodes require either grayscale or RGB images (backproject needs RGB. fitline, brightest-pixel, and skeletonize need grayscale).
 
 ## How to run
 For example, to run dilate node: `rosrun line_detection dilate.py`
