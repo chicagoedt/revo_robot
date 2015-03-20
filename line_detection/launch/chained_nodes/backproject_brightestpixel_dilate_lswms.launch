@@ -1,26 +1,18 @@
 <launch>
 
   <node pkg="line_detection" name="backproject" type="backproject.py" output="screen">
-    
-    <param name="subscriber_image_topic" type="str" value="/camera/image_raw" />
-    <param name="publisher_image_topic" type="str" value="/line_image" />
-
+    <param name="subscriber_image_topic" type="str" value="/camera/image_raw/compressed" />
+    <param name="publisher_image_topic" type="str" value="/line_image/compressed" />
   </node>
 
   <node pkg="line_detection" name="brightest_pixel" type="brightest-pixel.py" output="screen">
-    
-    <param name="use_mono" type="bool" value="true" />
-    <param name="subscriber_image_topic" type="str" value="/backproject/line_image" />
-    <param name="publisher_image_topic" type="str" value="/line_image" />
-
+    <param name="subscriber_image_topic" type="str" value="/backproject/line_image/compressed" />
+    <param name="publisher_image_topic" type="str" value="/line_image/compressed" />
   </node>
 
   <node pkg="line_detection" name="dilate" type="dilate.py" output="screen">
-    
-    <param name="use_mono" type="bool" value="true" />
-    <param name="subscriber_image_topic" type="str" value="/brightest_pixel/line_image" />
-    <param name="publisher_image_topic" type="str" value="/line_image" />
-
+    <param name="subscriber_image_topic" type="str" value="/brightest_pixel/line_image/compressed" />
+    <param name="publisher_image_topic" type="str" value="/line_image/compressed" />
   </node>
 
   <node pkg="line_detection" name="lswms_lanedetection" type="lswms" output="screen">

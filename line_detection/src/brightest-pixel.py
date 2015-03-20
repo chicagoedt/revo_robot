@@ -28,31 +28,22 @@ class BrightestPixel(LaneDetection):
 
     # this is what gets called when an image is received
     def image_callback(self, ros_image):
-
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
-        roi = LaneDetection.get_roi(self, cv2_image)
 
-        # we can't deal with non-mono images yet
-        assert self.use_mono
+        # this filter needs a mono image, no colors
+        roi = LaneDetection.convert_to_mono(self, cv2_image)
 
-        # if there is a 3rd dimension (RGB channel, aka not mono),
-        # if (len(roi.shape) > 2 ):
-            
+        roi = LaneDetection.get_roi(self, roi)
 
         # get indices of max pixels along each row
         indices = np.argmax(roi, axis=1)
         rows = np.arange(roi.shape[0])
         # get the values of max pixels along each row
-        # values = np.amax(roi, axis=1)
-        # print rows
-        # print indices
-        # print rows.shape
-        # print indices.shape
         values = roi[rows, indices]
         # make an empty image
         brightest_pixels = np.zeros(roi.shape)
 
-        # now fill the image only with the brightest_pixels
+        # now fill the image only with the brightest_pixels from each row
         for row, (col, pix) in enumerate(izip(indices, values)):
             brightest_pixels[row, col] = pix
 

@@ -1,9 +1,0 @@
-<launch>
-
-  <node pkg="line_detection" name="fitline" type="fitline.py" output="screen">
-    <param name="use_mono" type="bool" value="true" />
-  </node>
-
-  <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure" output="screen" />
-  
-</launch>

@@ -31,7 +31,7 @@ class HistogramEqualization(LaneDetection):
         roi = LaneDetection.get_roi(self, cv2_image)
 
         # given RGB images, it equalizes histogram for each channel separately!
-        if not self.use_mono and roi.ndim == 3:
+        if roi.ndim == 3:
             r = cv2.equalizeHist(roi[:, :, 0])
             g = cv2.equalizeHist(roi[:, :, 1])
             b = cv2.equalizeHist(roi[:, :, 2])

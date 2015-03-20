@@ -20,6 +20,12 @@ class Hough(LaneDetection):
     roi_top_left_y = 0
     roi_width = 2000
     roi_height = 2000
+    hough_rho = 1
+    hough_theta = 0.01
+    hough_threshold = 100
+    hough_min_line_length = 60
+    hough_max_line_gap = 7
+    hough_thickness = 1
 
     def __init__(self, namespace, node_name):
         LaneDetection.__init__(self, namespace, node_name)
@@ -28,9 +34,11 @@ class Hough(LaneDetection):
     def image_callback(self, ros_image):
 
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
-        roi = LaneDetection.get_roi(self, cv2_image)
+        # this filter needs a mono image, no colors
+        roi = LaneDetection.convert_to_mono(self, cv2_image)
 
-        assert self.use_mono
+        roi = LaneDetection.get_roi(self, roi)
+
         # apply hough line transform
         lines = cv2.HoughLinesP(
             roi,
