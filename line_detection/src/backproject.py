@@ -60,6 +60,8 @@ class Backproject(LaneDetection):
     # returns mask based on backprojection
     def get_backprojection_mask(self, image):
 
+        # make sure there are three channels in the image
+        assert image.ndim == 3
         # Convert BGR to HSV
         hsv = cv2.cvtColor(image, cv2.COLOR_BGR2HSV)
 
