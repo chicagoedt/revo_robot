@@ -11,6 +11,10 @@ from line_detection.cfg import LineDetectionConfig
 # Chicago Engineering Design Team
 # Dilate filter using Python OpenCV for autonomous robot Scipio
 #    (IGVC competition).
+#
+# This node performs a dilation on every pixel of given input image, and
+# publishes it. Nothing fancy here...
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 

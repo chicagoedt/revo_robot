@@ -11,6 +11,11 @@ import numpy as np
 # Chicago Engineering Design Team
 # Skeletonize filter using Python OpenCV for autonomous robot Scipio
 # (IGVC competition).
+#
+# This node "skeletonizes" input images by iteratively eroding the pixels until
+# they are a single-pixel thick. This makes it easier to apply line-fitting or
+# hough transforms on thick lines.
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 

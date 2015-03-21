@@ -10,6 +10,10 @@ import rospkg
 # Chicago Engineering Design Team
 # Lane Detection main class (interface) using Python OpenCV for autonomous
 # Robot Scipio (IGVC competition).
+#
+# All the line_detection nodes inherit from this class, which takes care of all
+# the boilerplate code (ROS-CV2 conversion) and topic-subscriber setup.
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 ###############################################################################

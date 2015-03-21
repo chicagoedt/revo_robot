@@ -11,6 +11,11 @@ from line_detection.cfg import LineDetectionConfig
 # Chicago Engineering Design Team
 # Histogram Equalization node using Python OpenCV for autonomous robot Scipio
 # (IGVC competition).
+#
+# This node performs histogram equalization on input images and publishes them.
+#
+# TODO consider using adaptive CLAHE when OpenCV 3.0 works on ROS Indigo
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 

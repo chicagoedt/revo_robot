@@ -11,6 +11,13 @@ from line_detection.cfg import LineDetectionConfig
 # Chicago Engineering Design Team
 # Fitline filter using Python OpenCV for autonomous robot Scipio
 #    (IGVC competition).
+#
+# This node runs OpenCV's line fitting algorithm on the input image and draws
+# the lines on the image, then publishes it. It currently uses the least-
+# squares method of line-fitting.
+#
+# Note: this node doesn't work so well when it's given dense images.
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 

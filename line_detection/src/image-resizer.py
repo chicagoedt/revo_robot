@@ -10,6 +10,10 @@ from line_detection.cfg import LineDetectionConfig
 # Chicago Engineering Design Team
 # Image Resizer using Python OpenCV for autonomous robot Scipio
 # (IGVC competition).
+#
+# This node resizes input images and publishes them. Just a tool to play with
+# image rosbags.
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 

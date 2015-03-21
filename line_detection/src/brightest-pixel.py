@@ -11,6 +11,13 @@ from itertools import izip
 # Chicago Engineering Design Team
 # Brightest Pixel filter using Python OpenCV for autonomous robot Scipio
 #    (IGVC competition).
+#
+# This node finds removes all pixels in every frame except the brightest pixels
+# from each row. If the given image was previously filtered properly, this
+# should leave us with the lanes on the grass being the brightest, and this
+# method would pick these pixels corresponding to the lanes (also reduces the
+# amount of data to be converted later into pointclouds).
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 

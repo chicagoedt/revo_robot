@@ -11,6 +11,10 @@ import numpy as np
 # Chicago Engineering Design Team
 # Hough Transform using Python OpenCV for autonomous robot Scipio
 # (IGVC competition).
+#
+# This node runs the hough transform on input images, draws lines from the
+# hough output, and publishes these images.
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 

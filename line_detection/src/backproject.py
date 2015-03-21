@@ -10,7 +10,14 @@ from line_detection.cfg import LineDetectionConfig
 ###############################################################################
 # Chicago Engineering Design Team
 # Backprojection filter using Python OpenCV for autonomous robot Scipio
-#    (IGVC competition).
+# (IGVC competition).
+#
+# This node reads a 2-d training histogram from a file and backprojects input
+# images, and filters out those that match the histogram. Essentially, it looks
+# for how well each pixel (in a given frame) matches the training histogram,
+# and filters it out if it does. This lets us filter out all the grass from
+# each frame.
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 
@@ -47,7 +54,7 @@ class Backproject(LaneDetection):
         # run backprojection to remove grass
         mask = self.get_backprojection_mask(roi)
         mask = np.dstack((mask, mask, mask))
-        # only include pixels from thresh
+        # only include pixels from mask
         final_image = cv2.bitwise_and(roi, mask)
 
         final_image_message = LaneDetection.cv2_to_ros_message(
