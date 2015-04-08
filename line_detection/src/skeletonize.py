@@ -11,6 +11,11 @@ import numpy as np
 # Chicago Engineering Design Team
 # Skeletonize filter using Python OpenCV for autonomous robot Scipio
 # (IGVC competition).
+#
+# This node "skeletonizes" input images by iteratively eroding the pixels until
+# they are a single-pixel thick. This makes it easier to apply line-fitting or
+# hough transforms on thick lines.
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 
@@ -29,9 +34,11 @@ class Skeletonize(LaneDetection):
     def image_callback(self, ros_image):
 
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
-        roi = LaneDetection.get_roi(self, cv2_image)
+        # this filter needs a mono image, no colors
+        roi = LaneDetection.convert_to_mono(self, cv2_image)
 
-        assert self.use_mono
+        roi = LaneDetection.get_roi(self, roi)
+
         # skeletonize image
         size = np.size(roi)
         skel = np.zeros(roi.shape, np.uint8)

@@ -5,18 +5,18 @@
     <param name="publisher_image_topic" type="str" value="/line_image/compressed" />
   </node>
 
-  <node pkg="line_detection" name="histogram_equalization" type="histogram-equalization.py" output="screen">
+  <node pkg="line_detection" name="brightest_pixel" type="brightest-pixel.py" output="screen">
     <param name="subscriber_image_topic" type="str" value="/backproject/line_image/compressed" />
     <param name="publisher_image_topic" type="str" value="/line_image/compressed" />
   </node>
 
-  <node pkg="line_detection" name="brightest_pixel" type="brightest-pixel.py" output="screen">
-    <param name="subscriber_image_topic" type="str" value="/histogram_equalization/line_image/compressed" />
+  <node pkg="line_detection" name="dilate" type="dilate.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/brightest_pixel/line_image/compressed" />
     <param name="publisher_image_topic" type="str" value="/line_image/compressed" />
   </node>
 
   <node pkg="line_detection" name="fitline" type="fitline.py" output="screen">
-    <param name="subscriber_image_topic" type="str" value="/brightest_pixel/line_image/compressed" />
+    <param name="subscriber_image_topic" type="str" value="/dilate/line_image/compressed" />
     <param name="publisher_image_topic" type="str" value="/line_image/compressed" />
   </node>
 

@@ -4,14 +4,16 @@ import cv2
 import rospy
 import sensor_msgs
 from sensor_msgs.msg import CompressedImage
-from sensor_msgs.msg import Image
-from cv_bridge import CvBridge, CvBridgeError
 import rospkg
 
 ###############################################################################
 # Chicago Engineering Design Team
 # Lane Detection main class (interface) using Python OpenCV for autonomous
 # Robot Scipio (IGVC competition).
+#
+# All the line_detection nodes inherit from this class, which takes care of all
+# the boilerplate code (ROS-CV2 conversion) and topic-subscriber setup.
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 ###############################################################################
@@ -26,21 +28,13 @@ class LaneDetection(object):
             namespace = namespace[:-1]
 
         # grab parameters from launch file
-        self.use_mono = rospy.get_param(
-            namespace + node_name + "/use_mono",
-            False
-        )
-        self.use_compressed_format = rospy.get_param(
-            namespace + node_name + "/use_compressed_format",
-            True
-        )
         self.subscriber_image_topic = rospy.get_param(
             namespace + node_name + "/subscriber_image_topic",
-            "/camera/image_raw"
+            "/camera/image_raw/compressed"
         )
         self.publisher_image_topic = rospy.get_param(
             namespace + node_name + "/publisher_image_topic",
-            "/line_image"
+            "/line_image/compressed"
         )
         self.buffer_size = rospy.get_param(
             namespace + node_name + "/buffer_size",
@@ -54,32 +48,19 @@ class LaneDetection(object):
         # publisher for image of line pixels (only for debugging, not used in
         # map)
         self.line_image_pub = rospy.Publisher(
-            namespace + "/" + node_name + self.publisher_image_topic +
-            '/compressed',
+            namespace + "/" + node_name + self.publisher_image_topic,
             sensor_msgs.msg.CompressedImage,
             queue_size=1
         )
 
-        if self.use_compressed_format:
-            # subscriber for ROS image topic
-            self.image_sub = rospy.Subscriber(
-                self.subscriber_image_topic + "/compressed",
-                CompressedImage,
-                self.image_callback,
-                queue_size=1,
-                buff_size=self.buffer_size
-            )
-        else:
-            # use this for uncompressed raw format
-            self.image_sub = rospy.Subscriber(
-                self.subscriber_image_topic,
-                Image,
-                self.image_callback,
-                queue_size=1,
-                buff_size=self.buffer_size
-            )
-
-        self.bridge = CvBridge()
+        # subscriber for ROS image topic
+        self.image_sub = rospy.Subscriber(
+            self.subscriber_image_topic,
+            CompressedImage,
+            self.image_callback,
+            queue_size=1,
+            buff_size=self.buffer_size
+        )
 
         # use this if you need to use the camera_info topic (has intrinsic
         #                                                     parameters)
@@ -119,6 +100,7 @@ class LaneDetection(object):
         self.hough_min_line_length = config['hough_min_line_length']
         self.hough_max_line_gap = config['hough_max_line_gap']
         self.hough_thickness = config['hough_thickness']
+        self.hough_number_of_lines = config['hough_number_of_lines']
         self.roi_top_left_x = config['roi_top_left_x']
         self.roi_top_left_y = config['roi_top_left_y']
         self.roi_width = config['roi_width']
@@ -182,6 +164,13 @@ class LaneDetection(object):
             rospy.logwarn("dilate_size should not be even! Changed to %d",
                           self.dilate_size)
 
+    # if there is a 3rd dimension (RGB channel, aka not mono),
+    # convert it to mono
+    def convert_to_mono(self, image):
+        if (len(image.shape) > 2):
+            return cv2.cvtColor(image, cv2.cv.CV_BGR2GRAY)
+        return image
+
     def cv2_to_ros_message(self, image):
         # Create CompressedImage to publish
         final_image_message = CompressedImage()
@@ -192,30 +181,9 @@ class LaneDetection(object):
         return final_image_message
 
     def ros_to_cv2_image(self, image):
-        # if it's not compressed and isn't actually mono,
-        # but we expected mono, then error
-        if (self.use_mono and
-                not self.use_compressed_format and
-                image.encoding != 'mono8'):
-            rospy.logerr("image is not mono8! Aborting!")
-            return
+        np_arr = np.fromstring(image.data, np.uint8)
+        img = cv2.imdecode(np_arr, -1)
 
-        if self.use_compressed_format:
-            # direct conversion from ROS CompressedImage to CV2 #
-            np_arr = np.fromstring(image.data, np.uint8)
-            if self.use_mono:
-                img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_GRAYSCALE)
-            else:
-                img = cv2.imdecode(np_arr, cv2.CV_LOAD_IMAGE_COLOR)
-        else:
-            # direct conversion from ROS Image to CV2
-            # first, we need to convert image from sensor_msgs/Image to numpy
-            # (or cv2). For this, we use cv_bridge
-            try:
-                img = self.bridge.imgmsg_to_cv2(image,
-                                                desired_encoding="passthrough")
-            except CvBridgeError, e:
-                rospy.logerr(e)
         if img is None:
             rospy.logerr("error! img is empty!")
             return
@@ -225,7 +193,7 @@ class LaneDetection(object):
 
     def get_roi(self, image):
         # if mono, don't take 3rd dimension since there's only one channel
-        if self.use_mono:
+        if image.ndim != 3:
             roi = image[
                 self.roi_top_left_y:self.roi_top_left_y + self.roi_height,
                 self.roi_top_left_x:self.roi_top_left_x + self.roi_width,

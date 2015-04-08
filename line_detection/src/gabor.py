@@ -11,6 +11,9 @@ from line_detection.cfg import LineDetectionConfig
 # Chicago Engineering Design Team
 # Gabor filter using Python OpenCV for autonomous robot Scipio
 # (IGVC competition).
+#
+# This node runs the Gabor filter on input images and publishes them.
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 

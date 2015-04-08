@@ -5,11 +5,19 @@ import rospy
 from dynamic_reconfigure.server import Server
 from lane_detection import LaneDetection
 from line_detection.cfg import LineDetectionConfig
+from itertools import izip
 
 ###############################################################################
 # Chicago Engineering Design Team
 # Brightest Pixel filter using Python OpenCV for autonomous robot Scipio
 #    (IGVC competition).
+#
+# This node finds removes all pixels in every frame except the brightest pixels
+# from each row. If the given image was previously filtered properly, this
+# should leave us with the lanes on the grass being the brightest, and this
+# method would pick these pixels corresponding to the lanes (also reduces the
+# amount of data to be converted later into pointclouds).
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 
@@ -27,23 +35,24 @@ class BrightestPixel(LaneDetection):
 
     # this is what gets called when an image is received
     def image_callback(self, ros_image):
-
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
-        roi = LaneDetection.get_roi(self, cv2_image)
+
+        # this filter needs a mono image, no colors
+        roi = LaneDetection.convert_to_mono(self, cv2_image)
+
+        roi = LaneDetection.get_roi(self, roi)
 
         # get indices of max pixels along each row
-        brightest_pixel_indices = np.argmax(roi, axis=1)
+        indices = np.argmax(roi, axis=1)
+        rows = np.arange(roi.shape[0])
         # get the values of max pixels along each row
-        brightest_pixel_values = np.amax(roi, axis=1)
-
+        values = roi[rows, indices]
         # make an empty image
         brightest_pixels = np.zeros(roi.shape)
 
-        count = 0
-        # now fill the image only with the brightest_pixels
-        for index in brightest_pixel_indices:
-            brightest_pixels[count, index] = brightest_pixel_values[count]
-            count += 1
+        # now fill the image only with the brightest_pixels from each row
+        for row, (col, pix) in enumerate(izip(indices, values)):
+            brightest_pixels[row, col] = pix
 
         final_image = brightest_pixels
         final_image_message = LaneDetection.cv2_to_ros_message(

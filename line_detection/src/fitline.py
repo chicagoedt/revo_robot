@@ -11,6 +11,13 @@ from line_detection.cfg import LineDetectionConfig
 # Chicago Engineering Design Team
 # Fitline filter using Python OpenCV for autonomous robot Scipio
 #    (IGVC competition).
+#
+# This node runs OpenCV's line fitting algorithm on the input image and draws
+# the lines on the image, then publishes it. It currently uses the least-
+# squares method of line-fitting.
+#
+# Note: this node doesn't work so well when it's given dense images.
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 
@@ -28,10 +35,10 @@ class Fitline(LaneDetection):
     def image_callback(self, ros_image):
 
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
-        roi = LaneDetection.get_roi(self, cv2_image)
+        # this filter needs a mono image, no colors
+        roi = LaneDetection.convert_to_mono(self, cv2_image)
 
-        # make sure the image is mono
-        assert self.use_mono
+        roi = LaneDetection.get_roi(self, roi)
 
         # extracts nonzero pixels and formats them as separate points
         # (each point is a vector of two elements, x and y)

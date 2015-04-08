@@ -1,12 +1,12 @@
 <launch>
 
-  <node pkg="line_detection" name="backproject" type="backproject.py" output="screen">
+  <node pkg="line_detection" name="canny_backproject" type="canny-backproject.py" output="screen">
     <param name="subscriber_image_topic" type="str" value="/camera/image_raw/compressed" />
     <param name="publisher_image_topic" type="str" value="/line_image/compressed" />
   </node>
 
-  <node pkg="line_detection" name="brightest_pixel" type="brightest-pixel.py" output="screen">
-    <param name="subscriber_image_topic" type="str" value="/backproject/line_image/compressed" />
+  <node pkg="line_detection" name="blob_detection" type="blob_detection.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/canny_backproject/line_image/compressed" />
     <param name="publisher_image_topic" type="str" value="/line_image/compressed" />
   </node>
 
