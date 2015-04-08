@@ -30,6 +30,7 @@ class Hough(LaneDetection):
     hough_min_line_length = 60
     hough_max_line_gap = 7
     hough_thickness = 1
+    hough_number_of_lines = 2
 
     def __init__(self, namespace, node_name):
         LaneDetection.__init__(self, namespace, node_name)
@@ -51,9 +52,13 @@ class Hough(LaneDetection):
             self.hough_threshold,
             minLineLength=self.hough_min_line_length,
             maxLineGap=self.hough_max_line_gap)
+        # TODO remove hough lines that are very close together
+
         final_image = np.zeros(roi.shape)
         if lines is not None:
-            for x1, y1, x2, y2 in lines[0]:
+            number_of_lines = min(self.hough_number_of_lines, len(lines[0]))
+            # draw only the first number_of_lines lines
+            for x1, y1, x2, y2 in lines[0, :number_of_lines]:
                 cv2.line(
                     final_image,
                     (x1, y1),

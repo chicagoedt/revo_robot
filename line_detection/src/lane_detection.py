@@ -100,6 +100,7 @@ class LaneDetection(object):
         self.hough_min_line_length = config['hough_min_line_length']
         self.hough_max_line_gap = config['hough_max_line_gap']
         self.hough_thickness = config['hough_thickness']
+        self.hough_number_of_lines = config['hough_number_of_lines']
         self.roi_top_left_x = config['roi_top_left_x']
         self.roi_top_left_y = config['roi_top_left_y']
         self.roi_width = config['roi_width']
