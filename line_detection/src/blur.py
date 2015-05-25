@@ -33,7 +33,7 @@ class Blur(LaneDetection):
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
         roi = LaneDetection.get_roi(self, cv2_image)
 
-        final_image = cv2.blur(roi, (7, 7))
+        final_image = cv2.blur(roi, (self.blur_size, self.blur_size))
 
         final_image_message = LaneDetection.cv2_to_ros_message(
             self, final_image
