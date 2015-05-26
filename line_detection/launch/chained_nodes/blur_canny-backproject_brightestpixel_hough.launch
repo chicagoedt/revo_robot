@@ -1,0 +1,25 @@
+<launch>
+
+  <node pkg="line_detection" name="blur" type="blur.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/camera/image_raw/compressed" />
+    <param name="publisher_image_topic" type="str" value="/line_image/compressed" />
+  </node>
+
+  <node pkg="line_detection" name="canny_backproject" type="canny-backproject.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/blur/line_image/compressed" />
+    <param name="publisher_image_topic" type="str" value="/line_image/compressed" />
+  </node>
+
+  <node pkg="line_detection" name="brightest_pixel" type="brightest-pixel.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/canny_backproject/line_image/compressed" />
+    <param name="publisher_image_topic" type="str" value="/line_image/compressed" />
+  </node>
+
+  <node pkg="line_detection" name="hough" type="hough.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/brightest_pixel/line_image/compressed" />
+    <param name="publisher_image_topic" type="str" value="/line_image/compressed" />
+  </node>
+
+  <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure" output="screen" />
+  
+</launch>
