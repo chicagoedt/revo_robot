@@ -1,3 +1,8 @@
 <launch>
     <node pkg="tf" type="static_transform_publisher" name="camera_to_optical_tf" args="0 0 0 -1.570796 0 -1.570796 camera camera_optical 100" />
+
+    
+    <!-- TODO set these actual transform values based on real robot!!! -->
+    <node pkg="tf" type="static_transform_publisher" name="base_link_to_camera_tf" args="0 0 1.0 -0 0.78539816339 0 base_link camera 100" />
+
 </launch>
