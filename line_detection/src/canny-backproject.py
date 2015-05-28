@@ -9,7 +9,7 @@ from line_detection.cfg import LineDetectionConfig
 
 ###############################################################################
 # Chicago Engineering Design Team
-# Backprojection filter using Python OpenCV for autonomous robot Scipio
+# Canny then Backprojection filter using Python OpenCV for autonomous robot Scipio
 # (IGVC competition).
 #
 # This node reads a 2-d training histogram from a file and backprojects input
@@ -51,11 +51,15 @@ class Backproject(LaneDetection):
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
         roi = LaneDetection.get_roi(self, cv2_image)
 
+        canny = cv2.Canny(roi, 100, 10)
+
         # run backprojection to remove grass
         mask = self.get_backprojection_mask(roi)
         mask = np.dstack((mask, mask, mask))
         # only include pixels from mask
-        final_image = cv2.bitwise_and(roi, mask)
+        temp_image = cv2.bitwise_and(roi, mask)
+
+        final_image = cv2.bitwise_and(temp_image[:, :, 0], canny)
 
         final_image_message = LaneDetection.cv2_to_ros_message(
             self, final_image
@@ -99,14 +103,14 @@ class Backproject(LaneDetection):
 
 
 def main(args):
-    node_name = "backproject"
+    node_name = "canny_backproject"
     namespace = rospy.get_namespace()
 
     # create a Backproject object
     bp = Backproject(namespace, node_name)
 
     # start the line_detector node and start listening
-    rospy.init_node("backproject", anonymous=True)
+    rospy.init_node("canny_backproject", anonymous=True)
 
     # starts dynamic_reconfigure server
     srv = Server(LineDetectionConfig, bp.reconfigure_callback)

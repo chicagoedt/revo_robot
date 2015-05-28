@@ -11,6 +11,11 @@ from line_detection.cfg import LineDetectionConfig
 # Chicago Engineering Design Team
 # Histogram Equalization node using Python OpenCV for autonomous robot Scipio
 # (IGVC competition).
+#
+# This node performs histogram equalization on input images and publishes them.
+#
+# TODO consider using adaptive CLAHE when OpenCV 3.0 works on ROS Indigo
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 
@@ -31,7 +36,7 @@ class HistogramEqualization(LaneDetection):
         roi = LaneDetection.get_roi(self, cv2_image)
 
         # given RGB images, it equalizes histogram for each channel separately!
-        if not self.use_mono and roi.ndim == 3:
+        if roi.ndim == 3:
             r = cv2.equalizeHist(roi[:, :, 0])
             g = cv2.equalizeHist(roi[:, :, 1])
             b = cv2.equalizeHist(roi[:, :, 2])
@@ -54,8 +59,6 @@ class HistogramEqualization(LaneDetection):
 def main(args):
     node_name = "histogram_equalization"
     namespace = rospy.get_namespace()
-    if namespace == "/":
-        namespace = ""
 
     # create a HistogramEqualization object
     he = HistogramEqualization(namespace, node_name)

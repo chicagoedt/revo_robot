@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(line_detection)
 
-find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs dynamic_reconfigure cv_bridge OpenCV sensor_msgs image_transport)
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs dynamic_reconfigure cv_bridge sensor_msgs image_transport)
 
 generate_dynamic_reconfigure_options(
   cfg/LineDetection.cfg

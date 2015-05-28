@@ -9,6 +9,10 @@ from line_detection.cfg import LineDetectionConfig
 # Chicago Engineering Design Team
 # Generic node using Python OpenCV for autonomous robot Scipio
 # (IGVC competition).
+#
+# This is a generic line_detection node, use it as a template for creating new
+# for OpenCV stuff.
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 
@@ -42,8 +46,6 @@ class Generic(LaneDetection):
 def main(args):
     node_name = "generic"
     namespace = rospy.get_namespace()
-    if namespace == "/":
-        namespace = ""
 
     # create a gabor object
     g = Generic(namespace, node_name)

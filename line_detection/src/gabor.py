@@ -11,6 +11,9 @@ from line_detection.cfg import LineDetectionConfig
 # Chicago Engineering Design Team
 # Gabor filter using Python OpenCV for autonomous robot Scipio
 # (IGVC competition).
+#
+# This node runs the Gabor filter on input images and publishes them.
+#
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 
@@ -20,6 +23,11 @@ class Gabor(LaneDetection):
     roi_top_left_y = 0
     roi_width = 2000
     roi_height = 2000
+    gabor_ksize = 4
+    gabor_sigma = 7
+    gabor_theta = 0
+    gabor_lambda = 27
+    gabor_gamma = 4.0
 
     def __init__(self, namespace, node_name):
         LaneDetection.__init__(self, namespace, node_name)
@@ -50,8 +58,6 @@ class Gabor(LaneDetection):
 def main(args):
     node_name = "gabor"
     namespace = rospy.get_namespace()
-    if namespace == "/":
-        namespace = ""
 
     # create a gabor object
     g = Gabor(namespace, node_name)
