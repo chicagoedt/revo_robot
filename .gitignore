@@ -1,6 +1,9 @@
 base_controller/doc/*
 base_controller/doc/html/*
 
+roboteq_driver/
+sick_tim/
+
 rpg_*
 
 simulation/grass/meshes/images/
