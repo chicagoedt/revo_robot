@@ -17,3 +17,8 @@ Check the generic.launch and stereo-generic.launch files for the default paramet
 
 ## Pitfalls (watch out! D:)
 If you've used and built very old versions (before LaneDetection class) of `line_detection` then tried to use the newer versions, you might have trouble with the `dynamic_reconfigure` node crashing because of some `cfg` not found error. Unfortunately, it seems this problem persists until you remove your entire workspace and start fresh (perhaps even have to reinstall `ROS` completely [?]). It has to do with some weird cfg filename changes persisting even after attempting clean builds. Just stay away from the old versions.
+
+## Dependencies
+ - `pixel\_to\_coordinate\_calculator` node:
+     - `image_geometry` has to be installed and compiled from source. Check [this issue](http://answers.ros.org/question/209953/image_geometry-pinholecameramodel-python-not-importing-properly-when-installed-using-debian-package/) for more details.
+<!--      - [scipy](http://scipy.org/install.html) has to be installed from debian packages. -->
