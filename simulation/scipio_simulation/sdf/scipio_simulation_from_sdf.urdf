@@ -1,0 +1,331 @@
+<?xml version='1.0' encoding='utf-8'?>
+<robot name='scipio_simulation'>
+  <origin xyz='0 0 0.1' rpy='0 0 1.57'/>
+  <link name='base_link'>
+    <inertial>
+      <origin xyz='0.00808696 0.174209 -5.1079e-07' rpy='0 -0 0'/>
+      <mass value='30.6648'/>
+      <inertia ixx='2.53655' ixy='-0.0102253' ixz='1.17409e-05' iyy='4.29926' iyz='1.93444e-07' izz='2.13276'/>
+    </inertial>
+    <collision name='base_link_collision'>
+      <origin xyz='0 0 0.5' rpy='0 -0 0'/>
+      <geometry>
+        <box size='0.7 0.7 0.7'/>
+      </geometry>
+    </collision>
+    <visual name='base_link_visual'>
+      <origin xyz='0.049 0.009 0' rpy='0 -0 0'/>
+      <geometry>
+        <mesh filename='package://scipio_simulation/meshes/base_link.DAE' scale='1 1 1'/>
+      </geometry>
+    </visual>
+  </link>
+
+  <link name='back_left_wheel_link'>
+    <origin xyz='0.26746 -0.17757 0.18923' rpy='3.0728 -6.245e-17 -1.5708'/>
+    <inertial>
+      <origin xyz='0.24702 -3.7896e-07 7.5693e-06' rpy='-1.85822e-34 6.93889e-18 -5.35596e-17'/>
+      <mass value='11.018'/>
+      <inertia ixx='0.20289' ixy='2.1691e-07' ixz='-4.2814e-06' iyy='0.1147' iyz='3.8435e-08' izz='0.1147'/>
+    </inertial>
+    <collision name='back_left_wheel_link_collision'>
+      <origin xyz='0 0 0' rpy='-1.85822e-34 6.93889e-18 -5.35596e-17'/>
+      <geometry>
+        <mesh filename='package://scipio_simulation/meshes/back_left_wheel_link.STL' scale='1 1 1'/>
+      </geometry>
+    </collision>
+    <visual name='back_left_wheel_link_visual'>
+      <origin xyz='0 0 0' rpy='-1.85822e-34 6.93889e-18 -5.35596e-17'/>
+      <geometry>
+        <mesh filename='package://scipio_simulation/meshes/back_left_wheel_link.STL' scale='1 1 1'/>
+      </geometry>
+    </visual>
+  </link>
+  <link name='back_right_wheel_link'>
+    <inertial>
+      <origin xyz='0.24702 -2.4732e-06 -7.1639e-06' rpy='0 -0 1.0842e-17'/>
+      <mass value='11.018'/>
+      <inertia ixx='0.20289' ixy='1.3965e-06' ixz='4.0531e-06' iyy='0.1147' iyz='-2.2566e-07' izz='0.1147'/>
+    </inertial>
+    <collision name='back_right_wheel_link_collision'>
+      <origin xyz='0 0 0' rpy='0 -0 1.0842e-17'/>
+      <geometry>
+        <mesh filename='package://scipio_simulation/meshes/back_right_wheel_link.STL' scale='1 1 1'/>
+      </geometry>
+    </collision>
+    <visual name='back_right_wheel_link_visual'>
+      <origin xyz='0 0 0' rpy='0 -0 1.0842e-17'/>
+      <geometry>
+        <mesh filename='package://scipio_simulation/meshes/back_right_wheel_link.STL' scale='1 1 1'/>
+      </geometry>
+    </visual>
+  </link>
+  <link name='front_left_wheel_link'>
+    <inertial>
+      <origin xyz='0.24702 -6.9913e-07 7.5465e-06' rpy='-6.93889e-18 -6.93889e-18 -4.42354e-17'/>
+      <mass value='11.018'/>
+      <inertia ixx='0.20289' ixy='3.9801e-07' ixz='-4.2684e-06' iyy='0.1147' iyz='6.9259e-08' izz='0.1147'/>
+    </inertial>
+    <collision name='front_left_wheel_link_collision'>
+      <origin xyz='0 0 0' rpy='-6.93889e-18 -6.93889e-18 -4.42354e-17'/>
+      <geometry>
+        <mesh filename='package://scipio_simulation/meshes/front_left_wheel_link.STL' scale='1 1 1'/>
+      </geometry>
+    </collision>
+    <visual name='front_left_wheel_link_visual'>
+      <origin xyz='0 0 0' rpy='-6.93889e-18 -6.93889e-18 -4.42354e-17'/>
+      <geometry>
+        <mesh filename='package://scipio_simulation/meshes/front_left_wheel_link.STL' scale='1 1 1'/>
+      </geometry>
+    </visual>
+  </link>
+  <link name='front_right_wheel_link'>
+    <inertial>
+      <origin xyz='0.24702 -8.6541e-07 -7.5292e-06' rpy='0 -0 7.88757e-18'/>
+      <mass value='11.018'/>
+      <inertia ixx='0.20289' ixy='4.8698e-07' ixz='4.2592e-06' iyy='0.1147' iyz='-8.183e-08' izz='0.1147'/>
+    </inertial>
+    <collision name='front_right_wheel_link_collision'>
+      <origin xyz='0 0 0' rpy='0 -0 7.88757e-18'/>
+      <geometry>
+        <mesh filename='package://scipio_simulation/meshes/front_right_wheel_link.STL' scale='1 1 1'/>
+      </geometry>
+    </collision>
+    <visual name='front_right_wheel_link_visual'>
+      <origin xyz='0 0 0' rpy='0 -0 7.88757e-18'/>
+      <geometry>
+        <mesh filename='package://scipio_simulation/meshes/front_right_wheel_link.STL' scale='1 1 1'/>
+      </geometry>
+    </visual>
+  </link>
+  <link name='blackfly_mount_link'>
+    <origin xyz='0.2 0 1.2' rpy='0 1.04719 0'/>
+    <inertial>
+      <origin xyz='0 0 0' rpy='0 -0 0'/>
+      <mass value='1e-05'/>
+      <inertia ixx='1e-06' ixy='0' ixz='0' iyy='1e-06' iyz='0' izz='1e-06'/>
+    </inertial>
+    <collision name='blackfly_mount_link_collision'>
+      <origin xyz='0 0 0' rpy='0 -0 0'/>
+      <geometry>
+        <box size='0.05 0.05 0.05'/>
+      </geometry>
+    </collision>
+    <visual name='blackfly_mount_link_visual'>
+      <origin xyz='0 0 0' rpy='0 -0 0'/>
+      <geometry>
+        <box size='0.05 0.05 0.05'/>
+      </geometry>
+    </visual>
+  </link>
+  <link name='imu_link'>
+    <inertial>
+      <origin xyz='0 0 0' rpy='0 -0 0'/>
+      <mass value='0.001'/>
+      <inertia ixx='1e-09' ixy='0' ixz='0' iyy='1e-09' iyz='0' izz='1e-09'/>
+    </inertial>
+  </link>
+  <link name='gps_link'>
+    <inertial>
+      <origin xyz='0 0 0' rpy='0 -0 0'/>
+      <mass value='0.001'/>
+      <inertia ixx='1e-09' ixy='0' ixz='0' iyy='1e-09' iyz='0' izz='1e-09'/>
+    </inertial>
+  </link>
+  <link name='laser'>
+    <inertial>
+      <origin xyz='0 0 0' rpy='0 -0 0'/>
+      <mass value='0.001'/>
+      <inertia ixx='1e-09' ixy='0' ixz='0' iyy='1e-09' iyz='0' izz='1e-09'/>
+    </inertial>
+  </link>
+
+  <joint name='back_left_wheel_joint' type='continuous'>
+    <origin xyz='0.26746 -0.17757 0.18923' rpy='3.0728 -6.245e-17 -1.5708'/>
+    <parent link='base_link'/>
+    <child link='back_left_wheel_link'/>
+    <axis xyz='-1 0 0'/>
+  </joint>
+
+  <joint name='back_right_wheel_joint' type='revolute'>
+    <origin xyz='0.26746 0.17757 0.18923' rpy='-3.0192 5.55112e-17 1.5708'/>
+    <parent link='base_link'/>
+    <child link='back_right_wheel_link'/>
+    <axis xyz='1 -4.85996e-12 5.97817e-13'/>
+    <limit lower='-1e+16' upper='1e+16' effort='-1' velocity='-1'/>
+  </joint>
+
+  <joint name='front_left_wheel_joint' type='revolute'>
+    <origin xyz='-0.26746 -0.17757 0.18923' rpy='3.0516 -6.245e-17 -1.5708'/>
+    <parent link='base_link'/>
+    <child link='front_left_wheel_link'/>
+    <axis xyz='-1 -4.87684e-12 -4.40075e-13'/>
+    <limit lower='-1e+16' upper='1e+16' effort='-1' velocity='-1'/>
+  </joint>
+
+  <joint name='front_right_wheel_joint' type='revolute'>
+    <origin xyz='-0.26746 0.17757 0.18923' rpy='-3.1282 5.89806e-17 1.5708'/>
+    <parent link='base_link'/>
+    <child link='front_right_wheel_link'/>
+    <axis xyz='1 -4.89612e-12 6.55769e-14'/>
+    <limit lower='-1e+16' upper='1e+16' effort='-1' velocity='-1'/>
+  </joint>
+
+  <joint name='blackfly_mount_joint' type='fixed'>
+    <origin xyz='0.2 0 1.2' rpy='0 1.04719 0'/>
+    <parent link='base_link'/>
+    <child link='blackfly_mount_link'/>
+   <!-- <axis xyz='-0.500007 0 -0.866022'/> -->
+    <axis xyz='-1 0 0'/>
+  </joint>
+
+  <joint name='imu_joint' type='revolute'>
+    <origin xyz='0 0 0' rpy='0 -0 0'/>
+    <parent link='base_link'/>
+    <child link='imu_link'/>
+    <axis xyz='0 0 1'/>
+    <limit lower='0' upper='0' effort='-1' velocity='-1'/>
+  </joint>
+
+  <joint name='gps_joint' type='revolute'>
+    <origin xyz='0 0 0' rpy='0 -0 0'/>
+    <parent link='base_link'/>
+    <child link='gps_link'/>
+    <axis xyz='0 0 1'/>
+    <limit lower='0' upper='0' effort='-1' velocity='-1'/>
+  </joint>
+
+  <joint name='laser_joint' type='revolute'>
+    <origin xyz='0.428 0 0.485' rpy='0 -0 0'/>
+    <parent link='base_link'/>
+    <child link='laser'/>
+    <axis xyz='0 0 1'/>
+    <limit lower='0' upper='0' effort='-1' velocity='-1'/>
+  </joint>
+
+  <gazebo reference="laser">
+    <sensor type="ray" name="laser">
+      <pose>0 0 0 0 0 0</pose>
+      <visualize>true</visualize>
+      <update_rate>15</update_rate>
+      <ray>
+        <scan>
+          <horizontal>
+            <samples>720</samples>
+            <resolution>1</resolution>
+            <min_angle>-1.570796</min_angle>
+            <max_angle>1.570796</max_angle>
+          </horizontal>
+        </scan>
+        <range>
+          <min>0.08</min>
+          <max>10.0</max>
+          <resolution>0.05</resolution>
+        </range>
+        <noise>
+          <type>gaussian</type>
+          <!-- Noise parameters based on published spec for Hokuyo laser
+               achieving "+-30mm" accuracy at range < 10m.  A mean of 0.0m and
+               stddev of 0.01m will put 99.7% of samples within 0.03m of the true
+               reading. -->
+          <mean>0.0</mean>
+          <stddev>0.01</stddev>
+        </noise>
+      </ray>
+      <plugin name="gazebo_ros_laser" filename="libgazebo_ros_laser.so">
+        <topicName>scan</topicName>
+        <frameName>laser</frameName>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+    <gazebo>
+        <plugin name="skid_steer_drive_controller" filename="libgazebo_ros_skid_steer_drive.so">
+            <updateRate>35.0</updateRate>
+            <robotNamespace>/</robotNamespace>
+            <leftFrontJoint>back_right_wheel_joint</leftFrontJoint>
+            <rightFrontJoint>back_left_wheel_joint</rightFrontJoint>
+            <leftRearJoint>front_right_wheel_joint</leftRearJoint>
+            <rightRearJoint>front_left_wheel_joint</rightRearJoint>
+            <wheelSeparation>0.854431</wheelSeparation>
+            <wheelDiameter>0.379476</wheelDiameter>
+            <robotBaseFrame>base_footprint</robotBaseFrame>
+            <torque>40</torque>
+            <commandTopic>cmd_vel</commandTopic>
+            <odometryTopic>raw_odom</odometryTopic>
+            <odometryFrame>odom</odometryFrame>
+        </plugin>
+    </gazebo>
+
+    <gazebo>
+        <plugin name="gps_controller" filename="libhector_gazebo_ros_gps.so">
+            <updateRate>40</updateRate>
+            <robotNamespace>/</robotNamespace>
+            <bodyName>gps_link</bodyName>
+            <frameId>base_footprint</frameId>
+            <topicName>fix</topicName>
+            <velocityTopicName>/navsat/vel</velocityTopicName>
+            <referenceLatitude>49.9</referenceLatitude>
+            <referenceLongitude>8.9</referenceLongitude>
+            <referenceHeading>0</referenceHeading>
+            <referenceAltitude>0</referenceAltitude>
+            <drift>0.0000 0.0000 0.0000</drift>
+        </plugin>
+    </gazebo>
+
+    <gazebo>
+    <plugin name="imu_controller" filename="libhector_gazebo_ros_imu.so">
+        <robotNamespace>/</robotNamespace>
+        <updateRate>50.0</updateRate>
+        <bodyName>base_link</bodyName>
+        <topicName>imu/data</topicName>
+        <accelDrift>0.00 0.00 0.00</accelDrift>
+        <accelGaussianNoise>0.00 0.00 0.00</accelGaussianNoise>
+        <rateDrift>0.00 0.00 0.00</rateDrift>
+        <rateGaussianNoise>0.00 0.00 0.00 </rateGaussianNoise>
+        <headingDrift>0.00</headingDrift>
+        <headingGaussianNoise>0.00</headingGaussianNoise>
+    </plugin>
+    </gazebo>
+
+    <gazebo reference="blackfly_mount_link">
+    <sensor type="camera" name="blackfly_camera">
+      <update_rate>20</update_rate>
+      <camera name="head">
+        <horizontal_fov>2.09</horizontal_fov>
+        <image>
+          <width>1280</width>
+          <height>960</height>
+          <format>R8G8B8</format>
+        </image>
+        <clip>
+          <near>0.02</near>
+          <far>300</far>
+        </clip>
+        <noise>
+          <type>gaussian</type>
+          <!-- Noise is sampled independently per pixel on each frame.
+               That pixel's noise value is added to each of its color
+               channels, which at that point lie in the range [0,1]. -->
+          <mean>0.0</mean>
+          <stddev>0.007</stddev>
+        </noise>
+      </camera>
+      <plugin name="camera_controller" filename="libgazebo_ros_camera.so">
+        <alwaysOn>true</alwaysOn>
+        <updateRate>0.0</updateRate>
+        <cameraName>camera</cameraName>
+        <imageTopicName>image_raw</imageTopicName>
+        <cameraInfoTopicName>camera_info</cameraInfoTopicName>
+        <frameName>blackfly_mount_link</frameName>
+        <hackBaseline>0.07</hackBaseline>
+        <distortionK1>0.0</distortionK1>
+        <distortionK2>0.0</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>0.0</distortionT1>
+        <distortionT2>0.0</distortionT2>
+      </plugin>
+    </sensor>
+  </gazebo>
+
+</robot>
