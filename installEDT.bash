@@ -1,24 +1,9 @@
 sudo apt-get update
 rosdep update
 
-git clone https://github.com/cra-ros-pkg/robot_localization.git
-cd robot_localization
-rosmake
-cd ..
-
 rosdep install --from-paths ./ --ignore-src --rosdistro indigo -y
 
-cd .git/hooks
-
-echo "#!/bin/bash" >> post-receive
-echo "rosdep install --from-paths src --ignore-src --rosdistro indigo -y" >> post-receive
-echo "#!/bin/bash" >> post-update
-echo "rosdep install --from-paths src --ignore-src --rosdistro indigo -y" >> post-update
-
-sudo chmod +x post-receive
-sudo chmod +x post-update
-
-cd ../../../
+cd ../../
 
 catkin_make clean
 catkin_make
@@ -39,18 +24,33 @@ roscd
 echo "You should now be in the /devel/ folder."
 
 echo "Now grabbing scipio's gazebo meshes from the EDT wiki..."
-cd ..
-cd src/simulation/scipio_simulation
+roscd scipio_simulation
 mkdir meshes
 cd meshes
 
-wget http://wiki.chicagoedt.org/images/7/70/Back_left_wheel_link.STL.zip
-unzip Back_left_wheel_link.STL.zip
-rm Back_left_wheel_link.STL.zip
+if [ -e ./Back_left_wheel_link.STL.zip ]; then
+    wget -c http://wiki.chicagoedt.org/images/7/70/Back_left_wheel_link.STL.zip
+    unzip Back_left_wheel_link.STL.zip
+    rm Back_left_wheel_link.STL.zip
+else
+    if [ ! -e ./Back_left_wheel_link.STL ]; then
+        wget http://wiki.chicagoedt.org/images/7/70/Back_left_wheel_link.STL.zip
+        unzip Back_left_wheel_link.STL.zip
+        rm Back_left_wheel_link.STL.zip
+    fi
+fi
 
-wget http://wiki.chicagoedt.org/images/7/71/Base_link.DAE.zip
-unzip Base_link.DAE.zip
-rm Base_link.DAE.zip
+if [ -e ./Base_link.DAE.zip ]; then
+    wget -c http://wiki.chicagoedt.org/images/7/71/Base_link.DAE.zip
+    unzip Base_link.DAE.zip
+    rm Base_link.DAE.zip
+else
+    if [ ! -e ./Base_link.DAE ]; then
+        wget http://wiki.chicagoedt.org/images/7/71/Base_link.DAE.zip
+        unzip Base_link.DAE.zip
+        rm Base_link.DAE.zip
+    fi
+fi
 
 wget http://wiki.chicagoedt.org/images/9/9b/Front_left_wheel_link.STL.zip
 unzip Front_left_wheel_link.STL.zip
