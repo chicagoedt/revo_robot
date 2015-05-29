@@ -23,7 +23,7 @@ import numpy as np
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 
-DEBUG_POINTCLOUD = True
+DEBUG_POINTCLOUD = False
 
 
 class PixelToCoordinateCalculator:
@@ -33,11 +33,15 @@ class PixelToCoordinateCalculator:
     # set up camera info manager instance
     camera_info_url = rospy.get_param(
         'pixel_to_coordinate_calculator/camera_info_url',
-        "file://" + package_path + "/misc/calibration_data/aptina_960.yaml"
+        "file://" + package_path + "/misc/calibration_data/aptina_960_fake.yaml"
     )
     camera_name = rospy.get_param(
         'pixel_to_coordinate_calculator/camera_name',
         "camera"
+    )
+    DEBUG_POINTCLOUD = rospy.get_param(
+        'debug_pointcloud',
+        False
     )
 
     cam_info_manager = CameraInfoManager(cname=camera_name, url=camera_info_url)
@@ -243,13 +247,13 @@ if __name__ == '__main__':
     p.get_3d_rays_from_camera_model()
     p.write_intersection_array_to_file()
 
-    rate = rospy.Rate(10)
-    while not rospy.is_shutdown():
-        if(DEBUG_POINTCLOUD):
+
+    if(DEBUG_POINTCLOUD):
+        rate = rospy.Rate(10)
+        while not rospy.is_shutdown():
             # don't forget to update time stamp on message
             p.debug_pointcloud.header.stamp = rospy.Time.now()
             # now publish the debug pointcloud
             p.cloud_pub.publish(p.debug_pointcloud)
-        rate.sleep()
-
-    rospy.spin()
+            rate.sleep()
+            rospy.spinOnce()
