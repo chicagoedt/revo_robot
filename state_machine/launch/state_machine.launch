@@ -1,0 +1,7 @@
+<launch>
+
+  <node pkg="state_machine" type="state_machine_node" name="state_machine" output="screen" >
+  	<rosparam command="load" file="$(find state_machine)/yaml/goalpoints.yaml" />
+  </node> 
+
+</launch>

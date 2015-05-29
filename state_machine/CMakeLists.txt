@@ -7,6 +7,7 @@ project(state_machine)
 find_package(catkin REQUIRED COMPONENTS
   actionlib
   geometry_msgs
+  geographic_msgs
   move_base_msgs
   roscpp
   tf
@@ -111,6 +112,8 @@ add_dependencies(state_machine_node state_machine_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(state_machine_node ${catkin_LIBRARIES} )
+
+set(CMAKE_BUILD_TYPE Debug)
 
 #############
 ## Install ##
