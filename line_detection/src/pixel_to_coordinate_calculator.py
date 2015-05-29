@@ -12,6 +12,7 @@ from geometry_msgs.msg import Point
 from geometry_msgs.msg import PoseStamped
 from sensor_msgs.msg import PointCloud
 import std_msgs.msg
+import numpy as np
 
 ###############################################################################
 # Chicago Engineering Design Team
@@ -90,6 +91,12 @@ class PixelToCoordinateCalculator:
         # self.image_height = self.camera_info.height
         # self.image_width = self.camera_info.width
 
+        # array that holds (x,y) point for each pixel
+        self.intersection_array = np.zeros((self.roi_height, self.roi_width, 2), dtype=float)
+
+    def get_transform(self):
+        self.trans = self.tf_buffer.lookup_transform("base_footprint", "camera_optical", rospy.Time())
+
     def get_3d_rays_from_camera_model(self):
 
         # go through every pixel in the image, and get
@@ -114,7 +121,7 @@ class PixelToCoordinateCalculator:
         # create an empty list of correct size
         self.debug_pointcloud.points = [None] * self.number_of_pixels
 
-        rospy.loginfo("Calculating 3d rays for each pixel. This might take a while...")
+        rospy.loginfo("Calculating %d rays for each pixel. This might take a while...", self.number_of_pixels)
         # loop over them and create a 3d ray for each pixel
         count = 0  # using a counter here because I have to loop over all elements in all_pixels iterator
         for pixel in all_pixels:
@@ -132,8 +139,7 @@ class PixelToCoordinateCalculator:
             # transform the point to base_footprint
             while True:
                 try:
-                    trans = self.tf_buffer.lookup_transform("base_footprint", "camera_optical", rospy.Time())
-                    transformed_point = tf2_geometry_msgs.do_transform_point(point_stamped, trans)
+                    transformed_point = tf2_geometry_msgs.do_transform_point(point_stamped, self.trans)
                     rospy.logdebug("transformed_point is (%f, %f, %f)", transformed_point.point.x, transformed_point.point.y, transformed_point.point.z)
                 except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                     rospy.logwarn("tf2 exception raised! retrying!")
@@ -141,21 +147,32 @@ class PixelToCoordinateCalculator:
                     continue  # stay in infinite while loop until point is successfully transformed
                 break  # break out of infinite while loop because this point was successfully transformed
 
-            self.debug_pointcloud.points[count] = point_stamped.point
+            # self.debug_pointcloud.points[count] = point_stamped.point
 
             # now the rays are from origin of camera_optical frame to this transformed_point.
             # so the intersection
-            inter = isect_line_plane_v3(trans.transform.translation, transformed_point.point, Point(0, 0, 0), Point(0, 0, 1))
-            rospy.logdebug("intersection of 3d ray with ground plane is (%f, %f, %f)", inter.x, inter.y, inter.z)
+            inter = isect_line_plane_v3(self.trans.transform.translation, transformed_point.point, Point(0, 0, 0), Point(0, 0, 1))
+            # rospy.logdebug("intersection of 3d ray with ground plane is (%f, %f, %f)", inter.x, inter.y, inter.z)
 
             # TEMPORARY TESTING
             self.debug_pointcloud.header.frame_id = "base_footprint"
             self.debug_pointcloud.points[count] = inter
 
+            self.intersection_array[pixel[1]-self.roi_y, pixel[0]-self.roi_x, 0] = inter.x
+            self.intersection_array[pixel[1]-self.roi_y, pixel[0]-self.roi_x, 1] = inter.y
+
+            if(count % 100000 == 0):
+                rospy.loginfo("Done with %d rays...", count)
             count += 1
 
         end_time = rospy.get_rostime().secs
         rospy.loginfo("finished getting 3d rays in %i seconds!", (end_time - start_time))
+
+    def write_intersection_array_to_file(self):
+        np.save(
+            self.package_path + "/misc/training_images/pixel_coordinates.npy",
+            self.intersection_array
+        )
 
 # end class
 
@@ -222,7 +239,9 @@ if __name__ == '__main__':
 
     rospy.sleep(1.0)  # fix for lookup_transform() being called too soon
     p.initialize_camera_model()
+    p.get_transform()
     p.get_3d_rays_from_camera_model()
+    p.write_intersection_array_to_file()
 
     rate = rospy.Rate(10)
     while not rospy.is_shutdown():
