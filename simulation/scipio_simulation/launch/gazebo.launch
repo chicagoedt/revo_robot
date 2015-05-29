@@ -1,8 +1,13 @@
 <?xml version="1.0"?>
 <launch>
 
+  <arg name="gui" default="false" />
+  <arg name="headless" default="true" />
+
   <include file="$(find gazebo_ros)/launch/empty_world.launch">
     <arg name="use_sim_time" value="true"/>
+    <arg name="gui" value="$(arg gui)" />
+    <arg name="headless" value="$(arg headless)" />
     <arg name="world_name" value="$(find scipio_simulation)/worlds/igvc_final.world"/>
   </include>
 
@@ -10,6 +15,7 @@
   <node ns="stereo_camera" pkg="stereo_image_proc" name="stereo_image_proc" type="stereo_image_proc"/>
 -->
 
+  <include file="$(find scipio_2dnav)/camera_tf.launch"/>
   <include file="$(find scipio_2dnav)/move_base.launch"/>
 
   <node name="rviz" pkg="rviz" type="rviz"/>
@@ -18,9 +24,9 @@
     <remap from="voxel_marked_cloud" to="/move_base/local_costmap/obstacle_layer/marked_cloud"/>
     <remap from="voxel_unknown_cloud" to="/move_base/local_costmap/obstacle_layer/unknown_cloud"/>
   </node>
-
+<!--
   <node name="robot_tf_publisher" pkg="robot_setup_tf" type="robot_tf_publisher"/>
-
+-->
   <param name="robot_description" textfile="$(find scipio_simulation)/sdf/scipio_simulation.sdf" />
   <node
     name="spawn_model"

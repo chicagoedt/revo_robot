@@ -460,6 +460,14 @@ This wont work yet because we also need a cylinder for the axel -->
         <cameraInfoTopicName>camera_info</cameraInfoTopicName>
         <frameName>blackfly_mount_link</frameName>
         <hackBaseline>0.07</hackBaseline>
+<!--
+        <distortionK1>0.00700312108117085</distortionK1>
+        <distortionK2>-0.00373939112092846</distortionK2>
+        <distortionK3>0.0</distortionK3>
+        <distortionT1>-1.71120905699391e-05</distortionT1>
+        <distortionT2>0.00010275961515041</distortionT2>
+-->
+
         <distortionK1>0.0</distortionK1>
         <distortionK2>0.0</distortionK2>
         <distortionK3>0.0</distortionK3>
