@@ -19,10 +19,6 @@ from line_detection.cfg import LineDetectionConfig
 
 
 class Blur(LaneDetection):
-    roi_top_left_x = 0
-    roi_top_left_y = 0
-    roi_width = 2000
-    roi_height = 2000
 
     def __init__(self, namespace, node_name):
         LaneDetection.__init__(self, namespace, node_name)

@@ -1,7 +1,7 @@
 <launch>
 
 <!-- These are the default params for all the line_detection nodes. Just copy-paste this and modify to your liking -->
-  <node pkg="line_detection" name="generic" type="generic.py" output="screen">
+  <node pkg="line_detection" name="blur" type="blur.py" output="screen">
     <param name="subscriber_image_topic" type="str" value="/camera/image_raw/compressed" />
     <param name="publisher_image_topic" type="str" value="/line_image/compressed" />
     <param name="buffer_size" type="int" value="52428800" />

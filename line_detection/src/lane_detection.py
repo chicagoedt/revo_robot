@@ -41,6 +41,34 @@ class LaneDetection(object):
             52428800
         )
         self.package_path = rospkg.RosPack().get_path('line_detection')
+
+        # top-left x coordinate of ROI rectangle
+        self.roi_top_left_x = rospy.get_param(
+            namespace + node_name + '/roi_x',
+            0
+        )
+        # top-left y coordinate of ROI rectangle
+        self.roi_top_left_y = rospy.get_param(
+            namespace + node_name + '/roi_y',
+            # self.camera_info.height / 2
+            0
+        )
+        # assert(self.roi_x >= 0)
+        # assert(self.roi_x < self.camera_info.width)
+        # assert(self.roi_y >= 0)
+        # assert(self.roi_y < self.camera_info.height)
+
+        # width of ROI rectangle
+        self.roi_width = rospy.get_param(
+            namespace + node_name + '/roi_width',
+            960
+        )
+        # height of ROI rectangle
+        self.roi_height = rospy.get_param(
+            namespace + node_name + '/roi_height',
+            480
+        )
+
         # initialize ROS stuff
 
         # set publisher and subscriber
@@ -101,10 +129,10 @@ class LaneDetection(object):
         self.hough_max_line_gap = config['hough_max_line_gap']
         self.hough_thickness = config['hough_thickness']
         self.hough_number_of_lines = config['hough_number_of_lines']
-        self.roi_top_left_x = config['roi_top_left_x']
-        self.roi_top_left_y = config['roi_top_left_y']
-        self.roi_width = config['roi_width']
-        self.roi_height = config['roi_height']
+        # self.roi_top_left_x = config['roi_top_left_x']
+        # self.roi_top_left_y = config['roi_top_left_y']
+        # self.roi_width = config['roi_width']
+        # self.roi_height = config['roi_height']
         self.dilate_size = config['dilate_size']
         self.dilate_iterations = config['dilate_iterations']
         self.image_width = config['image_width']
@@ -145,6 +173,13 @@ class LaneDetection(object):
         if self.hough_max_line_gap <= 0:
             self.hough_max_line_gap = 1
 
+        # dilate kernel size cannot be even
+        if self.dilate_size % 2 == 0:
+            self.dilate_size += 1
+            rospy.logwarn("dilate_size should not be even! Changed to %d",
+                          self.dilate_size)
+
+    def validate_roi(self):
         # now check if ROI parameters are out of bounds
         # only do this if image dimensions have been set
         if self.image_width > 0 and self.image_height > 0:
@@ -157,12 +192,6 @@ class LaneDetection(object):
                 self.roi_height = self.image_height - self.roi_top_left_y
             if self.roi_top_left_y < 0:
                 self.roi_top_left_y = 0
-
-        # dilate kernel size cannot be even
-        if self.dilate_size % 2 == 0:
-            self.dilate_size += 1
-            rospy.logwarn("dilate_size should not be even! Changed to %d",
-                          self.dilate_size)
 
     # if there is a 3rd dimension (RGB channel, aka not mono),
     # convert it to mono
@@ -189,6 +218,7 @@ class LaneDetection(object):
             return
         self.image_height = img.shape[0]
         self.image_width = img.shape[1]
+        self.validate_roi()
         return img
 
     def get_roi(self, image):
