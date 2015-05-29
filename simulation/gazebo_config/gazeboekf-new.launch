@@ -19,6 +19,7 @@
       <param name="pitch_offset" value="0"/>
       <param name="yaw_offset" value="0"/>
       <param name="zero_altitude" value="true"/>
+      <param name="publish_filtered_gps" value="true"/>
 
       <remap from="/gps/fix" to="/fix" />
 
