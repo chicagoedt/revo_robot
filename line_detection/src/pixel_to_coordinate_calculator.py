@@ -16,14 +16,17 @@ import numpy as np
 
 ###############################################################################
 # Chicago Engineering Design Team
-# 
+# ROS node that calculates 3d coordinates of all possible pixels (in ROI) of
+# a calibrated camera assuming they are projected on the ground in front of it.
+# These coordinates (x and y) are written to a file afterwards, and if
+# debugging is on, a pointcloud is published.
 #
-# 
+# This node is run only once. The output file is effectively a lookup table for
+# line detection nodes to figure out where certain pixels lie in 3d space (for
+# which they generate pointclouds and place them in costmaps).
 #
 # @author Basheer Subei
 # @email basheersubei@gmail.com
-
-DEBUG_POINTCLOUD = False
 
 
 class PixelToCoordinateCalculator:
@@ -33,14 +36,14 @@ class PixelToCoordinateCalculator:
     # set up camera info manager instance
     camera_info_url = rospy.get_param(
         'pixel_to_coordinate_calculator/camera_info_url',
-        "file://" + package_path + "/misc/calibration_data/aptina_960_fake.yaml"
+        "file://" + package_path + "/misc/calibration_data/aptina_960.yaml"
     )
     camera_name = rospy.get_param(
         'pixel_to_coordinate_calculator/camera_name',
         "camera"
     )
     DEBUG_POINTCLOUD = rospy.get_param(
-        'debug_pointcloud',
+        'pixel_to_coordinate_calculator/debug_pointcloud',
         False
     )
 
@@ -61,6 +64,7 @@ class PixelToCoordinateCalculator:
             queue_size=10
         )
 
+    # TODO handle exceptions if camera_info cant be obtained
     def initialize_camera_model(self):
         # create a pinhole model from camera info
         self.cam_frame = self.camera_info.header.frame_id
@@ -99,7 +103,15 @@ class PixelToCoordinateCalculator:
         self.intersection_array = np.zeros((self.roi_height, self.roi_width, 2), dtype=float)
 
     def get_transform(self):
-        self.trans = self.tf_buffer.lookup_transform("base_footprint", "camera_optical", rospy.Time())
+        while not rospy.is_shutdown():
+            try:
+                self.trans = self.tf_buffer.lookup_transform("base_footprint", "camera_optical", rospy.Time())
+            except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+                rospy.logwarn("tf2 exception raised! Check that base_footprint to camera_optical transform is being broadcasted! Retrying in 1 second")
+                rospy.sleep(1)
+                continue  # stay in infinite while loop until point is successfully transformed
+            return True  # if we managed to look it up even once, leave
+        return False  # if rospy is shutdown, signal fail
 
     def get_3d_rays_from_camera_model(self):
 
@@ -130,7 +142,7 @@ class PixelToCoordinateCalculator:
         count = 0  # using a counter here because I have to loop over all elements in all_pixels iterator
         for pixel in all_pixels:
             if rospy.is_shutdown():  # loop takes a while, use this to respond to shutdown signal
-                return
+                return False
             (r_x, r_y, r_z) = self.cam_model.projectPixelTo3dRay(pixel)
 
             # create a point stamped in camera_optical frame
@@ -171,6 +183,7 @@ class PixelToCoordinateCalculator:
 
         end_time = rospy.get_rostime().secs
         rospy.loginfo("finished getting 3d rays in %i seconds!", (end_time - start_time))
+        return True
 
     def write_intersection_array_to_file(self):
         np.save(
@@ -181,6 +194,7 @@ class PixelToCoordinateCalculator:
 # end class
 
 
+# TODO clean up this code and make it more compact
 # p0 is origin of camera_optical frame (the transform.translation)
 # p1 is the current point for this pixel (transformed_point.point)
 # p_co is just (0, 0, 0) origin of base_footprint frame
@@ -242,18 +256,21 @@ if __name__ == '__main__':
     p = PixelToCoordinateCalculator()
 
     rospy.sleep(1.0)  # fix for lookup_transform() being called too soon
+
+    p.rate = rospy.Rate(10)
+
+    rospy.loginfo("debug is: %d", p.DEBUG_POINTCLOUD)
     p.initialize_camera_model()
-    p.get_transform()
-    p.get_3d_rays_from_camera_model()
-    p.write_intersection_array_to_file()
 
+    if(p.get_transform() and p.get_3d_rays_from_camera_model()):
+        # only write to file if got transform and 3d rays successfully
+        p.write_intersection_array_to_file()
 
-    if(DEBUG_POINTCLOUD):
-        rate = rospy.Rate(10)
-        while not rospy.is_shutdown():
-            # don't forget to update time stamp on message
-            p.debug_pointcloud.header.stamp = rospy.Time.now()
-            # now publish the debug pointcloud
-            p.cloud_pub.publish(p.debug_pointcloud)
-            rate.sleep()
-            rospy.spinOnce()
+    # for debug, publish pointcloud
+    while p.DEBUG_POINTCLOUD and not rospy.is_shutdown():
+        # don't forget to update time stamp on message
+        p.debug_pointcloud.header.stamp = rospy.Time.now()
+        # now publish the debug pointcloud
+        p.cloud_pub.publish(p.debug_pointcloud)
+        p.rate.sleep()
+    rospy.loginfo("PixelToCoordinateCalculator done. Exiting...")
