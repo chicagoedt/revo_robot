@@ -1,6 +1,8 @@
 Software_IGVC [![Build Status](http://jenkins.chicagoedt.org/job/Software_IGVC_Upstream/badge/icon)](http://jenkins.chicagoedt.org/job/Software_IGVC_Upstream/)
 =============
 
+Please refer to the [prerequisite setup](https://github.com/chicagoedt/Software_IGVC/wiki#prerequisites-for-testing) before continuing.  
+
 Run the Real Robot
 ------------
 **1)** The configuration command below will:
