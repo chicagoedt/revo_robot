@@ -18,7 +18,9 @@ import std_msgs.msg
 # Chicago Engineering Design Team
 # Line PointCloud publisher node
 #
-# Publishes a pointcloud of every non-zero pixel in the input image
+# Publishes a pointcloud of every non-zero pixel in the input image. The
+# pixel_to_coordinate_calculator node must be run at least once before with
+# consistent roi settings.
 #
 # @author Basheer Subei
 # @email basheersubei@gmail.com
@@ -28,6 +30,9 @@ class PointcloudPublisher(LaneDetection):
 
     def __init__(self, namespace, node_name):
         LaneDetection.__init__(self, namespace, node_name)
+
+        # remove this publisher that was inherited from LaneDetection
+        self.line_image_pub.unregister()
 
         self.publisher_cloud_topic = rospy.get_param(
             namespace + node_name + "/publisher_cloud_topic",
