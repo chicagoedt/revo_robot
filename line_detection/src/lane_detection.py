@@ -146,6 +146,12 @@ class LaneDetection(object):
     # makes sure the parameters are valid and don't crash the
     # openCV calls. Changes them to valid values if invalid.
     def validate_parameters(self):
+        # adaptive threshold kernel size must be odd
+        if self.adaptive_threshold_block_size % 2 == 0:
+            self.adaptive_threshold_block_size += 1
+        if self.adaptive_threshold_block_size <= 2:
+            self.adaptive_threshold_block_size = 3
+
         # blur_size can be an odd number only
         if self.blur_size % 2 == 0:
             self.blur_size -= 1

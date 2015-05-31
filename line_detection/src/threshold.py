@@ -20,6 +20,14 @@ class Threshold(LaneDetection):
 
     def __init__(self, namespace, node_name):
         LaneDetection.__init__(self, namespace, node_name)
+        # if rospy.has_param('/use_sim_time'):
+        #     self.use_sim_time = rospy.get_param("/use_sim_time")
+        # else:
+        #     self.use_sim_time = False
+        self.use_adaptive_threshold = rospy.get_param(
+            namespace + node_name + "/use_adaptive_threshold",
+            False
+        )
 
     # this is what gets called when an image is received
     def image_callback(self, ros_image):
@@ -30,14 +38,31 @@ class Threshold(LaneDetection):
 
         roi = self.get_roi(mono)
 
-        retval, final_image = cv2.threshold(
-            roi,
-            self.global_threshold,
-            255,
-            cv2.THRESH_BINARY
-        )
+        # use adaptive threshold or global threshold
+        if self.use_adaptive_threshold:
+            final_image = cv2.adaptiveThreshold(
+                roi,
+                255,
+                cv2.ADAPTIVE_THRESH_MEAN_C,
+                cv2.THRESH_BINARY,
+                self.adaptive_threshold_block_size,
+                self.adaptive_threshold_C
+            )
+        else:
+            retval, final_image = cv2.threshold(
+                roi,
+                self.global_threshold,
+                255,
+                cv2.THRESH_BINARY
+            )
 
         final_image_message = self.cv2_to_ros_message(final_image)
+        # if we're reading from a bag, let the published message have same time
+        # if self.use_sim_time:
+        # just a hack to make published messages have same timestamps,
+        # used for message_filter
+        final_image_message.header.stamp = ros_image.header.stamp
+
         # publishes final image message in ROS format
         self.line_image_pub.publish(final_image_message)
     # end image_callback()
