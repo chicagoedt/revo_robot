@@ -1,0 +1,13 @@
+<launch>
+
+  <node pkg="line_detection" name="threshold" type="threshold.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/camera/image_raw/compressed" />
+    <param name="publisher_image_topic" type="str" value="/line_image/compressed" />
+    <param name="buffer_size" type="int" value="52428800" />
+    <rosparam command="load" file="$(find line_detection)/roi.yaml" />
+
+  </node>
+
+  <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure" output="screen" />
+  
+</launch>
