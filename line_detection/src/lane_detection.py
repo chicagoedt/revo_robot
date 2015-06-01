@@ -23,10 +23,6 @@ class LaneDetection(object):
 
     def __init__(self, namespace, node_name):
 
-        # removes trailing slash in namespace
-        if (namespace.endswith("/")):
-            namespace = namespace[:-1]
-
         # grab parameters from launch file
         self.subscriber_image_topic = rospy.get_param(
             namespace + node_name + "/subscriber_image_topic",
@@ -76,7 +72,7 @@ class LaneDetection(object):
         # publisher for image of line pixels (only for debugging, not used in
         # map)
         self.line_image_pub = rospy.Publisher(
-            namespace + "/" + node_name + self.publisher_image_topic,
+            self.publisher_image_topic,
             sensor_msgs.msg.CompressedImage,
             queue_size=1
         )

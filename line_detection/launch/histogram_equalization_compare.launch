@@ -1,0 +1,23 @@
+<launch>
+
+  <node pkg="line_detection" ns="hist1" name="histogram_equalization" type="histogram-equalization.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/camera/image_raw/compressed" />
+    <param name="publisher_image_topic" type="str" value="/adaptive_line_image/compressed" />
+    <param name="buffer_size" type="int" value="52428800" />
+    <param name="use_adaptive_histogram" type="bool" value="true" />
+    <rosparam command="load" file="$(find line_detection)/roi.yaml" />
+
+  </node>
+
+  <node pkg="line_detection" ns="hist2" name="histogram_equalization" type="histogram-equalization.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/camera/image_raw/compressed" />
+    <param name="publisher_image_topic" type="str" value="/histogram/compressed" />
+    <param name="buffer_size" type="int" value="52428800" />
+    <param name="use_adaptive_histogram" type="bool" value="false" />
+    <rosparam command="load" file="$(find line_detection)/roi.yaml" />
+
+  </node>
+
+  <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure" output="screen" />
+  
+</launch>
