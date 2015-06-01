@@ -28,21 +28,37 @@ class HistogramEqualization(LaneDetection):
 
     def __init__(self, namespace, node_name):
         LaneDetection.__init__(self, namespace, node_name)
+        self.use_adaptive_histogram = rospy.get_param(
+            namespace + node_name + "/use_adaptive_histogram",
+            False
+        )
 
     # this is what gets called when an image is received
     def image_callback(self, ros_image):
 
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
+
         roi = LaneDetection.get_roi(self, cv2_image)
+
+        if self.use_adaptive_histogram:
+            clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8,8))
 
         # given RGB images, it equalizes histogram for each channel separately!
         if roi.ndim == 3:
-            r = cv2.equalizeHist(roi[:, :, 0])
-            g = cv2.equalizeHist(roi[:, :, 1])
-            b = cv2.equalizeHist(roi[:, :, 2])
+            if self.use_adaptive_histogram:
+                r = clahe.apply(roi[:, :, 0])
+                g = clahe.apply(roi[:, :, 1])
+                b = clahe.apply(roi[:, :, 2])
+            else:
+                r = cv2.equalizeHist(roi[:, :, 0])
+                g = cv2.equalizeHist(roi[:, :, 1])
+                b = cv2.equalizeHist(roi[:, :, 2])
             final_image = np.dstack((r, g, b))
-        elif roi.ndim == 1:
-            final_image = cv2.equalizeHist(roi)
+        elif roi.ndim == 2:
+            if self.use_adaptive_histogram:
+                final_image = clahe.apply(roi)
+            else:
+                final_image = cv2.equalizeHist(roi)
         else:
             rospy.logerr("unknown color format! Won't perform equalization!")
             final_image = roi
