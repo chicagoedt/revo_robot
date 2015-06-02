@@ -1,7 +1,7 @@
 <launch>
 
   <node pkg="line_detection" name="pointcloud_publisher" type="pointcloud_publisher.py" output="screen">
-    <rosparam command="load" file="$(find line_detection)/roi.yaml" />
+      <param name="subscriber_image_topic" type="str" value="/threshold/line_image/compressed" />
   </node>
 
 </launch>

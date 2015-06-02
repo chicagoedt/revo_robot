@@ -1,0 +1,21 @@
+<launch>
+
+  <node pkg="line_detection" name="threshold" type="threshold.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/camera/compressed" />
+
+    <rosparam command="load" file="$(find line_detection)/roi.yaml" />
+
+  </node>
+
+  <node pkg="line_detection" name="erode" type="erode.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/threshold/line_image/compressed" />
+
+  </node>
+
+  <node pkg="line_detection" name="pointcloud_publisher" type="pointcloud_publisher.py" output="screen">
+      <param name="subscriber_image_topic" type="str" value="/erode/line_image/compressed" />
+  </node>
+
+  <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure" output="screen" />
+  
+</launch>

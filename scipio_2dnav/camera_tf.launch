@@ -3,7 +3,7 @@
     
     <!-- TODO set these actual transform values based on real robot!!! -->
     <node pkg="tf2_ros" type="static_transform_publisher" name="base_footprint_to_base_link"    args="0 0 0 0 0 0 base_footprint base_link" />
-    <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_camera_tf"         args="0.2 0 1.6 0 0.78539816339 0 base_link camera" />
+    <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_camera_tf"         args="0 0 0.76 0 0.78539816339 0 base_link camera" />
     <node pkg="tf2_ros" type="static_transform_publisher" name="baselink_laser"                 args="0.4014 0 0.1686 0 0 0 1 base_link laser" />
 
 </launch>

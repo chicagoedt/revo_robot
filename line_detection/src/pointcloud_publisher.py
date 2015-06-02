@@ -33,7 +33,6 @@ class PointcloudPublisher(LaneDetection):
 
         # remove this publisher that was inherited from LaneDetection
         self.line_image_pub.unregister()
-
         self.publisher_cloud_topic = rospy.get_param(
             namespace + node_name + "/publisher_cloud_topic",
             "/line_pointcloud"
@@ -48,9 +47,9 @@ class PointcloudPublisher(LaneDetection):
     # this is what gets called when an image is received
     def image_callback(self, ros_image):
 
-        cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
+        cv2_image = self.ros_to_cv2_image(ros_image)
         # print cv2_image.shape
-        roi = LaneDetection.get_roi(self, cv2_image)
+        roi = self.get_roi(cv2_image)
 
         non_zeros = roi.nonzero()
         self.number_of_points = len(non_zeros[0])
