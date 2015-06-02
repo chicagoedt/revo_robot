@@ -143,7 +143,8 @@ class PixelToCoordinateCalculator:
         for pixel in all_pixels:
             if rospy.is_shutdown():  # loop takes a while, use this to respond to shutdown signal
                 return False
-            (r_x, r_y, r_z) = self.cam_model.projectPixelTo3dRay(pixel)
+            rectified_pixel = self.cam_model.rectifyPoint(pixel)
+            (r_x, r_y, r_z) = self.cam_model.projectPixelTo3dRay(rectified_pixel)
 
             # create a point stamped in camera_optical frame
             point_stamped = PointStamped()
@@ -174,8 +175,8 @@ class PixelToCoordinateCalculator:
             self.debug_pointcloud.header.frame_id = "base_footprint"
             self.debug_pointcloud.points[count] = inter
 
-            self.intersection_array[pixel[1]-self.roi_y, pixel[0]-self.roi_x, 0] = inter.x
-            self.intersection_array[pixel[1]-self.roi_y, pixel[0]-self.roi_x, 1] = inter.y
+            self.intersection_array[pixel[1]-self.roi_y][pixel[0]-self.roi_x][0] = inter.x
+            self.intersection_array[pixel[1]-self.roi_y][pixel[0]-self.roi_x][1] = inter.y
 
             if(count % 100000 == 0):
                 rospy.loginfo("Done with %d rays...", count)

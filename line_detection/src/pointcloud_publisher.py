@@ -38,12 +38,9 @@ class PointcloudPublisher(LaneDetection):
             namespace + node_name + "/publisher_cloud_topic",
             "/line_pointcloud"
         )
-        # removes trailing slash in namespace
-        if (namespace.endswith("/")):
-            namespace = namespace[:-1]
         # publisher for line pointcloud
         self.line_cloud_pub = rospy.Publisher(
-            namespace + "/" + node_name + self.publisher_cloud_topic,
+            namespace + node_name + self.publisher_cloud_topic,
             PointCloud,
             queue_size=10
         )
