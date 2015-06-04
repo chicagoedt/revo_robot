@@ -1,5 +1,5 @@
 #include "state_machine.h"
-#include <roboteq_node/Actuators.h>
+//#include <roboteq_node/Actuators.h>
 
 StateMachineBase::StateMachineBase(void):
 	_moveBaseAC("move_base", true), _nh("state_machine"),
