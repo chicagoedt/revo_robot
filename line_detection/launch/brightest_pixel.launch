@@ -1,0 +1,9 @@
+<launch>
+
+  <node pkg="line_detection" name="brightest_pixel" type="brightest-pixel.py" output="screen">
+    <rosparam command="load" file="$(find line_detection)/roi.yaml" />
+  </node>
+
+  <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure" output="screen" />
+  
+</launch>

@@ -42,17 +42,21 @@ class BrightestPixel(LaneDetection):
 
         roi = LaneDetection.get_roi(self, roi)
 
-        # get indices of max pixels along each row
-        indices = np.argmax(roi, axis=1)
-        rows = np.arange(roi.shape[0])
-        # get the values of max pixels along each row
-        values = roi[rows, indices]
         # make an empty image
         brightest_pixels = np.zeros(roi.shape)
 
-        # now fill the image only with the brightest_pixels from each row
-        for row, (col, pix) in enumerate(izip(indices, values)):
-            brightest_pixels[row, col] = pix
+        # perform this brightest_pixel_number of times
+        for p in xrange(self.brightest_pixel_number):
+            # get indices of max pixels along each row
+            indices = np.argmax(roi, axis=1)
+            rows = np.arange(roi.shape[0])
+            # get the values of max pixels along each row
+            values = roi[rows, indices]
+
+            # now fill the image only with the brightest_pixels from each row
+            for row, (col, pix) in enumerate(izip(indices, values)):
+                brightest_pixels[row, col] = pix
+                roi[row, col] = 0  # remove that chosen pixel for next loop iteration
 
         final_image = brightest_pixels
         final_image_message = LaneDetection.cv2_to_ros_message(

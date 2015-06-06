@@ -112,6 +112,7 @@ class LaneDetection(object):
         self.value_low = config['value_low']
         self.value_high = config['value_high']
         self.backprojection_kernel_size = config['backprojection_kernel_size']
+        self.brightest_pixel_number = config['brightest_pixel_number']
         self.histogram_view_value = config['histogram_view_value']
         self.gabor_ksize = config['gabor_ksize']
         self.gabor_sigma = config['gabor_sigma']
