@@ -35,8 +35,10 @@ class Gabor(LaneDetection):
     # this is what gets called when an image is received
     def image_callback(self, ros_image):
 
-        cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
-        roi = LaneDetection.get_roi(self, cv2_image)
+        cv2_image = self.ros_to_cv2_image(ros_image)
+        roi = self.get_roi(cv2_image)
+
+        mono = self.convert_to_mono(roi)
 
         # apply Gabor filter
         gabor_kernel = cv2.getGaborKernel((self.gabor_ksize, self.gabor_ksize),
@@ -45,7 +47,7 @@ class Gabor(LaneDetection):
                                           self.gabor_lambda,
                                           self.gabor_gamma)
 
-        final_image = cv2.filter2D(roi, -1, gabor_kernel)
+        final_image = cv2.filter2D(mono, -1, gabor_kernel)
 
         final_image_message = LaneDetection.cv2_to_ros_message(
             self, final_image
