@@ -4,7 +4,9 @@ import cv2
 import rospy
 import sensor_msgs
 from sensor_msgs.msg import CompressedImage
+from sensor_msgs.msg import Image
 import rospkg
+from cv_bridge import CvBridge, CvBridgeError
 
 ###############################################################################
 # Chicago Engineering Design Team
@@ -73,6 +75,11 @@ class LaneDetection(object):
 
         # set publisher and subscriber
 
+        self.use_raw = rospy.get_param(
+            namespace + node_name + '/use_raw',
+            False
+        )
+
         # publisher for image of line pixels (only for debugging, not used in
         # map)
         self.line_image_pub = rospy.Publisher(
@@ -82,13 +89,23 @@ class LaneDetection(object):
         )
 
         # subscriber for ROS image topic
-        self.image_sub = rospy.Subscriber(
-            self.subscriber_image_topic,
-            CompressedImage,
-            self.image_callback,
-            queue_size=1,
-            buff_size=self.buffer_size
-        )
+        if self.use_raw:
+            self.image_sub = rospy.Subscriber(
+                self.subscriber_image_topic,
+                Image,
+                self.image_callback,
+                queue_size=1,
+                buff_size=self.buffer_size
+            )
+            self.bridge = CvBridge()
+        else:
+            self.image_sub = rospy.Subscriber(
+                self.subscriber_image_topic,
+                CompressedImage,
+                self.image_callback,
+                queue_size=1,
+                buff_size=self.buffer_size
+            )
 
         # use this if you need to use the camera_info topic (has intrinsic
         #                                                     parameters)
@@ -221,8 +238,20 @@ class LaneDetection(object):
         return final_image_message
 
     def ros_to_cv2_image(self, image):
-        np_arr = np.fromstring(image.data, np.uint8)
-        img = cv2.imdecode(np_arr, -1)
+        if self.use_raw:
+            # direct conversion from ROS Image to CV2
+            # first, we need to convert image from sensor_msgs/Image to numpy
+            # (or cv2). For this, we use cv_bridge
+            try:
+                img = self.bridge.imgmsg_to_cv2(
+                    image,
+                    desired_encoding="passthrough"
+                )
+            except CvBridgeError, e:
+                rospy.logerr(e)
+        else:
+            np_arr = np.fromstring(image.data, np.uint8)
+            img = cv2.imdecode(np_arr, -1)
 
         if img is None:
             rospy.logerr("error! img is empty!")
