@@ -1,6 +1,8 @@
 <launch>
 
   <node pkg="line_detection" name="circle_roi" type="circle_roi.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/camera/image_color" />
+    <param name="use_raw" type="bool" value="True" />
   </node>
 
   <node pkg="line_detection" name="scipio_roi" type="scipio_roi.py" output="screen">
