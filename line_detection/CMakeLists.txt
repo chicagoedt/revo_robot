@@ -26,5 +26,5 @@ generate_dynamic_reconfigure_options(
 
 include_directories(include ${catkin_INCLUDE_DIRS} ${OPENCV_INCLUDE_DIR})
 
-add_executable( lswms include/LSWMS.cpp include/LSWMS.h src/lswms_node.cpp)
-TARGET_LINK_LIBRARIES( lswms ${OpenCV_LIBS} ${catkin_LIBRARIES})
+#add_executable( lswms include/LSWMS.cpp include/LSWMS.h src/lswms_node.cpp)
+#TARGET_LINK_LIBRARIES( lswms ${OpenCV_LIBS} ${catkin_LIBRARIES})
