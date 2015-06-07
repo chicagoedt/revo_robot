@@ -5,6 +5,7 @@
 
   <node pkg="line_detection" name="scipio_roi" type="scipio_roi.py" output="screen">
     <param name="subscriber_image_topic" type="str" value="/circle_roi/line_image/compressed" />
+    <rosparam command="load" file="$(find line_detection)/scipio_roi_points.yaml" />
   </node>
 
   <node pkg="line_detection" name="hsv_filter" type="hsv_filter.py" output="screen">

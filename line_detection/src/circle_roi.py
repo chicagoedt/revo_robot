@@ -30,7 +30,7 @@ class Circle(LaneDetection):
         cv2_image_ellipse = np.zeros(cv2_image.shape, dtype=np.uint8)
         cv2.ellipse(
             cv2_image_ellipse,
-            (self.circle_center_y, self.circle_center_x),
+            (self.circle_center_x, self.circle_center_y),
             (self.circle_major_axis, self.circle_minor_axis),
             0,
             0,
