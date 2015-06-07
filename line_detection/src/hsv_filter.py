@@ -33,11 +33,15 @@ class HSVFilter(LaneDetection):
         green_max = np.array([self.hue_high, self.saturation_high, self.value_high])
 
         mask = cv2.inRange(hsv, green_min, green_max)
-        filtered_image = cv2.bitwise_and(np.dstack((mask, mask, mask)), hsv)
+        inverted_mask = cv2.bitwise_not(mask)
 
+        filtered_image = cv2.bitwise_and(np.dstack((inverted_mask, inverted_mask, inverted_mask)), hsv)
         final_image = cv2.cvtColor(filtered_image, cv2.COLOR_HSV2BGR)
 
         final_image_message = self.cv2_to_ros_message(final_image)
+        # just a hack to make published messages have same timestamps,
+        # used for message_filter
+        final_image_message.header.stamp = ros_image.header.stamp
 
         self.line_image_pub.publish(final_image_message)
 
