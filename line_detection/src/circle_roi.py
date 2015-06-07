@@ -9,7 +9,8 @@ from line_detection.cfg import LineDetectionConfig
 
 ###############################################################################
 # Chicago Engineering Design Team
-# Node to extact circular region of interest using Python OpenCV for autonomous robot Scipio
+# Node to extract circular region of interest using Python OpenCV for
+# autonomous robot Scipio
 # (IGVC competition).
 #
 # @author Steven Taylor
@@ -25,15 +26,20 @@ class Circle(LaneDetection):
     def image_callback(self, ros_image):
 
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
-        
-        cv2_image_ellipse = np.zeros(cv2_image.shape,dtype=np.uint8)
-        cv2.ellipse(cv2_image_ellipse, (960,540), (959,539), 0, 0, 360,(255,255,255),thickness=-1)
-        
-#        print(cv2_image_ellipse.dtype)
-#        final_image = (cv2_image == 1) & (cv2_image_ellipse == 1)        
-#        print(cv2_image.dtype)
+
+        cv2_image_ellipse = np.zeros(cv2_image.shape, dtype=np.uint8)
+        cv2.ellipse(
+            cv2_image_ellipse,
+            (self.circle_center_y, self.circle_center_x),
+            (self.circle_major_axis, self.circle_minor_axis),
+            0,
+            0,
+            360,
+            (255, 255, 255),
+            thickness=-1
+        )
+
         final_image = np.bitwise_and(cv2_image, cv2_image_ellipse)
-#        final_image = cv2_image_ellipse
         final_image_message = LaneDetection.cv2_to_ros_message(
             self, final_image
         )

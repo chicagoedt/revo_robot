@@ -139,6 +139,10 @@ class LaneDetection(object):
         self.image_width = config['image_width']
         self.image_height = config['image_height']
         self.skeletonize_max_iterations = config['skeletonize_max_iterations']
+        self.circle_center_x = config['circle_center_x']
+        self.circle_center_y = config['circle_center_y']
+        self.circle_major_axis = config['circle_major_axis']
+        self.circle_minor_axis = config['circle_minor_axis']
 
         # check that all these params are legal values
         self.validate_parameters()
