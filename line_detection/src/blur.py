@@ -26,14 +26,13 @@ class Blur(LaneDetection):
     # this is what gets called when an image is received
     def image_callback(self, ros_image):
 
-        cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
-        roi = LaneDetection.get_roi(self, cv2_image)
-
+        cv2_image = self.ros_to_cv2_image(ros_image)
+        if self.use_roi:
+            roi = self.get_roi(cv2_image)
+        else:
+            roi = cv2_image
         final_image = cv2.blur(roi, (self.blur_size, self.blur_size))
-
-        final_image_message = LaneDetection.cv2_to_ros_message(
-            self, final_image
-        )
+        final_image_message = self.cv2_to_ros_message(final_image)
         # publishes final image message in ROS format
         self.line_image_pub.publish(final_image_message)
     # end image_callback()

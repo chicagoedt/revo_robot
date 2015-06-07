@@ -38,6 +38,10 @@ class LaneDetection(object):
         )
         self.package_path = rospkg.RosPack().get_path('line_detection')
 
+        self.use_roi = rospy.get_param(
+            namespace + node_name + '/use_roi',
+            False
+        )
         # top-left x coordinate of ROI rectangle
         self.roi_top_left_x = rospy.get_param(
             namespace + node_name + '/roi_x',
@@ -221,7 +225,7 @@ class LaneDetection(object):
             return
         self.image_height = img.shape[0]
         self.image_width = img.shape[1]
-        self.validate_roi()
+        # self.validate_roi()
         return img
 
     def get_roi(self, image):

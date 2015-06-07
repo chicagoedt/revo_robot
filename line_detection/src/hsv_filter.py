@@ -25,7 +25,11 @@ class HSVFilter(LaneDetection):
     def image_callback(self, ros_image):
 
         cv2_image = self.ros_to_cv2_image(ros_image)
-        roi = self.get_roi(cv2_image)
+        if self.use_roi:
+            roi = self.get_roi(cv2_image)
+        else:
+            roi = cv2_image
+
         # convert from BGR to HSV
         hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
 

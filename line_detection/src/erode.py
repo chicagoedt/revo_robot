@@ -32,9 +32,12 @@ class Erode(LaneDetection):
 
         cv2_image = self.ros_to_cv2_image(ros_image)
         # this filter needs a mono image, no colors
-        roi = self.convert_to_mono(cv2_image)
+        mono = self.convert_to_mono(cv2_image)
 
-        roi = self.get_roi(roi)
+        if self.use_roi:
+            roi = self.get_roi(mono)
+        else:
+            roi = mono
 
         # erode image
         size = np.size(roi)

@@ -40,7 +40,10 @@ class BrightestPixel(LaneDetection):
         # this filter needs a mono image, no colors
         roi = LaneDetection.convert_to_mono(self, cv2_image)
 
-        roi = LaneDetection.get_roi(self, roi)
+        if self.use_roi:
+            roi = self.get_roi(roi)
+        else:
+            roi = roi
 
         # make an empty image
         brightest_pixels = np.zeros(roi.shape)

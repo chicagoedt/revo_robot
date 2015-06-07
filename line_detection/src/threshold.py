@@ -36,8 +36,10 @@ class Threshold(LaneDetection):
         # this filter needs a mono image, no colors
         mono = self.convert_to_mono(cv2_image)
 
-        roi = self.get_roi(mono)
-
+        if self.use_roi:
+            roi = self.get_roi(mono)
+        else:
+            roi = mono
         # use adaptive threshold or global threshold
         if self.use_adaptive_threshold:
             final_image = cv2.adaptiveThreshold(

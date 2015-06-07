@@ -48,9 +48,10 @@ class PointcloudPublisher(LaneDetection):
     def image_callback(self, ros_image):
 
         cv2_image = self.ros_to_cv2_image(ros_image)
-        # print cv2_image.shape
-        roi = self.get_roi(cv2_image)
-
+        if self.use_roi:
+            roi = self.get_roi(cv2_image)
+        else:
+            roi = cv2_image
         non_zeros = roi.nonzero()
         self.number_of_points = len(non_zeros[0])
         self.line_pointcloud = PointCloud()
