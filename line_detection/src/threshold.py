@@ -44,7 +44,7 @@ class Threshold(LaneDetection):
                 roi,
                 255,
                 cv2.ADAPTIVE_THRESH_MEAN_C,
-                cv2.THRESH_BINARY,
+                cv2.THRESH_TOZERO,
                 self.adaptive_threshold_block_size,
                 self.adaptive_threshold_C
             )
@@ -53,7 +53,7 @@ class Threshold(LaneDetection):
                 roi,
                 self.global_threshold,
                 255,
-                cv2.THRESH_BINARY
+                cv2.THRESH_TOZERO
             )
 
         final_image_message = self.cv2_to_ros_message(final_image)
