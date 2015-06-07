@@ -11,13 +11,13 @@ from sensor_msgs.msg import CompressedImage
 
 ###############################################################################
 # Chicago Engineering Design Team
-# Mask filter that applies a binary mask on an input image
+# Max Mask filter that applies a mask on an input image
 #
 # @author Basheer Subei
 # @email basheersubei@gmail.com
 
 
-class Mask(LaneDetection):
+class MaxMask(LaneDetection):
 
     def __init__(self, namespace, node_name):
         LaneDetection.__init__(self, namespace, node_name)
@@ -50,18 +50,18 @@ class Mask(LaneDetection):
     # this is what gets called when an image is received
     def image_callback(self, ros_image, mask_message):
 
-        cv2_image = self.ros_to_cv2_image(ros_image)
-
-        roi = self.get_roi(cv2_image)
+        first_image = self.ros_to_cv2_image(ros_image)
 
         # convert mask_message to cv2
         np_arr = np.fromstring(mask_message.data, np.uint8)
         mask_image = cv2.imdecode(np_arr, -1)
 
+        mask_image = self.convert_to_mono(mask_image)
+
         # need to make mask 3 channels
         mask = np.dstack((mask_image, mask_image, mask_image))
 
-        final_image = cv2.bitwise_and(roi, mask)
+        final_image = np.maximum(first_image, mask)
 
         final_image_message = self.cv2_to_ros_message(final_image)
         # publishes final image message in ROS format
@@ -70,14 +70,14 @@ class Mask(LaneDetection):
 
 
 def main(args):
-    node_name = "mask"
+    node_name = "max_mask"
     namespace = rospy.get_namespace()
 
     # create a hough object
-    m = Mask(namespace, node_name)
+    m = MaxMask(namespace, node_name)
 
     # start the line_detector node and start listening
-    rospy.init_node("mask", anonymous=True)
+    rospy.init_node("max_mask", anonymous=True)
 
     # starts dynamic_reconfigure server
     srv = Server(LineDetectionConfig, m.reconfigure_callback)
