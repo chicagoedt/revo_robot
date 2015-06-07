@@ -1,0 +1,44 @@
+<launch>
+
+  <node pkg="line_detection" name="circle_roi" type="circle_roi.py" output="screen">
+  </node>
+
+  <node pkg="line_detection" name="scipio_roi" type="scipio_roi.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/circle_roi/line_image/compressed" />
+  </node>
+
+  <node pkg="line_detection" name="hsv_filter" type="hsv_filter.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/scipio_roi/line_image/compressed" />
+    <rosparam command="load" file="$(find line_detection)/roi.yaml" />
+  </node>
+
+  <node pkg="line_detection" name="threshold" type="threshold.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/scipio_roi/line_image/compressed" />
+    <rosparam command="load" file="$(find line_detection)/roi.yaml" />
+  </node>
+
+
+  <node pkg="line_detection" name="max_mask" type="max_mask.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/hsv_filter/line_image/compressed" />
+    <param name="subscriber_mask_topic" type="str" value="/threshold/line_image/compressed" />
+  </node>
+
+  <node pkg="line_detection" name="blur" type="blur.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/max_mask/line_image/compressed" />
+  </node>
+
+  <node pkg="line_detection" name="brightest_pixel" type="brightest-pixel.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/blur/line_image/compressed" />
+  </node>
+
+  <node pkg="line_detection" name="erode" type="erode.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/brightest_pixel/line_image/compressed" />
+  </node>
+
+  <node pkg="line_detection" name="pointcloud_publisher" type="pointcloud_publisher.py" output="screen">
+      <param name="subscriber_image_topic" type="str" value="/erode/line_image/compressed" />
+  </node>
+
+  <node pkg="rqt_reconfigure" type="rqt_reconfigure" name="rqt_reconfigure" output="screen" />
+  
+</launch>
