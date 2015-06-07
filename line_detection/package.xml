@@ -24,11 +24,9 @@
   <build_depend>libopencv-dev</build_depend>
   <build_depend>dynamic_reconfigure</build_depend>
   <build_depend>image_geometry</build_depend>
-  <build_depend>numpy</build_depend>
   <build_depend>sensor_msgs</build_depend>
-  <build_depend>rospkg</build_depend>
   <build_depend>message_filters</build_depend>
-  <build_depend>tf2_ros</build_depend>
+  <build_depend>tf2</build_depend>
   <build_depend>geometry_msgs</build_depend>
   <build_depend>image_transport</build_depend>
 
@@ -38,11 +36,9 @@
   <run_depend>libopencv-dev</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
   <run_depend>image_geometry</run_depend>
-  <run_depend>numpy</run_depend>
   <run_depend>sensor_msgs</run_depend>
-  <run_depend>rospkg</run_depend>
   <run_depend>message_filters</run_depend>
-  <run_depend>tf2_ros</run_depend>
+  <run_depend>tf2</run_depend>
   <run_depend>geometry_msgs</run_depend>
   <run_depend>image_transport</run_depend>
 
