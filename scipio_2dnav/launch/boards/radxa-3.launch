@@ -1,0 +1,6 @@
+<launch>
+
+    <include file="$(find microstrain_3dmgx2_imu)/microstrain_3dmgx2.launch"/>
+    <include file="$(find scipio_2dnav)/launch/robot_localization.launch"/>
+    <include file="$(find scipio_2dnav)/camera_tf.launch"/>
+</launch>
