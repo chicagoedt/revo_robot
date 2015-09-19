@@ -1,0 +1,8 @@
+<launch>
+
+	<node name="roboteq" pkg="roboteq_node" type="roboteq_node"/>
+	<include file="$(find nmea_navsat_driver)/serial_driver.launch"/>
+	<node name="odom" pkg="odom" type="odom"/>
+	<include file="$(find sick_tim)/launch/sick_tim551_2050001.launch"/>
+
+</launch>
