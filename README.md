@@ -1,7 +1,8 @@
 Software_IGVC [![Build Status](http://jenkins.chicagoedt.org/job/Software_IGVC_Upstream/badge/icon)](http://jenkins.chicagoedt.org/job/Software_IGVC_Upstream/)
 =============
 
-Please refer to the [prerequisite setup](https://github.com/chicagoedt/Software_IGVC/wiki#prerequisites-for-testing) before continuing.  
+The wiki and other instructions has been moved to the [EDT Wiki](http://wiki.chicagoedt.org/wiki/Software_Engineering/Revo)
+
 
 Run the Real Robot
 ------------
