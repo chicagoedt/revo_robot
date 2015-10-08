@@ -89,12 +89,40 @@ int main(int argc, char **argv)
         odom.header.stamp = current_time;
         odom.header.frame_id = "odom";
         odom.child_frame_id = "base_link";
-        odom.pose.covariance[0] = 1e-3;
-        odom.pose.covariance[7] = 1e-1;
-        odom.pose.covariance[14] = 1e6;
-        odom.pose.covariance[21] = 1e6;
-        odom.pose.covariance[28] = 1e6;
-        odom.pose.covariance[35] = 0.174;
+
+        if(fabs(twist_velocity.linear.x) <= 1e-3 && fabs(twist_velocity.angular.z) <= 1e-3) 
+        {
+            odom.pose.covariance[0] = 1e-9;
+            odom.pose.covariance[7] = 1e-9;
+            odom.pose.covariance[14] = 1e6;
+            odom.pose.covariance[21] = 1e6;
+            odom.pose.covariance[28] = 1e6;
+            odom.pose.covariance[35] = 1e-9;
+
+            odom.twist.covariance[0] = 1e-9;
+            odom.twist.covariance[7] = 1e-9;
+            odom.twist.covariance[14] = 1e6;
+            odom.twist.covariance[21] = 1e6;
+            odom.twist.covariance[28] = 1e6;
+            odom.twist.covariance[35] = 1e-9;
+        } 
+        else 
+        {
+            odom.pose.covariance[0] = 1e-3;
+            odom.pose.covariance[7] = 1e-1;
+            odom.pose.covariance[14] = 1e6;
+            odom.pose.covariance[21] = 1e6;
+            odom.pose.covariance[28] = 1e6;
+            odom.pose.covariance[35] = 0.174;
+
+            odom.twist.covariance[0] = 1e-3;
+            odom.twist.covariance[7] = 1e-1;
+            odom.twist.covariance[14] = 1e6;
+            odom.twist.covariance[21] = 1e6;
+            odom.twist.covariance[28] = 1e6;
+            odom.twist.covariance[35] = 0.174;
+        }
+
           
 	    //position
         odom.pose.pose.position.x = x;
@@ -109,12 +137,6 @@ int main(int argc, char **argv)
         odom.twist.twist.angular.y  = 0.0;
         odom.twist.twist.angular.z  = vth;
 
-        odom.twist.covariance[0] = 1e-3;
-        odom.twist.covariance[7] = 1e-1;
-        odom.twist.covariance[14] = 1e6;
-        odom.twist.covariance[21] = 1e6;
-        odom.twist.covariance[28] = 1e6;
-        odom.twist.covariance[35] = 0.174;
 
         last_time = current_time;
 
