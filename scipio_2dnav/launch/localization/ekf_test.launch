@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+ 
+	<param name="/use_sim_time" value="true" />
+
+	<include file="$(find scipio_2dnav)/launch/localization/robot_localization.launch"/>
+
+	<node pkg="tf2_ros" type="static_transform_publisher" name="baselink_imu"    args="0 0 0 0 0 0 base_link imu" />
+
+	<node pkg="odom" type="odom" name="odom"/>
+
+	<node pkg="rosbag" type="play" name="player" output="screen" args="--clock /home/krystian/raw_imu_gps_wheel_2015-10-07-20-43-56.bag"/>
+
+	<node pkg="rviz" type="rviz" name="rviz"/>
+
+</launch>

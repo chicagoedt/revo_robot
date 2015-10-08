@@ -88,13 +88,13 @@ int main(int argc, char **argv)
         //filling the odometry
         odom.header.stamp = current_time;
         odom.header.frame_id = "odom";
-        odom.child_frame_id = "base_footprint";
-        odom.pose.covariance[0] = 0.00001;
-        odom.pose.covariance[7] = 0.00001;
-        odom.pose.covariance[14] = 1000000000000.0;
-        odom.pose.covariance[21] = 1000000000000.0;
-        odom.pose.covariance[28] = 1000000000000.0;
-        odom.pose.covariance[35] = 0.001;
+        odom.child_frame_id = "base_link";
+        odom.pose.covariance[0] = 0.005;
+        odom.pose.covariance[7] = 0.1;
+        odom.pose.covariance[14] = 0.1;
+        odom.pose.covariance[21] = 0.1;
+        odom.pose.covariance[28] = 0.1;
+        odom.pose.covariance[35] = 0.05;
           
 	    //position
         odom.pose.pose.position.x = x;

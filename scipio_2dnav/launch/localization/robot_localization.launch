@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <launch>
 
     <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true" output="screen">
@@ -5,7 +6,7 @@
       <param name="magnetic_declination_radians" value="0.0659855583"/>
       -->
       <param name="roll_offset" value="0"/>
-      <param name="delay" value="15"/>
+      <param name="delay" value="3"/>
       <param name="pitch_offset" value="0"/>
       <param name="yaw_offset" value="1.570795"/>
       <param name="zero_altitude" value="true"/>
@@ -22,7 +23,7 @@
       <param name="odom0" value="/raw_odom"/>
       <!--
       <param name="odom1" value="/odometry/gps"/>
-      -->
+    -->
       <param name="imu0" value="/imu/data"/>
 
       <param name="two_d_mode" value="true"/>
