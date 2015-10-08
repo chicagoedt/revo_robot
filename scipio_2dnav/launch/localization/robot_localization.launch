@@ -2,13 +2,13 @@
 <launch>
 
     <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true" output="screen">
-    <!--
+    
       <param name="magnetic_declination_radians" value="0.0659855583"/>
-      -->
+      
       <param name="roll_offset" value="0"/>
-      <param name="delay" value="3"/>
+      <param name="delay" value="1"/>
       <param name="pitch_offset" value="0"/>
-      <param name="yaw_offset" value="1.570795"/>
+      <param name="yaw_offset" value="0"/>
       <param name="zero_altitude" value="true"/>
       <param name="publish_filtered_gps" value="true"/>
       <param name="broadcast_utm_transform" value="true"/>
@@ -18,28 +18,24 @@
 
     <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true">
 
-      <param name="frequency" value="15"/>  
+      <param name="frequency" value="50"/>  
       <param name="sensor_timeout" value="0.1"/>  
       <param name="odom0" value="/raw_odom"/>
-      <!--
-      <param name="odom1" value="/odometry/gps"/>
-    -->
+<!--       <param name="odom1" value="/odometry/gps"/> -->
       <param name="imu0" value="/imu/data"/>
 
       <param name="two_d_mode" value="true"/>
 
       <rosparam param="odom0_config">[false, false, false, 
                                      false, false, false, 
-                                     true, false, false, 
-                                     false, false, true,
+                                     true, true, false, 
+                                     false, false, false,
                                      false, false, false]</rosparam>
-                                     <!--
-      <rosparam param="odom1_config">[true, true, false, 
+<!--       <rosparam param="odom1_config">[true, true, false, 
                                      false, false, false, 
                                      false, false, false, 
                                      false, false, false,
-                                     false, false, false]</rosparam>
-                                     -->
+                                     false, false, false]</rosparam> -->
       <rosparam param="imu0_config">[false, false, false, 
                                      false, false, true, 
                                      false, false, false, 
@@ -47,10 +43,8 @@
                                      false, false, false]</rosparam> 
 
       <param name="odom0_differential" value="false"/>
-      <!--
-      <param name="odom1_differential" value="false"/> 
-      -->
-      <param name="imu0_differential" value="false"/>
+<!--       <param name="odom1_differential" value="false"/>  -->
+      <param name="imu0_differential" value="true"/>
 
       <param name="imu0_remove_gravitational_acceleration" value="true"/>
 

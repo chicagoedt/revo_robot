@@ -89,12 +89,12 @@ int main(int argc, char **argv)
         odom.header.stamp = current_time;
         odom.header.frame_id = "odom";
         odom.child_frame_id = "base_link";
-        odom.pose.covariance[0] = 0.005;
-        odom.pose.covariance[7] = 0.1;
-        odom.pose.covariance[14] = 0.1;
-        odom.pose.covariance[21] = 0.1;
-        odom.pose.covariance[28] = 0.1;
-        odom.pose.covariance[35] = 0.05;
+        odom.pose.covariance[0] = 1e-3;
+        odom.pose.covariance[7] = 1e-1;
+        odom.pose.covariance[14] = 1e6;
+        odom.pose.covariance[21] = 1e6;
+        odom.pose.covariance[28] = 1e6;
+        odom.pose.covariance[35] = 0.174;
           
 	    //position
         odom.pose.pose.position.x = x;
@@ -108,6 +108,13 @@ int main(int argc, char **argv)
         odom.twist.twist.angular.x  = 0.0;
         odom.twist.twist.angular.y  = 0.0;
         odom.twist.twist.angular.z  = vth;
+
+        odom.twist.covariance[0] = 1e-3;
+        odom.twist.covariance[7] = 1e-1;
+        odom.twist.covariance[14] = 1e6;
+        odom.twist.covariance[21] = 1e6;
+        odom.twist.covariance[28] = 1e6;
+        odom.twist.covariance[35] = 0.174;
 
         last_time = current_time;
 
