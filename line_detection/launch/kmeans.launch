@@ -1,0 +1,9 @@
+<launch>
+
+  <node pkg="line_detection" name="kmeans" type="kmeans.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/camera/image_raw/compressed" />
+    <param name="use_roi" type="bool" value="True" />
+    <rosparam command="load" file="$(find line_detection)/roi_240p.yaml" />
+  </node>
+
+</launch>
