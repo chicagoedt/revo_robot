@@ -18,5 +18,5 @@ observation_sources: laser_scan_sensor point_cloud_sensor
 
 laser_scan_sensor: {sensor_frame: laser, data_type: LaserScan, topic: /scan, marking: true, clearing: true}
 
-#point_cloud_sensor: {sensor_frame: base_footprint, data_type: PointCloud, topic: /pointcloud_publisher/line_pointcloud, marking: true, clearing: true}
+point_cloud_sensor: {sensor_frame: base_link, data_type: PointCloud, topic: /pointcloud_publisher/line_pointcloud, marking: true, clearing: false}
 #point_cloud_sensor: {sensor_frame: bumblebee_mount_link, data_type: PointCloud2, topic: /stereo_camera/points2, marking: true, clearing: true}

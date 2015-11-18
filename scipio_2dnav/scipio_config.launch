@@ -1,9 +1,0 @@
-<launch>
-
-	<node pkg="sick_tim3xx" name="sick_tim310" type="sick_tim310"/>
-
-	<node pkg="robot_setup_tf" type="robot_tf_publisher" name="robot_tf_publisher"/>
-    
-	<node pkg="gmapping" type="slam_gmapping" name="slam_gmapping"/>
-
-</launch>
