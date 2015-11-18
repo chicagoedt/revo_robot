@@ -1,9 +1,0 @@
-<launch>
-    <node pkg="tf2_ros" type="static_transform_publisher" name="camera_to_optical_tf"           args="0 0 0 -1.570796 0 -1.570796 camera camera_optical" />
-    
-    <!-- TODO set these actual transform values based on real robot!!! -->
-    <node pkg="tf2_ros" type="static_transform_publisher" name="base_link_to_camera_tf"         args="0 0 0.76 0 0.78539816339 0 base_link camera" />
-    <node pkg="tf2_ros" type="static_transform_publisher" name="baselink_laser"                 args="0.4014 0 0.1686 0 0 0 1 base_link laser" />
-    <node pkg="tf" type="static_transform_publisher" name="baselink_imu"    args="0 0 0 1.57 0 3.14159 base_link imu 1" />
-
-</launch>
