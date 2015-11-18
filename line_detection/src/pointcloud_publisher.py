@@ -37,6 +37,10 @@ class PointcloudPublisher(LaneDetection):
             namespace + node_name + "/publisher_cloud_topic",
             "/line_pointcloud"
         )
+        self.generated_pyc_path = rospy.get_param(
+            namespace + node_name + "/generated_npy_path",
+            "/misc/training_images/pixel_coordinates.npy"
+        )
         # publisher for line pointcloud
         self.line_cloud_pub = rospy.Publisher(
             namespace + node_name + self.publisher_cloud_topic,
@@ -57,7 +61,7 @@ class PointcloudPublisher(LaneDetection):
         self.line_pointcloud = PointCloud()
         self.line_pointcloud.header = std_msgs.msg.Header()
         self.line_pointcloud.header.stamp = rospy.Time.now()
-        self.line_pointcloud.header.frame_id = "base_footprint"
+        self.line_pointcloud.header.frame_id = "base_link"
         # create an empty list of correct size
         self.line_pointcloud.points = [None] * self.number_of_points
         count = 0
@@ -83,7 +87,7 @@ def main(args):
     rospy.init_node("pointcloud_publisher", anonymous=True)
 
     pp.intersection_array = np.load(
-        pp.package_path + "/misc/training_images/pixel_coordinates.npy"
+        pp.package_path + pp.generated_pyc_path
     )
     # starts dynamic_reconfigure server
     # srv = Server(LineDetectionConfig, c.reconfigure_callback)

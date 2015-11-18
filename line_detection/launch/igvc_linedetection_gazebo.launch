@@ -1,0 +1,23 @@
+<launch>
+
+  <node pkg="line_detection" name="circle_roi" type="circle_roi.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/camera/image_raw" />
+    <param name="use_raw" type="bool" value="True" />
+  </node>
+
+  <node pkg="line_detection" name="scipio_roi" type="scipio_roi.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/circle_roi/line_image/compressed" />
+    <rosparam command="load" file="$(find line_detection)/scipio_gazebo_roi_points.yaml" />
+  </node>
+
+  <node pkg="line_detection" name="threshold" type="threshold.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/scipio_roi/line_image/compressed" />
+    <param name="use_roi" type="bool" value="True" />
+    <rosparam command="load" file="$(find line_detection)/roi.yaml" />
+  </node>
+
+  <include file="$(find line_detection)/launch/pointcloud_publisher.launch">
+      <arg name="npy_path" value="/misc/training_images/gazebo_pixel_coordinates.npy"/>
+  </include>
+  
+</launch>

@@ -105,9 +105,9 @@ class PixelToCoordinateCalculator:
     def get_transform(self):
         while not rospy.is_shutdown():
             try:
-                self.trans = self.tf_buffer.lookup_transform("base_footprint", "camera_optical", rospy.Time())
+                self.trans = self.tf_buffer.lookup_transform("base_link", "camera_optical", rospy.Time())
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
-                rospy.logwarn("tf2 exception raised! Check that base_footprint to camera_optical transform is being broadcasted! Retrying in 1 second")
+                rospy.logwarn("tf2 exception raised! Check that base_link to camera_optical transform is being broadcasted! Retrying in 1 second")
                 rospy.sleep(1)
                 continue  # stay in infinite while loop until point is successfully transformed
             return True  # if we managed to look it up even once, leave
@@ -171,8 +171,11 @@ class PixelToCoordinateCalculator:
             inter = isect_line_plane_v3(self.trans.transform.translation, transformed_point.point, Point(0, 0, 0), Point(0, 0, 1))
             # rospy.logdebug("intersection of 3d ray with ground plane is (%f, %f, %f)", inter.x, inter.y, inter.z)
 
+            if inter is None:
+                 continue
+
             # TEMPORARY TESTING
-            self.debug_pointcloud.header.frame_id = "base_footprint"
+            self.debug_pointcloud.header.frame_id = "base_link"
             self.debug_pointcloud.points[count] = inter
 
             self.intersection_array[pixel[1]-self.roi_y][pixel[0]-self.roi_x][0] = inter.x
