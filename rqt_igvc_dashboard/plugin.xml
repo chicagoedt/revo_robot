@@ -1,0 +1,18 @@
+<library path="lib/librqt_igvc_dashboard">
+  <class name="IgvcDashboard/IgvcDashboard" type="rqt_igvc_dashboard::IgvcDashboard" base_class_type="rqt_gui_cpp::Plugin">
+    <description>
+      An IGVC control GUI to send GPS Waypoints and monitor a state machine
+    </description>
+    <qtgui>
+      <group>
+        <label>Mission Control</label>
+        <icon type="theme">folder</icon>
+        <statustip>Plugins related to system oversight/manipulation.</statustip>
+      </group>
+      <label>Igvc Dashboard</label>
+      <icon type="theme">applications-internet</icon>
+      <statustip>Igvc Dashboard</statustip>
+    </qtgui>
+  </class>
+</library>
+
