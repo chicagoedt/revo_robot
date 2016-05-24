@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<launch>
+
+  <arg name="npy_path" default="/misc/training_images/pixel_coordinates_right.npy"/>
+
+  <node pkg="line_detection" name="pointcloud_publisher" type="pointcloud_publisher_right.py" output="screen">
+      <param name="subscriber_image_topic" type="str" value="/threshold_right/line_image/compressed" />
+      <param name="generated_npy_path" type="str" value="$(arg npy_path)" />
+  </node>
+
+</launch>

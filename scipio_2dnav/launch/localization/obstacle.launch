@@ -1,0 +1,17 @@
+<launch>
+<arg name="pi/2" value="1.5707963267948966" />
+
+<!-- Run the ROS package stereo_image_proc -->
+<group ns="/stereo_camera" >
+
+    <node pkg="nodelet" type="nodelet" name="obstacles_detection" args="load rtabmap_ros/obstacles_detection stereo_nodelet">
+<!--         <remap from="cloud" to="points2"/>
+         <remap from="obstacles" to="/planner_cloud"/> -->
+ <!--try base_link -->
+         <param name="frame_id" type="string" value="base_link"/>
+         <param name="map_frame_id" type="string" value="map"/>
+         <param name="min_cluster_size" type="int" value="20"/>
+         <param name="max_obstacles_height" type="double" value="0.0"/>
+    </node>     
+</group> 
+</launch>

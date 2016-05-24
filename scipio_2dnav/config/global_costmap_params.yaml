@@ -1,7 +1,7 @@
 global_costmap:
-    global_frame:       utm
+    global_frame:       odom
     robot_base_frame:   base_link
-    update_frequency:   8.0
+    update_frequency:   10.0
     publish_frequency:  3.0
     static_map: false
     rolling_window: true

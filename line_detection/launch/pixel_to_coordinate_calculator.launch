@@ -1,7 +1,7 @@
 <launch>
 
   <node pkg="line_detection" name="pixel_to_coordinate_calculator" type="pixel_to_coordinate_calculator.py" output="screen">
-    <param name="debug_pointcloud" type="bool" value="true" />
+    <param name="debug_pointcloud" type="bool" value="false" />
     <rosparam command="load" file="$(find line_detection)/roi.yaml" />
   </node>
 

@@ -1,0 +1,11 @@
+global_costmap:
+    global_frame:       utm
+    robot_base_frame:   base_link
+    update_frequency:   10.0
+    publish_frequency:  3.0
+    static_map: false
+    rolling_window: true
+    origin_x: 0
+    origin_y: 0
+    width: 200
+    height: 200

@@ -1,0 +1,8 @@
+roi_x: 0
+roi_y: 0
+roi_width: 640
+roi_height: 480
+#roi_x: 0
+#roi_y: 0
+#roi_width: 1280
+#roi_height: 960

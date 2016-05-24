@@ -105,7 +105,7 @@ class PixelToCoordinateCalculator:
     def get_transform(self):
         while not rospy.is_shutdown():
             try:
-                self.trans = self.tf_buffer.lookup_transform("base_link", "camera_optical", rospy.Time())
+                self.trans = self.tf_buffer.lookup_transform("base_link", "bumblebee_optical_link", rospy.Time())
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                 rospy.logwarn("tf2 exception raised! Check that base_link to camera_optical transform is being broadcasted! Retrying in 1 second")
                 rospy.sleep(1)
@@ -133,7 +133,7 @@ class PixelToCoordinateCalculator:
         self.debug_pointcloud = PointCloud()
         self.debug_pointcloud.header = std_msgs.msg.Header()
         self.debug_pointcloud.header.stamp = rospy.Time.now()
-        self.debug_pointcloud.header.frame_id = "camera_optical"
+        self.debug_pointcloud.header.frame_id = "bumblebee_optical_link"
         # create an empty list of correct size
         self.debug_pointcloud.points = [None] * self.number_of_pixels
 
@@ -151,7 +151,7 @@ class PixelToCoordinateCalculator:
             point_stamped.point = Point(r_x, r_y, r_z)
             point_stamped.header = std_msgs.msg.Header()
             point_stamped.header.stamp = rospy.Time.now()
-            point_stamped.header.frame_id = "camera_optical"
+            point_stamped.header.frame_id = "bumblebee_optical_link"
 
             # transform the point to base_footprint
             while True:

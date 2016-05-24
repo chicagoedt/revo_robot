@@ -1,0 +1,9 @@
+<launch>
+
+  <node pkg="line_detection" name="pixel_to_coordinate_calculator" type="pixel_to_coordinate_calculator_right.py" output="screen">
+    <param name="debug_pointcloud" type="bool" value="false" />
+    <param name="subscriber_image_topic" type="str" value="/camera_left/image_raw_left" />
+    <rosparam command="load" file="$(find line_detection)/roi.yaml" />
+  </node>
+
+</launch>
