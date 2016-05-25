@@ -24,7 +24,7 @@
 -->
 
 <!-- Left Image -->
-  <node pkg="line_detection" name="circle_roi_left" type="circle_roi.py" output="screen">
+<!--  <node pkg="line_detection" name="circle_roi_left" type="circle_roi.py" output="screen">
     <param name="subscriber_image_topic" type="str" value="/camera/image_raw" />
     <param name="use_raw" type="bool" value="True" />
   </node>
@@ -38,14 +38,14 @@
     <param name="use_roi" type="bool" value="True" />
     <rosparam command="load" file="$(find line_detection)/roi.yaml" />
   </node>
-
+-->
 <!-- Right Image -->
-  <node pkg="line_detection" name="scipio_roi_right" type="scipio_roi_right.py" output="screen">
+<!--  <node pkg="line_detection" name="scipio_roi_right" type="scipio_roi_right.py" output="screen">
     <param name="subscriber_image_topic" type="str" value="/camera_right/image_raw_right/compressed" />
     <rosparam command="load" file="$(find line_detection)/scipio_gazebo_roi_points_right.yaml" />
   </node>
 
-  <node pkg="line_detection" name="threshold_right" type="threshold_right.py" output="screen"> <!--CHANGE THRESHOLD FOR RIGHT -->
+  <node pkg="line_detection" name="threshold_right" type="threshold_right.py" output="screen"> 
     <param name="subscriber_image_topic" type="str" value="/scipio_roi_right/line_image/compressed" />
     <param name="use_roi" type="bool" value="True" />
     <rosparam command="load" file="$(find line_detection)/roi.yaml" />
@@ -54,7 +54,7 @@
   <include file="$(find line_detection)/launch/pointcloud_publisher_right.launch">
       <arg name="npy_path" value="/misc/training_images/pixel_coordinates_right.npy"/>
   </include>
-
+-->
 <!-- Stereo Left -->
   <node pkg="line_detection" name="threshold_stereo_left" type="threshold_stereo_left.py" output="screen">
     <param name="subscriber_image_topic" type="str" value="/stereo_camera/left/image_raw/compressed" />
