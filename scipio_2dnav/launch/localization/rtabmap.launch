@@ -2,7 +2,9 @@
 <arg name="pi/2" value="1.5707963267948966" />
 
 <!-- Run the ROS package stereo_image_proc -->
-<group ns="/stereo_camera" >
+
+   <group ns="/stereo_camera" >
+      
     <node pkg="stereo_image_proc" type="stereo_image_proc" name="stereo_image_proc"/>
 
     <!-- Odometry -->
@@ -21,9 +23,32 @@
         <param name="Odom/MinInliers" type="string" value="10"/>
         <param name="Odom/RoiRatios" type="string" value="0.03 0.03 0.04 0.04"/>
         <param name="Odom/MaxDepth" type="string" value="10"/>
-     	<param name="publish_tf" type="bool" value="false"/>
+        <param name="publish_tf" type="bool" value="false"/>
     </node>    
-</group>
+
+    <node pkg="nodelet" type="nodelet" name="stereo_manager"  args="manager"/>
+
+    <node pkg="nodelet" type="nodelet" name="disparity2cloud" args="load rtabmap_ros/point_cloud_xyz stereo_manager">
+        <remap from="disparity/image"       to="disparity"/>
+        <remap from="disparity/camera_info" to="left/camera_info"/>
+        <remap from="cloud"                to="cloud"/>
+
+        <param name="voxel_size" type="double" value="0.05"/>
+        <param name="decimation" type="int" value="4"/>
+        <param name="max_depth" type="double" value="10"/>
+    </node>
+
+      <!-- Create point cloud for the local planner -->
+      <node pkg="nodelet" type="nodelet" name="obstacles_detection" args="load rtabmap_ros/obstacles_detection stereo_manager">
+         <remap from="cloud" to="cloud"/>
+         <!-- <remap from="obstacles" to="/planner_cloud"/> -->
+
+         <param name="frame_id" type="string" value="base_link"/>
+         <param name="map_frame_id" type="string" value="map"/>
+         <param name="min_cluster_size" type="int" value="30"/>
+         <param name="max_obstacles_height" type="double" value="4.0"/>
+       </node>
+   </group>
 
 <group ns="rtabmap">   
   <node name="rtabmap" pkg="rtabmap_ros" type="rtabmap" output="screen" args="--delete_db_on_start">
