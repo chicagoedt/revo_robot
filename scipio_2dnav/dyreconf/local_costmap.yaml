@@ -32,6 +32,6 @@ dictitems:
   resolution: 0.05
   robot_radius: 0.46
   transform_tolerance: 0.3
-  update_frequency: 5.0
+  update_frequency: 10.0
   width: 15
 state: []
