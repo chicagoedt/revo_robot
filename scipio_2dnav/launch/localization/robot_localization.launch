@@ -4,6 +4,7 @@
 	<arg name="magnetic_declination" default="0.066031623"/>
 	<arg name="wheel_odom_topic" default="/raw_odom"/>	
 	<arg name="imu_topic" default="/imu/data"/>	
+  <arg name="stereo_odom" default="/stereo_camera/odom"/>
 
     <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true" output="screen">
     
@@ -15,7 +16,7 @@
       <param name="yaw_offset" value="-1.127"/>
       <param name="zero_altitude" value="true"/>
       <param name="publish_filtered_gps" value="true"/>
-      <param name="broadcast_utm_transform" value="true"/>
+      <param name="broadcast_utm_transform" value="false"/>
       <remap from="/gps/fix" to="/fix" />
     </node>
 
@@ -26,6 +27,7 @@
       <param name="sensor_timeout" value="0.1"/>  
       <param name="odom0" value="$(arg wheel_odom_topic)"/>
       <param name="imu0" value="$(arg imu_topic)"/>
+      <param name="odom1" value="$(arg stereo_odom)"/>
 <!--       <param name="odom1" value="/odometry/gps"/> -->
 
       <param name="two_d_mode" value="true"/>
@@ -39,7 +41,12 @@
                                      false, false, true, 
                                      false, false, false, 
                                      false, false, true,
-                                     false, false, false]</rosparam> 
+                                     false, false, false]</rosparam>
+      <rosparam param="odom1_config">[true, true, false,
+                                      false, false, true,
+                                      false, false, false,
+                                      false, false, false,
+                                      false, false, false]</rosparam>                                
 <!--       <rosparam param="odom1_config">[true, true, false, 
                                      false, false, false, 
                                      false, false, false, 
@@ -48,12 +55,14 @@
 
       <param name="odom0_differential" value="false"/>
       <param name="imu0_differential" value="true"/>
+      <param name="odom1_differential" value="false"/>
 <!--       <param name="odom1_differential" value="false"/>  -->
 
       <param name="imu0_remove_gravitational_acceleration" value="true"/>
 
       <param name="debug"           value="false"/>
       <param name="debug_out_file"  value="~/Desktop/debug_ekf_localization.txt"/>
+
 
       <param name="odom_frame" value="odom"/>
       <param name="base_link_frame" value="base_link"/>
