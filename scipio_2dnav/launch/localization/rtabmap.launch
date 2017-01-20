@@ -72,8 +72,8 @@
      <param name="Rtabmap/TimeThr" type="string" value="700"/>
      <param name="Rtabmap/DetectionRate" type="string" value="1"/>
 
-     <param name="LccBow/MinInliers" type="string" value="10"/>
-     <param name="LccBow/InlierDistance" type="string" value="0.1"/>
+     <param name="Vis/MinInliers" type="string" value="10"/>
+     <param name="Vis/InlierDistance" type="string" value="0.1"/>
   </node>
 
 
