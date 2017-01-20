@@ -20,10 +20,10 @@
         <param name="approx_sync" type="bool" value="false"/>
         <param name="queue_size" type="int" value="5"/>
 
-        <param name="Odom/InlierDistance" type="string" value="0.1"/>
-        <param name="Odom/MinInliers" type="string" value="10"/>
-        <param name="Odom/RoiRatios" type="string" value="0.03 0.03 0.04 0.04"/>
-        <param name="Odom/MaxDepth" type="string" value="10"/>
+        <param name="Vis/InlierDistance" type="string" value="0.1"/>
+        <param name="Vis/MinInliers" type="string" value="10"/>
+        <param name="Vis/RoiRatios" type="string" value="0.03 0.03 0.04 0.04"/>
+        <param name="Vis/MaxDepth" type="string" value="10"/>
         <param name="publish_tf" type="bool" value="false"/>
     </node>    
 
@@ -56,7 +56,7 @@
      <param name="frame_id" type="string" value="base_link"/>
      <param name="subscribe_stereo" type="bool" value="true"/>
      <param name="subscribe_depth" type="bool" value="false"/>
-     <param name="stereo_approx_sync" type="bool" value="false"/>
+     <param name="approx_sync" type="bool" value="false"/>
      <param name="publish_tf" type="bool" value="true"/>
 
      <remap from="left/image_rect" to="/stereo_camera/left/image_rect_color"/>
