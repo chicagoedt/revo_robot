@@ -1,0 +1,7 @@
+<launch>
+	<node pkg="line_detection" name="fitline" type="fitline.py" output="screen" >
+	<param name="subscriber_image_topic" type="str" value="/hsv_filter/line_image/compressed" />
+	<param name="publisher_image_topic" type="str" value="/fit_line/line_image/compressed" />
+	</node>
+
+</launch>

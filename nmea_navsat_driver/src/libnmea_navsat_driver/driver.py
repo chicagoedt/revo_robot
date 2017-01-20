@@ -74,11 +74,11 @@ class RosNMEADriver(object):
             current_time = rospy.get_rostime()
         current_fix = NavSatFix()
         current_fix.header.stamp = current_time
-        current_fix.header.frame_id = frame_id
+        current_fix.header.frame_id = 'gps'
 
         current_heading = Imu()
 	current_heading.header.stamp = current_time
-	current_heading.header.frame_id = 'base_footprint'	
+	current_heading.header.frame_id = 'gps'	
 
         current_direction = String() # For testing
 
@@ -95,7 +95,10 @@ class RosNMEADriver(object):
             #rospy.loginfo("HDT!")
             data = parsed_sentence['HDT']
 	    tempHeading = data['true_heading']
-	    ccHeading = (2 * math.pi) - tempHeading
+            rospy.loginfo("Heading = " + str(tempHeading))
+	    ccHeading = ((2 * math.pi) - tempHeading) - math.pi # gps is oriented backwards, so fix this later
+
+            rospy.loginfo("Heading = " + str(ccHeading))
 
 	    q = tf.transformations.quaternion_from_euler(0,0,ccHeading)
 	    current_heading.orientation.x = q[0]

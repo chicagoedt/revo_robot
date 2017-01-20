@@ -1,0 +1,7 @@
+<launch>
+	<include file="$(find roboteq_node)/launch/roboteq-serial.launch"/>
+	<include file="$(find scipio_2dnav)/launch/sensors.launch"/>
+	<include file="$(find scipio_2dnav)/launch/localization/robot_localization.launch"/>
+	<include file="$(find scipio_2dnav)/launch/move_base.launch"/>
+	<include file="$(find state_machine)/launch/state_machine.launch"/>
+</launch>

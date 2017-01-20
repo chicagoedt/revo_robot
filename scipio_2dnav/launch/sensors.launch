@@ -1,0 +1,5 @@
+<launch>
+	<include file="$(find nmea_navsat_driver)/serial_driver.launch"/>
+	<include file="$(find microstrain_3dmgx2_imu)/microstrain_3dmgx2.launch"/>
+	<include file="$(find sick_tim)/launch/sick_tim551_2050001.launch"/>
+</launch>

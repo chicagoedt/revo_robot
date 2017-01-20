@@ -5,7 +5,7 @@
 
     <remap from="/odom" to="/odometry/filtered" />
 
-    <param name="controller_frequency" value="10.0"/>
+    <param name="controller_frequency" value="8.0"/>
     <rosparam file="$(find scipio_2dnav)/config/costmap_common_params.yaml" command="load" ns="global_costmap" />
     <rosparam file="$(find scipio_2dnav)/config/costmap_common_params.yaml" command="load" ns="local_costmap" />
     <rosparam file="$(find scipio_2dnav)/config/local_costmap_params.yaml" command="load" />

@@ -34,9 +34,13 @@ class PixelToCoordinateCalculator:
     package_path = rospkg.RosPack().get_path('line_detection')
 
     # set up camera info manager instance
+#    camera_info_url = rospy.get_param(
+#        'pixel_to_coordinate_calculator/camera_info_url',
+#        "file://" + package_path + "/misc/calibration_data/aptina_960.yaml"
+#    )
     camera_info_url = rospy.get_param(
         'pixel_to_coordinate_calculator/camera_info_url',
-        "file://" + package_path + "/misc/calibration_data/aptina_960.yaml"
+        "file:///home/revo/.ros/camera_info/zed_1920_left.yaml"
     )
     camera_name = rospy.get_param(
         'pixel_to_coordinate_calculator/camera_name',
@@ -105,7 +109,7 @@ class PixelToCoordinateCalculator:
     def get_transform(self):
         while not rospy.is_shutdown():
             try:
-                self.trans = self.tf_buffer.lookup_transform("base_link", "bumblebee_optical_link", rospy.Time())
+                self.trans = self.tf_buffer.lookup_transform("base_link", "zed_optical_frame", rospy.Time())
             except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                 rospy.logwarn("tf2 exception raised! Check that base_link to camera_optical transform is being broadcasted! Retrying in 1 second")
                 rospy.sleep(1)
@@ -133,7 +137,7 @@ class PixelToCoordinateCalculator:
         self.debug_pointcloud = PointCloud()
         self.debug_pointcloud.header = std_msgs.msg.Header()
         self.debug_pointcloud.header.stamp = rospy.Time.now()
-        self.debug_pointcloud.header.frame_id = "bumblebee_optical_link"
+        self.debug_pointcloud.header.frame_id = "zed_optical_frame"
         # create an empty list of correct size
         self.debug_pointcloud.points = [None] * self.number_of_pixels
 
@@ -151,7 +155,7 @@ class PixelToCoordinateCalculator:
             point_stamped.point = Point(r_x, r_y, r_z)
             point_stamped.header = std_msgs.msg.Header()
             point_stamped.header.stamp = rospy.Time.now()
-            point_stamped.header.frame_id = "bumblebee_optical_link"
+            point_stamped.header.frame_id = "zed_optical_frame"
 
             # transform the point to base_footprint
             while True:

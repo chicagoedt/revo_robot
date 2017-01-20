@@ -1,7 +1,7 @@
 <launch>
 
 <node pkg="nmea_navsat_driver" type="nmea_serial_driver" name="gps_driver">
-    <param name="port" type="string" value="/dev/ttyACM0"/>
+    <param name="port" type="string" value="/dev/ttyUSB0"/>
 </node>
 
 </launch>

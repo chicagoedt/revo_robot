@@ -52,14 +52,18 @@ class MaxMask(LaneDetection):
 
         first_image = self.ros_to_cv2_image(ros_image)
 
+        #roi = self.get_roi(first_image)
+
         # convert mask_message to cv2
         np_arr = np.fromstring(mask_message.data, np.uint8)
         mask_image = cv2.imdecode(np_arr, -1)
 
         mask_image = self.convert_to_mono(mask_image)
 
+	mask_roi = self.get_roi(mask_image)
+	
         # need to make mask 3 channels
-        mask = np.dstack((mask_image, mask_image, mask_image))
+        mask = np.dstack((mask_roi, mask_roi, mask_roi))
 
         final_image = np.maximum(first_image, mask)
 

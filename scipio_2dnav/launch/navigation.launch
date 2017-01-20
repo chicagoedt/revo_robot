@@ -1,0 +1,4 @@
+<launch>
+	<include file="$(find scipio_2dnav)/launch/move_base.launch"/>
+	<include file="$(find scipio_2dnav)/launch/localization/robot_localization.launch"/>
+</launch>

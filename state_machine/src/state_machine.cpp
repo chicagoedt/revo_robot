@@ -17,7 +17,14 @@ bool StateMachineBase::Initialize()
 {
   std::string   goalParamName = "GoalPoint";
 
-  for(int i = 1; i <= MAX_GOAL_POINTS; i++)
+  int numWaypoints = 1;
+  if(_nh.hasParam("NumberOfWaypoints"))
+  {
+    _nh.getParam("NumberOfWaypoints", numWaypoints);
+  }
+  ROS_INFO_STREAM("Number of waypoints: " << numWaypoints);
+
+  for(int i = 1; i <= numWaypoints; i++)
   {
     std::ostringstream gpLat; 
     std::ostringstream gpLong; 
@@ -41,14 +48,24 @@ bool StateMachineBase::Initialize()
         double latitudeVal   = 0;
         double longitudeVal  = 0;
 
-        StateMachineBase::convertDegMinSecToLL( goalLat, goalLong, latitudeVal, longitudeVal ); 
+	if(goalLat.size() > 1 && goalLong.size() > 1)
+	{
+        	StateMachineBase::convertDegMinSecToLL( goalLat, goalLong, latitudeVal, longitudeVal ); 
+	}
+	else
+	{
+		latitudeVal 	= goalLat[0];
+		longitudeVal 	= goalLong[0];
+	}
 
         ROS_INFO_STREAM("Lat: " << latitudeVal);
         ROS_INFO_STREAM("Long: " << longitudeVal);
         ROS_INFO_STREAM(" ");
 
-        geoPoint.latitude   = latitudeVal;
-        geoPoint.longitude  = longitudeVal;
+	RobotLocalization::NavsatConversions::UTM(latitudeVal, longitudeVal, &geoPoint.latitude, &geoPoint.longitude);
+
+        //geoPoint.latitude   = latitudeVal;
+        //geoPoint.longitude  = longitudeVal;
 
         _geoPointsQueue.push(geoPoint);
     }
@@ -89,12 +106,13 @@ void StateMachineBase::run()
 
     int x = 0;
 
-    while(!_goalPointsQueue.empty())
+    while(!_geoPointsQueue.empty())
     {
-        _moveBaseGoal.target_pose.header.frame_id   = "odom";
+        _moveBaseGoal.target_pose.header.frame_id   = "utm";
         _moveBaseGoal.target_pose.header.stamp      = ros::Time::now();
 
-        _moveBaseGoal.target_pose.pose.position     = _goalPointsQueue.front().position;
+        _moveBaseGoal.target_pose.pose.position.x     = _geoPointsQueue.front().latitude;
+        _moveBaseGoal.target_pose.pose.position.y     = _geoPointsQueue.front().longitude;
         _moveBaseGoal.target_pose.pose.orientation  = tf::createQuaternionMsgFromYaw(0.01);
 
         ROS_INFO_STREAM("Sending goal(X, Y):" << "[ " << _moveBaseGoal.target_pose.pose.position.x << " , "
@@ -106,15 +124,15 @@ void StateMachineBase::run()
 
         if(_moveBaseAC.getState() == actionlib::SimpleClientGoalState::SUCCEEDED)
         {
-            _goalPointsQueue.pop();
+            _geoPointsQueue.pop();
 	        x++;
 
-	        if(x == 2)
+            ROS_INFO("Succesfully moved to GoalPoint.");
+	        if(x == 3)
 	        {   
-		
+			return;			
 	        }
 
-            ROS_INFO("Succesfully moved to GoalPoint.");
         }
         else
         {
