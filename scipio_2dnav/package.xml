@@ -12,5 +12,6 @@
 
   <buildtool_depend>catkin</buildtool_depend>
   <run_depend>navigation</run_depend>
+  <run_depend>rtabmap</run_depend>
 
 </package>
