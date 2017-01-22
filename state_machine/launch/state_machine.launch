@@ -1,3 +1,4 @@
+<?xml version="1.0"?>
 <launch>
 
   <node pkg="state_machine" type="state_machine_node" name="state_machine" output="screen" >
@@ -5,3 +6,4 @@
   </node> 
 
 </launch>
+
