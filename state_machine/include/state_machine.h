@@ -9,6 +9,7 @@
 #include <geometry_msgs/Point.h>
 #include <tf/transform_datatypes.h>
 #include <std_msgs/Bool.h>
+#include <robot_localization/navsat_conversions.h>
 
 #include <vector>
 #include <queue>

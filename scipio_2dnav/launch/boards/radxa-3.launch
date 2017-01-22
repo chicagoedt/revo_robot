@@ -1,6 +1,5 @@
 <launch>
 
     <include file="$(find microstrain_3dmgx2_imu)/microstrain_3dmgx2.launch"/>
-    <include file="$(find scipio_2dnav)/launch/localization/robot_localization.launch"/>
-    <include file="$(find scipio_2dnav)/launch/static_transforms.launch"/>
+    <!-- there used to be includes for robot_localization.launch and static_transforms.launch here... -->
 </launch>

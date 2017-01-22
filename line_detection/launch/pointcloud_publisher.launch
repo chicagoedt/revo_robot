@@ -4,7 +4,7 @@
   <arg name="npy_path" default="/misc/training_images/pixel_coordinates.npy"/>
 
   <node pkg="line_detection" name="pointcloud_publisher" type="pointcloud_publisher.py" output="screen">
-      <param name="subscriber_image_topic" type="str" value="/threshold/line_image/compressed" />
+      <param name="subscriber_image_topic" type="str" value="/dilate/line_image/compressed" />
       <param name="generated_npy_path" type="str" value="$(arg npy_path)" />
   </node>
 

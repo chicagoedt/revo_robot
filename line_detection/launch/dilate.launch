@@ -1,0 +1,6 @@
+<launch>
+ <node pkg="line_detection" name="dilate" type="dilate.py" output="screen">
+    <param name="subscriber_image_topic" type="str" value="/erode/line_image/compressed" />
+    <param name="publisher_image_topic" type="str" value="/line_image/compressed" />
+  </node>
+  </launch>

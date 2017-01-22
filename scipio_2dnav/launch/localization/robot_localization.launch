@@ -1,37 +1,43 @@
-<?xml version="1.0"?>
+<?xml version="0.0"?>
 <launch>
 
-	<arg name="magnetic_declination" default="0.066031623"/>
+	<!-- <arg name="magnetic_declination" default="-0.066904288"/> -->
+	<arg name="magnetic_declination" default="0"/>
+	 <!-- zero if using gps heading** <arg name="magnetic_declination" default="0"/> -->
 	<arg name="wheel_odom_topic" default="/raw_odom"/>	
 	<arg name="imu_topic" default="/imu/data"/>	
   <arg name="stereo_odom" default="/stereo_camera/odom"/>
 
-    <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" respawn="true" output="screen">
+	<include file="$(find scipio_2dnav)/launch/static_transforms.launch"/>
+
+    <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" clear_params="true" respawn="true" output="screen">
     
       <param name="magnetic_declination_radians" value="$(arg magnetic_declination)"/>
       
       <param name="roll_offset" value="0"/>
-      <param name="delay" value="1"/>
+      <param name="delay" value="3"/>
       <param name="pitch_offset" value="0"/>
-      <param name="yaw_offset" value="-1.127"/>
+      <param name="yaw_offset" value="1.57"/>
       <param name="zero_altitude" value="true"/>
       <param name="publish_filtered_gps" value="true"/>
       <param name="broadcast_utm_transform" value="false"/>
       <remap from="/gps/fix" to="/fix" />
+      <remap from="/imu/data" to="/heading" />
     </node>
 
 
-    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true">
+    <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true" output="screen">
 
-      <param name="frequency" value="50"/>  
+      <param name="frequency" value="40"/>  
       <param name="sensor_timeout" value="0.1"/>  
+<!--
       <param name="odom0" value="$(arg wheel_odom_topic)"/>
+-->
       <param name="imu0" value="$(arg imu_topic)"/>
-      <param name="odom1" value="$(arg stereo_odom)"/>
 <!--       <param name="odom1" value="/odometry/gps"/> -->
+      <param name="odom0" value="$(arg wheel_odom_topic)"/>
 
       <param name="two_d_mode" value="true"/>
-
       <rosparam param="odom0_config">[false, false, false, 
                                      false, false, false, 
                                      true, false, false, 
@@ -40,13 +46,33 @@
       <rosparam param="imu0_config">[false, false, false, 
                                      false, false, true, 
                                      false, false, false, 
+                                     false, false, false,
+                                     false, false, false]</rosparam>
+      <rosparam param="imu1_config">[false, false, false, 
+                                     false, false, true, 
+                                     false, false, false, 
+                                     false, false, false,
+                                     false, false, false]</rosparam>
+<!--
+      <rosparam param="odom0_config">[true, true, false,
+                                      false, false, true,
+                                      false, false, false,
+                                      false, false, false,
+                                      false, false, false]</rosparam>                                
+      <rosparam param="odom1_config">[false, false, false, 
+                                     false, false, false, 
+                                     true, false, false, 
                                      false, false, true,
                                      false, false, false]</rosparam>
+<<<<<<< HEAD
       <rosparam param="odom1_config">[true, true, false,
                                       false, false, true,
                                       false, false, false,
                                       false, false, false,
                                       false, false, false]</rosparam>                                
+=======
+-->
+>>>>>>> IGVC2016_final
 <!--       <rosparam param="odom1_config">[true, true, false, 
                                      false, false, false, 
                                      false, false, false, 
@@ -55,7 +81,12 @@
 
       <param name="odom0_differential" value="false"/>
       <param name="imu0_differential" value="true"/>
+<<<<<<< HEAD
       <param name="odom1_differential" value="false"/>
+=======
+      <param name="imu1_differential" value="true"/>
+      <!--<param name="odom1_differential" value="false"/>-->
+>>>>>>> IGVC2016_final
 <!--       <param name="odom1_differential" value="false"/>  -->
 
       <param name="imu0_remove_gravitational_acceleration" value="true"/>
@@ -79,9 +110,9 @@
                                                   0.0, 0.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0, 0.0,
                                                   0.0, 0.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0, 0.0, 0.0,
                                                   0.0, 0.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.02, 0.0, 0.0, 0.0,
-                                                  0.0, 0.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0, 0.0,
-                                                  0.0, 0.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.01, 0.0,
-                                                  0.0, 0.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.015]</rosparam>
+                                                  0.0, 0.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.001, 0.0, 0.0,
+                                                  0.0, 0.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.001, 0.0,
+                                                  0.0, 0.0, 0.0, 0.0, 0.00, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0015]</rosparam>
 
     </node>
 

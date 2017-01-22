@@ -20,10 +20,10 @@ from line_detection.cfg import LineDetectionConfig
 
 
 class Dilate(LaneDetection):
-    roi_top_left_x = 0
-    roi_top_left_y = 0
-    roi_width = 2000
-    roi_height = 2000
+#    roi_top_left_x = 0
+#    roi_top_left_y = 0
+#    roi_width = 2000
+#    roi_height = 2000
     dilate_size = 0
     dilate_iterations = 0
 
@@ -34,8 +34,8 @@ class Dilate(LaneDetection):
     def image_callback(self, ros_image):
 
         cv2_image = LaneDetection.ros_to_cv2_image(self, ros_image)
-        roi = LaneDetection.get_roi(self, cv2_image)
-
+#        roi = LaneDetection.get_roi(self, cv2_image)
+	roi = cv2_image
         # dilate each pixel using kernel with dilate_size
         if self.dilate_size > 0 and self.dilate_iterations > 0:
             kernel = np.ones((self.dilate_size, self.dilate_size), np.uint8)

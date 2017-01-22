@@ -1,0 +1,20 @@
+NumberOfWaypoints: 3
+#ALWAYS SUBSCRIBE TO /gps/filtered and not /fix to get lat long
+
+# 5th parking lane intersection after light post
+GoalPoint1_Latitude: [41.8684306095]
+GoalPoint1_Longitude: [-87.645603555]
+
+# 11th parking lane intersection after light post
+GoalPoint2_Latitude: [41.8685829243]
+GoalPoint2_Longitude: [-87.6456126423]
+
+# right by the dumpster
+GoalPoint3_Latitude: [41.868251]
+GoalPoint3_Longitude: [-87.645487]
+
+GoalPoint4_Latitude: [3.69, 0,0.0]
+GoalPoint4_Longitude: [3.69, 0,0.0]
+
+GoalPoint5_Latitude: [3.69, 0,0.0]
+GoalPoint5_Longitude: [3.69, 0,0.0]
