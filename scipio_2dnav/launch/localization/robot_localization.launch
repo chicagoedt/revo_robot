@@ -64,15 +64,7 @@
                                      true, false, false, 
                                      false, false, true,
                                      false, false, false]</rosparam>
-<<<<<<< HEAD
-      <rosparam param="odom1_config">[true, true, false,
-                                      false, false, true,
-                                      false, false, false,
-                                      false, false, false,
-                                      false, false, false]</rosparam>                                
-=======
 -->
->>>>>>> IGVC2016_final
 <!--       <rosparam param="odom1_config">[true, true, false, 
                                      false, false, false, 
                                      false, false, false, 
@@ -81,12 +73,6 @@
 
       <param name="odom0_differential" value="false"/>
       <param name="imu0_differential" value="true"/>
-<<<<<<< HEAD
-      <param name="odom1_differential" value="false"/>
-=======
-      <param name="imu1_differential" value="true"/>
-      <!--<param name="odom1_differential" value="false"/>-->
->>>>>>> IGVC2016_final
 <!--       <param name="odom1_differential" value="false"/>  -->
 
       <param name="imu0_remove_gravitational_acceleration" value="true"/>
