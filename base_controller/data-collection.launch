@@ -9,18 +9,22 @@
 
     <!-- your params may be different
             see http://wiki.ros.org/joy#Application -->
-    <param name="axis_linear" value="1" type="int"/>
-    <param name="axis_angular" value="0" type="int"/>
+    <param name="axis_linear" value="0" type="int"/>
+    <param name="axis_angular" value="1" type="int"/>
     <param name="scale_linear" value="2" type="double"/>
     <param name="scale_angular" value="2" type="double"/>
     <node pkg="base_controller" type="joystick_teleop" name="base_controller"/>
 
     <arg name="port" default="/dev/ttyACM0" />
-    <node name="roboteq_can" pkg="roboteq_node" type="roboteq_node" output="screen" >
+    <node name="roboteq_serial" pkg="roboteq_node" type="roboteq_node" output="screen" >
          <param name="mode" value="serial" type="str" />
          <param name="device" value="$(arg port)" type="str" />
          <param name="left" value="1" type="str" />
          <param name="right" value="2" type="str" />
     </node>
+
+    <!--
+    <node name="wheel_odometry" pkg="odom" type="odom" /> -->
+
 
 </launch>
