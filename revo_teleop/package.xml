@@ -42,10 +42,17 @@
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>geometry_msgs</build_depend>
-  <run_depend>geometry_msgs</run_depend>
-
   <build_depend>base_controller</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <build_depend>sensor_msgs</build_depend>
+  <build_depend>base_controller</build_depend>
+
+  <run_depend>geometry_msgs</run_depend>
   <run_depend>base_controller</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+  <run_depend>sensor_msgs</run_depend>
+  <run_depend>base_controller</run_depend>
+
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
