@@ -42,9 +42,9 @@ TeleopJoy::TeleopJoy()
 {
 	counter = 0;
 
-	n.param("axis_linear" 		, velLinear,  	0 );
+	n.param("axis_linear" 		, velLinear,  	0);
 	n.param("axis_angular"		, velAngular,   1);
-	n.param("button_a"			, buttonA, 		0);
+	n.param("button_a"			, buttonA, 		buttonA);
 	n.param("button_b"			, buttonB, 		buttonB);
 	n.param("button_x"			, buttonX, 		buttonX);
 	n.param("button_y"			, buttonY, 		buttonY);
@@ -71,12 +71,12 @@ void TeleopJoy::callback(const sensor_msgs::Joy::ConstPtr& joy)
 
 	geometry_msgs::Twist 				vel;
 	base_controller::Xbox_Button_Msg	buttonPressed;
-/*
+
 	vel.angular.z 	= joy->axes[velAngular];
 	vel.linear.x 	= joy->axes[velLinear];
-*/
-	buttonPressed.a 					= joy.buttons[0];
-/*	buttonPressed.b 					= joy->buttons[buttonB];
+
+/*	buttonPressed.a 					= joy->buttons[0];
+	buttonPressed.b 					= joy->buttons[buttonB];
 	buttonPressed.x 					= joy->buttons[buttonX];
 	buttonPressed.y 					= joy->buttons[buttonY];
 	buttonPressed.left_bumper 			= joy->buttons[left_bumper];
@@ -100,8 +100,8 @@ int main(int argc, char** argv)
 {  
 	ros::init(argc, argv, "teleopJoy");
 	TeleopJoy 	joystick;
-    ROS_INFO_STREAM(axis_linear);
-	ros::spin();
+	
+    ros::spin();
 
 	std::cout << "Count: " << joystick.counter << std::endl;
 }
