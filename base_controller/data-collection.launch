@@ -45,5 +45,6 @@
     <!--
     <node name="wheel_odometry" pkg="odom" type="odom" /> -->
 
+    <node name="zed_feed" pkg="zed_ros" type="record_data.py" />
 
 </launch>
