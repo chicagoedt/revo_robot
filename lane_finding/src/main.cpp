@@ -6,11 +6,15 @@
 #include <opencv_apps/LineArrayStamped.h>
 
 void findLanes(const sensor_msgs::CompressedImage frame) {
-    //TODO: Convert to grayscale
-    
+
+    //TODO: cv2.COLOR_RGB2HLS
+    // cv2.COLOR_RGB2GRAY
+
+    //TODO: Undistort
+
     //TODO: Gaussian blur to reduce noise using kernel size 3 or 5
 
-    //TODO: Canny edge detection
+    //TODO: isolate S channel of HLS and run Sobel over gray - see sections 24 and 30 in Advanced Lane Finding
 
     //TODO: Hough transform
 
