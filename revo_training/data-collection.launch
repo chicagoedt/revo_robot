@@ -47,6 +47,10 @@
     <node name="wheel_odometry" pkg="odom" type="odom" /> -->
 
     <!-- zed camera feed -->
-    <node name="zed_feed" pkg="zed_ros" type="record_data.py" />
+    <node name="zed_feed" pkg="zed_ros" type="zed_ros" />
+    
+    <!-- opencv -->
+    <remap from="image" to="stereo_camera/left/image_color" />
+    <node name
 
 </launch>
