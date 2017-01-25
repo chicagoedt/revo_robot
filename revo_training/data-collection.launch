@@ -34,6 +34,7 @@
 
     <node pkg="base_controller" type="joystick_teleop" name="base_controller"/>
 
+    <!-- roboteq drivers -->
     <arg name="port" default="/dev/ttyACM0" />
     <node name="roboteq_serial" pkg="roboteq_node" type="roboteq_node" output="screen" >
          <param name="mode" value="serial" type="str" />
@@ -45,6 +46,7 @@
     <!--
     <node name="wheel_odometry" pkg="odom" type="odom" /> -->
 
+    <!-- zed camera feed -->
     <node name="zed_feed" pkg="zed_ros" type="record_data.py" />
 
 </launch>
