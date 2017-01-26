@@ -23,7 +23,7 @@ void findLanes(const sensor_msgs::Image frame) {
     cv::Mat frame = cv_ptr->image;
     
     //TODO: Undistort
-    
+    // http://docs.opencv.org/2.4/doc/tutorials/core/file_input_output_with_xml_yml/file_input_output_with_xml_yml.html#fileinputoutputxmlyaml 
 
     // Resize.
     frame.resize(cv::Size(160,90));
