@@ -1,0 +1,5 @@
+/home/jeff/Documents/OpenCV/ArUco/CMakeFiles/calibrate.dir
+/home/jeff/Documents/OpenCV/ArUco/CMakeFiles/charuco.dir
+/home/jeff/Documents/OpenCV/ArUco/CMakeFiles/detectMarker.dir
+/home/jeff/Documents/OpenCV/ArUco/CMakeFiles/fly.dir
+/home/jeff/Documents/OpenCV/ArUco/CMakeFiles/genMarker.dir
