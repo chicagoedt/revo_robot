@@ -2,19 +2,49 @@
 
 #include <ros/ros.h>
 #include <opencv_apps>
-#include <sensor_msgs/Image.h>
-#include <opencv_apps/LineArrayStamped.h>
+#include <sensor_msgs/image_encodings.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <cv_bridge/cv_bridge.h>
+#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
 
-void findLanes(const sensor_msgs::CompressedImage frame) {
 
-    //TODO: cv2.COLOR_RGB2HLS
-    // cv2.COLOR_RGB2GRAY
+void findLanes(const sensor_msgs::Image frame) {
 
+    // Convert sensor_msgs/Image to Mat
+    cv_bridge::CvImagePtr cv_ptr;
+    try {
+        cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+    }
+    catch (cv_bridge::Exception& e) {
+        ROS_ERROR("cv_bridge exception: %s", e.what());
+        return;
+    }
+    cv::Mat frame = cv_ptr->image;
+    
     //TODO: Undistort
+    
+
+    // Resize.
+    frame.resize(cv::Size(160,90));
 
     //TODO: Gaussian blur to reduce noise using kernel size 3 or 5
 
-    //TODO: isolate S channel of HLS and run Sobel over gray - see sections 24 and 30 in Advanced Lane Finding
+    // Convert to grayscale and HSV
+    cv::Mat gray;
+    cv::Mat hsv;
+    cv::cvtColor(frame, gray, cv::CV_BGR2GRAY);
+    cv::cvtColor(frame, hsv, cv::CV_BGR2HSV);
+    frame.release();
+
+    // Isolate S channel of HLS and run Sobel over gray.
+    cv::Mat saturation;
+    cv::extractChannel(hsv, saturation, 1);
+    hsv.release();
+    
+    cv::Mat grad_x;
+    cv::Sobel(gray, grad_x, cv::CV_16S, 1, 0);
+    gray.release();
 
     //TODO: Hough transform
 
