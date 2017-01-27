@@ -9,18 +9,22 @@
 #include <opencv2/highgui/highgui.hpp>
 
 
-void findLanes(const sensor_msgs::Image msg) {
+ros::NodeHandle nh;
+ros::Publisher right_pub = nh.advertise<sensor_msgs::Image>("lane_detector/lane_lines/right", 1000);
+ros::Publisher left_pub = nh.advertise<sensor_msgs::Image>("lane_detector/lane_lines/left", 1000);
+
+sensor_msgs::CompressedImage findLanes(const sensor_msgs::Image msg) {
 
     // Convert sensor_msgs/Image to Mat
-    cv_bridge::CvImagePtr cv_ptr;
+    cv_bridge::CvImagePtr in_msg;
     try {
-        cv_ptr = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
+        in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     }
     catch (cv_bridge::Exception& e) {
         ROS_ERROR("cv_bridge exception: %s", e.what());
-        return;
+        //return;
     }
-    cv::Mat full_frame = cv_ptr->image;
+    cv::Mat full_frame = in_msg->image;
     
     //TODO: Undistort
     // http://docs.opencv.org/2.4/doc/tutorials/core/file_input_output_with_xml_yml/file_input_output_with_xml_yml.html#fileinputoutputxmlyaml 
@@ -29,7 +33,6 @@ void findLanes(const sensor_msgs::Image msg) {
     cv::Mat frame;
     cv::resize(full_frame, frame, cv::Size(160,90));
     full_frame.release();
-
 
     //TODO: Gaussian blur to reduce noise using kernel size 3 or 5
 
@@ -53,20 +56,36 @@ void findLanes(const sensor_msgs::Image msg) {
 
     //TODO: Delete everything outside the region of interest
 
-    //TODO: Perspective transform
+    //TODO: Perspective transform    
+
+    //TODO: Convert back to sensor_msgs/Image
+    sensor_msgs::CompressedImage out_msg;
+    out_msg.header = in_msg->header;
+    out_msg.format = "png";
+    out_msg.data = grad_x;
+
+    return out_msg;
+
+}
+
+void left_callback(const sensor_msgs::Image msg) {
+    sensor_msgs::CompressedImage lanes = findLanes(msg);
+    left_pub.publish(lanes);
+}
+
+void right_callback(const sensor_msgs::Image msg) {
+    sensor_msgs::CompressedImage lanes = findLanes(msg);
+    right_pub.publish(lanes);
 }
 
 int main( int argc, char **argv ) {
     
     // Initialize the ROS system and become a node.
     ros::init( argc, argv, "lane_finder");
-    ros::NodeHandle nh;
 
     // Create publisher and subscriber objects.
-    ros::Subscriber left_sub = nh.subscribe("/stereo_camera/left/image_color", 1000, &findLanes);
-    ros::Subscriber right_sub = nh.subscribe("/stereo_camera/right/image_color", 1000, &findLanes);
-    ros::Publisher left_pub = nh.advertise<sensor_msgs::Image>("lane_detector/lane_lines/left", 1000);
-    ros::Publisher right_pub = nh.advertise<sensor_msgs::Image>("lane_detector/lane_lines/right", 1000);
+    ros::Subscriber left_sub = nh.subscribe("/stereo_camera/left/image_color", 1000, &left_callback);
+    ros::Subscriber right_sub = nh.subscribe("/stereo_camera/right/image_color", 1000, &right_callback);
     
     // Let ROS take over.
     ros::spin();
