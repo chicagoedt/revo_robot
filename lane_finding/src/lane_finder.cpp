@@ -1,6 +1,7 @@
 // This program does all image processing.
 
 #include "lane_finder.h"
+#include <signal.h>
 
 sensor_msgs::CompressedImage LaneFinder::findLanes(const sensor_msgs::Image& msg) {
 
@@ -20,9 +21,6 @@ sensor_msgs::CompressedImage LaneFinder::findLanes(const sensor_msgs::Image& msg
     cv::Mat frame;
     frame = in_msg->image;
     
-    cv::namedWindow("Display Image", cv::WINDOW_AUTOSIZE );
-    cv::imshow("Display Image", frame);
-    cv::waitKey(0);
     //TODO: Undistort
     // http://docs.opencv.org/2.4/doc/tutorials/core/file_input_output_with_xml_yml/file_input_output_with_xml_yml.html#fileinputoutputxmlyaml 
     /*
@@ -36,7 +34,7 @@ sensor_msgs::CompressedImage LaneFinder::findLanes(const sensor_msgs::Image& msg
     // Convert to grayscale and HSV
     cv::Mat gray;
     cv::Mat hsv;
-    cv::cvtColor(frame, gray, CV_BGR2GRAY);
+    //cv::cvtColor(frame, gray, CV_BGR2GRAY);
  /*   cv::cvtColor(frame, hsv, CV_BGR2HSV);
     //frame.release();
 
@@ -84,3 +82,23 @@ void LaneFinder::Initialize() {
     _left_pub = _nh.advertise<sensor_msgs::CompressedImage>("lane_finder/lane_lines/left", 1000);
     _right_pub = _nh.advertise<sensor_msgs::CompressedImage>("lane_finder/lane_lines/right", 1000);
 }
+
+/*
+ void sigIntHandler(int sig) {
+     ROS_DEBUG("--> SIGINT Handler called <--");
+ 
+     ros::shutdown();
+ }
+ */
+ int main(int argc, char** argv) {
+     ros::init(argc, argv, "lane_finder");
+ 
+     LaneFinder laneFinder;
+ 
+    // signal(SIGINT, sigIntHandler);
+ 
+     laneFinder.Initialize();
+ 
+     ros::spin();
+ }
+
