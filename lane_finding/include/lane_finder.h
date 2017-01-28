@@ -25,7 +25,7 @@ class LaneFinder
         ros::Subscriber     _left_sub;
         ros::Subscriber     _right_sub;
 
-        sensor_msgs::CompressedImage findLanes(const sensor_msgs::Image&);
+        sensor_msgs::Image findLanes(const sensor_msgs::Image&);
         void left_callback(const sensor_msgs::Image&);
         void right_callback(const sensor_msgs::Image&);
 };

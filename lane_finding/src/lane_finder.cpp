@@ -3,7 +3,7 @@
 #include "lane_finder.h"
 #include <signal.h>
 
-sensor_msgs::CompressedImage LaneFinder::findLanes(const sensor_msgs::Image& msg) {
+sensor_msgs::Image LaneFinder::findLanes(const sensor_msgs::Image& msg) {
 
     // Convert sensor_msgs/Image to Mat
     cv_bridge::CvImagePtr in_msg;
@@ -19,13 +19,12 @@ sensor_msgs::CompressedImage LaneFinder::findLanes(const sensor_msgs::Image& msg
     cv::Mat full_frame;
     full_frame = in_msg->image;
     
-    cv::namedWindow("Jeff", CV_WINDOW_AUTOSIZE);
     //TODO: Undistort
     // http://docs.opencv.org/2.4/doc/tutorials/core/file_input_output_with_xml_yml/file_input_output_with_xml_yml.html#fileinputoutputxmlyaml 
     
-    // Resize.
+    // Resize. Default Zed dimensions are 1600x900
     cv::Mat frame;
-    cv::resize(full_frame, frame, cv::Size(160,90));
+    cv::resize(full_frame, frame, cv::Size(320,180));
     full_frame.release();
     
     //TODO: Gaussian blur to reduce noise using kernel size 3 or 5
@@ -43,7 +42,7 @@ sensor_msgs::CompressedImage LaneFinder::findLanes(const sensor_msgs::Image& msg
     //hsv.release();
     
     cv::Mat grad_x;
-    cv::Sobel(gray, grad_x, CV_16S, 1, 0);
+    cv::Sobel(gray, grad_x, CV_8U, 1, 0);
     //gray.release();
 
     //TODO: Hough transform
@@ -53,22 +52,30 @@ sensor_msgs::CompressedImage LaneFinder::findLanes(const sensor_msgs::Image& msg
     //TODO: Perspective transform    
 
     //TODO: Convert back to sensor_msgs/Image
-    sensor_msgs::CompressedImage out_msg;
-    out_msg.header = in_msg->header;
-    out_msg.format = "png";
-    out_msg.data = grad_x;
+    //sensor_msgs::Image out_msg;
+    //out_msg.header = in_msg->header;
+    //out_msg.format = "png";
+    //out_msg.data = grad_x;
+    
+    cv_bridge::CvImage out_bridge;
+    sensor_msgs::Image out_msg;
+    std_msgs::Header header = msg.header;
+    out_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::TYPE_8UC1, grad_x);
+    out_bridge.toImageMsg(out_msg);
 
+    //cv::namedWindow("Jeff", CV_WINDOW_AUTOSIZE);
+    //cv::imshow("Jeff", grad_x);
     return out_msg;
 
 }
 
 void LaneFinder::left_callback(const sensor_msgs::Image& msg) {
-    sensor_msgs::CompressedImage lanes = findLanes(msg);
+    sensor_msgs::Image lanes = findLanes(msg);
     _left_pub.publish(lanes);
 }
 
 void LaneFinder::right_callback(const sensor_msgs::Image& msg) {
-    sensor_msgs::CompressedImage lanes = findLanes(msg);
+    sensor_msgs::Image lanes = findLanes(msg);
     _right_pub.publish(lanes);
 }
 
@@ -77,8 +84,8 @@ void LaneFinder::Initialize() {
     // Create publisher and subscriber objects.
     _left_sub = _nh.subscribe("/stereo_camera/left/image_color", 1000, &LaneFinder::left_callback, this);
     _right_sub = _nh.subscribe("/stereo_camera/right/image_color", 1000, &LaneFinder::right_callback, this);
-    _left_pub = _nh.advertise<sensor_msgs::CompressedImage>("lane_finder/lane_lines/left", 1000);
-    _right_pub = _nh.advertise<sensor_msgs::CompressedImage>("lane_finder/lane_lines/right", 1000);
+    _left_pub = _nh.advertise<sensor_msgs::Image>("lane_finder/lane_lines/left", 1000);
+    _right_pub = _nh.advertise<sensor_msgs::Image>("lane_finder/lane_lines/right", 1000);
 }
 
 /*
