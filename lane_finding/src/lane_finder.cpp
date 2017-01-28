@@ -7,7 +7,6 @@ sensor_msgs::CompressedImage LaneFinder::findLanes(const sensor_msgs::Image& msg
 
     // Convert sensor_msgs/Image to Mat
     cv_bridge::CvImagePtr in_msg;
-    ROS_INFO_STREAM("SHIT");
   
     try {
         in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
@@ -17,25 +16,25 @@ sensor_msgs::CompressedImage LaneFinder::findLanes(const sensor_msgs::Image& msg
         //return;
     }
 
-    ROS_INFO_STREAM("POOP");
-    cv::Mat frame;
-    frame = in_msg->image;
+    cv::Mat full_frame;
+    full_frame = in_msg->image;
     
+    cv::namedWindow("Jeff", CV_WINDOW_AUTOSIZE);
     //TODO: Undistort
     // http://docs.opencv.org/2.4/doc/tutorials/core/file_input_output_with_xml_yml/file_input_output_with_xml_yml.html#fileinputoutputxmlyaml 
-    /*
+    
     // Resize.
     cv::Mat frame;
     cv::resize(full_frame, frame, cv::Size(160,90));
     full_frame.release();
-    */
+    
     //TODO: Gaussian blur to reduce noise using kernel size 3 or 5
 
     // Convert to grayscale and HSV
     cv::Mat gray;
     cv::Mat hsv;
-    //cv::cvtColor(frame, gray, CV_BGR2GRAY);
- /*   cv::cvtColor(frame, hsv, CV_BGR2HSV);
+    cv::cvtColor(frame, gray, CV_BGR2GRAY);
+    cv::cvtColor(frame, hsv, CV_BGR2HSV);
     //frame.release();
 
     // Isolate S channel of HLS and run Sobel over gray.
@@ -58,8 +57,7 @@ sensor_msgs::CompressedImage LaneFinder::findLanes(const sensor_msgs::Image& msg
     out_msg.header = in_msg->header;
     out_msg.format = "png";
     out_msg.data = grad_x;
-*/
-    sensor_msgs::CompressedImage out_msg;
+
     return out_msg;
 
 }
