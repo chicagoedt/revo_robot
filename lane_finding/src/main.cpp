@@ -7,7 +7,7 @@ void sigIntHandler(int sig) {
     ros::shutdown();
 }
 */
-int main(int argc, char **argv) {
+int main(int argc, char** argv) {
     ros::init(argc, argv, "lane_finder");
 
     LaneFinder laneFinder;
@@ -15,5 +15,7 @@ int main(int argc, char **argv) {
    // signal(SIGINT, sigIntHandler);
 
     laneFinder.Initialize();
+
+    ros::spin();
 }
 

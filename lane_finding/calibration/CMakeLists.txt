@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8)
-project( ArUco )
+project( calibration )
 find_package( OpenCV REQUIRED )
 add_executable( genMarker genMarker.cpp )
 add_executable( detectMarker detectMarker.cpp )

@@ -2,10 +2,12 @@
 
 #include "lane_finder.h"
 
-sensor_msgs::CompressedImage LaneFinder::findLanes(const sensor_msgs::Image msg) {
+sensor_msgs::CompressedImage LaneFinder::findLanes(const sensor_msgs::Image& msg) {
 
     // Convert sensor_msgs/Image to Mat
     cv_bridge::CvImagePtr in_msg;
+    ROS_INFO_STREAM("SHIT");
+  
     try {
         in_msg = cv_bridge::toCvCopy(msg, sensor_msgs::image_encodings::BGR8);
     }
@@ -13,33 +15,39 @@ sensor_msgs::CompressedImage LaneFinder::findLanes(const sensor_msgs::Image msg)
         ROS_ERROR("cv_bridge exception: %s", e.what());
         //return;
     }
-    cv::Mat full_frame = in_msg->image;
+
+    ROS_INFO_STREAM("POOP");
+    cv::Mat frame;
+    frame = in_msg->image;
     
+    cv::namedWindow("Display Image", cv::WINDOW_AUTOSIZE );
+    cv::imshow("Display Image", frame);
+    cv::waitKey(0);
     //TODO: Undistort
     // http://docs.opencv.org/2.4/doc/tutorials/core/file_input_output_with_xml_yml/file_input_output_with_xml_yml.html#fileinputoutputxmlyaml 
-
+    /*
     // Resize.
     cv::Mat frame;
     cv::resize(full_frame, frame, cv::Size(160,90));
     full_frame.release();
-
+    */
     //TODO: Gaussian blur to reduce noise using kernel size 3 or 5
 
     // Convert to grayscale and HSV
     cv::Mat gray;
     cv::Mat hsv;
     cv::cvtColor(frame, gray, CV_BGR2GRAY);
-    cv::cvtColor(frame, hsv, CV_BGR2HSV);
-    frame.release();
+ /*   cv::cvtColor(frame, hsv, CV_BGR2HSV);
+    //frame.release();
 
     // Isolate S channel of HLS and run Sobel over gray.
     cv::Mat saturation;
     cv::extractChannel(hsv, saturation, 1);
-    hsv.release();
+    //hsv.release();
     
     cv::Mat grad_x;
     cv::Sobel(gray, grad_x, CV_16S, 1, 0);
-    gray.release();
+    //gray.release();
 
     //TODO: Hough transform
 
@@ -52,17 +60,18 @@ sensor_msgs::CompressedImage LaneFinder::findLanes(const sensor_msgs::Image msg)
     out_msg.header = in_msg->header;
     out_msg.format = "png";
     out_msg.data = grad_x;
-
+*/
+    sensor_msgs::CompressedImage out_msg;
     return out_msg;
 
 }
 
-void LaneFinder::left_callback(const sensor_msgs::Image msg) {
+void LaneFinder::left_callback(const sensor_msgs::Image& msg) {
     sensor_msgs::CompressedImage lanes = findLanes(msg);
     _left_pub.publish(lanes);
 }
 
-void LaneFinder::right_callback(const sensor_msgs::Image msg) {
+void LaneFinder::right_callback(const sensor_msgs::Image& msg) {
     sensor_msgs::CompressedImage lanes = findLanes(msg);
     _right_pub.publish(lanes);
 }
