@@ -1,19 +1,8 @@
 // This program does all image processing.
 
-#include <ros/ros.h>
-//#include <opencv_apps>
-#include <sensor_msgs/image_encodings.h>
-#include <cv_bridge/cv_bridge.h>
-//#include <opencv2/core/core.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
-#include <opencv2/highgui/highgui.hpp>
+#include "lane_finder.h"
 
-
-ros::NodeHandle nh;
-ros::Publisher right_pub = nh.advertise<sensor_msgs::Image>("lane_detector/lane_lines/right", 1000);
-ros::Publisher left_pub = nh.advertise<sensor_msgs::Image>("lane_detector/lane_lines/left", 1000);
-
-sensor_msgs::CompressedImage findLanes(const sensor_msgs::Image msg) {
+sensor_msgs::CompressedImage LaneFinder::findLanes(const sensor_msgs::Image msg) {
 
     // Convert sensor_msgs/Image to Mat
     cv_bridge::CvImagePtr in_msg;
@@ -68,25 +57,21 @@ sensor_msgs::CompressedImage findLanes(const sensor_msgs::Image msg) {
 
 }
 
-void left_callback(const sensor_msgs::Image msg) {
+void LaneFinder::left_callback(const sensor_msgs::Image msg) {
     sensor_msgs::CompressedImage lanes = findLanes(msg);
-    left_pub.publish(lanes);
+    _left_pub.publish(lanes);
 }
 
-void right_callback(const sensor_msgs::Image msg) {
+void LaneFinder::right_callback(const sensor_msgs::Image msg) {
     sensor_msgs::CompressedImage lanes = findLanes(msg);
-    right_pub.publish(lanes);
+    _right_pub.publish(lanes);
 }
 
-int main( int argc, char **argv ) {
-    
-    // Initialize the ROS system and become a node.
-    ros::init( argc, argv, "lane_finder");
+void LaneFinder::Initialize() {
 
     // Create publisher and subscriber objects.
-    ros::Subscriber left_sub = nh.subscribe("/stereo_camera/left/image_color", 1000, &left_callback);
-    ros::Subscriber right_sub = nh.subscribe("/stereo_camera/right/image_color", 1000, &right_callback);
-    
-    // Let ROS take over.
-    ros::spin();
+    _left_sub = _nh.subscribe("/stereo_camera/left/image_color", 1000, &LaneFinder::left_callback, this);
+    _right_sub = _nh.subscribe("/stereo_camera/right/image_color", 1000, &LaneFinder::right_callback, this);
+    _left_pub = _nh.advertise<sensor_msgs::CompressedImage>("lane_finder/lane_lines/left", 1000);
+    _right_pub = _nh.advertise<sensor_msgs::CompressedImage>("lane_finder/lane_lines/right", 1000);
 }
