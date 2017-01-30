@@ -2,6 +2,7 @@
 
 #include "lane_finder.h"
 #include <signal.h>
+#include <cmath> // for abs()
 
 sensor_msgs::Image LaneFinder::findLanes(const sensor_msgs::Image& msg) {
 
@@ -43,8 +44,34 @@ sensor_msgs::Image LaneFinder::findLanes(const sensor_msgs::Image& msg) {
     cv::extractChannel(hsv, saturation, 1);
     //hsv.release();
     
-    cv::Mat grad_x;
-    cv::Sobel(gray, grad_x, CV_8U, 1, 0);
+    cv::Mat sobelX, sobelY;
+    cv::Sobel(gray, sobelX, CV_8U, 1, 0);
+    cv::Sobel(gray, sobelY, CV_8U, 0, 1);
+
+    // Threshold the magnitude and direction of the Sobel-ized image.
+    cv::Mat abs_sobelX; 
+    abs_sobelX = abs(sobelX);
+
+    cv::Mat sobel_mag, sobel_dir;
+    sobel_dir = gray;
+    cv::threshold(abs_sobelX, sobel_mag, 25.0, 255.0, cv::THRESH_BINARY);
+    for (int i=0; i < gray.rows; i++) {
+        for (int j=0; j < gray.cols ; j++) {
+            double y = (double)sobelY.at<uchar>(i,j);
+            double x = (double)sobelX.at<uchar>(i,j);
+            int editValue = (int)atan( y / x );
+            std::cout << (double)sobelY.at<uchar>(i,j) << std::endl;
+            std::cout << y << std::endl;
+            std::cout << y / x << std::endl; 
+            bool l = ( (editValue > 1.1) && (editValue < 1.5) );
+            bool r = ( (editValue < -1.1) && (editValue > -1.5) );
+            if ( l || r )
+                sobel_dir.at<uchar>(i,j) = 255;
+            else
+                sobel_dir.at<uchar>(i,j) = 0;
+        }
+    }       
+
     //gray.release();
 
     //TODO: Hough transform
@@ -53,20 +80,13 @@ sensor_msgs::Image LaneFinder::findLanes(const sensor_msgs::Image& msg) {
 
     //TODO: Perspective transform    
 
-    //TODO: Convert back to sensor_msgs/Image
-    //sensor_msgs::Image out_msg;
-    //out_msg.header = in_msg->header;
-    //out_msg.format = "png";
-    //out_msg.data = grad_x;
-    
+    // Convert back to sensor_msgs/Image
     cv_bridge::CvImage out_bridge;
     sensor_msgs::Image out_msg;
     std_msgs::Header header = msg.header;
-    out_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::TYPE_8UC1, grad_x);
+    out_bridge = cv_bridge::CvImage(header, sensor_msgs::image_encodings::TYPE_8UC1, sobel_dir);
     out_bridge.toImageMsg(out_msg);
 
-    //cv::namedWindow("Jeff", CV_WINDOW_AUTOSIZE);
-    //cv::imshow("Jeff", grad_x);
     return out_msg;
 
 }
