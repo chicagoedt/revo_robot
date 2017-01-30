@@ -27,6 +27,11 @@ int main( int argc, char **argv ) {
     ros::Publisher pub = nh.advertise<sensor_msgs::Image>( "stereo_camera/left/image_color", 1000 );
     ros::Rate rate(fps);
 
+    cv_bridge::CvImage out_bridge;
+    sensor_msgs::Image frame_msg;
+    std_msgs::Header header;
+
+    // Main loop.
     while( ros::ok() ) {
         bool bSuccess = cap.read( frame ); // read a new frame from video
 
@@ -35,9 +40,6 @@ int main( int argc, char **argv ) {
             break;
         }
 
-        cv_bridge::CvImage out_bridge;
-        sensor_msgs::Image frame_msg;
-        std_msgs::Header header();
         out_bridge = cv_bridge::CvImage( header, sensor_msgs::image_encodings::RGB8, frame );
         out_bridge.toImageMsg( frame_msg );
 
