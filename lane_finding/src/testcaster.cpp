@@ -32,7 +32,14 @@ int main( int argc, char **argv ) {
     std_msgs::Header header;
 
     // Main loop.
+    int counter = 0;
+    int frame_count = cap.get(CV_CAP_PROP_FRAME_COUNT);
     while( ros::ok() ) {
+        if (counter == frame_count) {
+            cap.open(argv[1]);
+            counter = 0;
+        }
+
         bool bSuccess = cap.read( frame ); // read a new frame from video
 
         if ( !bSuccess) {
@@ -45,5 +52,7 @@ int main( int argc, char **argv ) {
 
         pub.publish( frame_msg );
         rate.sleep();
+
+        counter++;
     }
 }

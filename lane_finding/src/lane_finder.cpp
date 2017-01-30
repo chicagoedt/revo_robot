@@ -24,7 +24,9 @@ sensor_msgs::Image LaneFinder::findLanes(const sensor_msgs::Image& msg) {
     
     // Resize. Default Zed dimensions are 1600x900
     cv::Mat frame;
-    cv::resize(full_frame, frame, cv::Size(320,180));
+    int newCols = 500;
+    double ratio = (double)full_frame.rows / (double)full_frame.cols;
+    cv::resize(full_frame, frame, cv::Size(newCols,newCols*ratio));
     full_frame.release();
     
     //TODO: Gaussian blur to reduce noise using kernel size 3 or 5
