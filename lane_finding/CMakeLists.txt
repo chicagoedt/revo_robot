@@ -123,6 +123,7 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 
 ## Declare a C++ executable
 add_executable(lane_finder src/lane_finder.cpp)
+add_executable(testcaster src/testcaster.cpp)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
@@ -133,6 +134,7 @@ target_link_libraries(lane_finder
    ${catkin_LIBRARIES}
    ${OpenCV_LIBS}
 )
+target_link_libraries(testcaster ${catkin_LIBRARIES} ${OpenCV_LIBS})
 
 #############
 ## Install ##
