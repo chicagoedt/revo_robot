@@ -1,10 +1,11 @@
 // This program does all image processing.
 
 #include "lane_finder.h"
+#include "lane_pipeline.h"
 #include <signal.h>
 #include <cmath> // for abs() and atan()
 
-void LaneFinder::publishImage( cv::Mat& image, ros::Publisher& publisher ) {
+void LaneFinder::publishImage( cv::Mat& image, const ros::Publisher& publisher ) {
     cv_bridge::CvImage out_bridge;
     sensor_msgs::Image out_msg;
     std_msgs::Header header = std_msgs::Header();
@@ -58,37 +59,41 @@ cv::Mat LaneFinder::findLanes(const sensor_msgs::Image& msg) {
     cv::extractChannel(hsv, value, 2);
     //hsv.release();
     
-    cv::Mat sobelX, sobelY;
-    cv::Sobel(saturation, sobelX, -1, 1, 0);
-    cv::Sobel(saturation, sobelY, -1, 0, 1);
-    //std::cout << hsv.depth() << std::endl;
+    cv::Mat sobelX, sobelY, sat_sobel;
+    cv::Sobel(gray, sobelX, -1, 1, 0, 5);
+    cv::Sobel(saturation, sat_sobel, -1, 1, 0, 5);
+    cv::Sobel(saturation, sobelY, -1, 0, 1, 5);
+    //std::cout << saturation.depth() << std::endl;
     // It's CV_8U
+    //std::cout << saturation.channels() << std::endl;
 
     // Threshold the magnitude and direction of the Sobel-ized image.
-    cv::Mat abs_sobelX; 
+    cv::Mat abs_sobelX, abs_sobel_sat;
     abs_sobelX = abs(sobelX);
+    abs_sobel_sat = abs(sat_sobel);
 
     cv::Mat sobel_mag, sobel_dir;
     frame.copyTo(sobel_dir);
-    cv::threshold(abs_sobelX, sobel_mag, 10.0, 255.0, cv::THRESH_BINARY);
+    cv::threshold(abs_sobelX, sobel_mag, 100.0, 255.0, cv::THRESH_BINARY);
     for (int i=0; i < frame.rows; i++) {
         for (int j=0; j < frame.cols ; j++) {
-            double y = static_cast<double>( sobelY.at<uchar>(i,j) );
-            double x = static_cast<double>( sobelX.at<uchar>(i,j) );
+            double y = (double)sobelY.at<uchar>(i,j);
+            double x = (double)sobelX.at<uchar>(i,j);
             if ( x < 1 )
                 x = 1;
             double pi = 3.14159265358979323846264338;
-            double editValue = abs( atan( y / x ) ); 
-            std::cout << y << std::endl;
-            std::cout << x << std::endl;
+            double editValue = fabs( atan( y / x ) ); /* 
+            std::cout << y << ", " << x << std::endl;
             std::cout << y / x << std::endl; 
-            std::cout << editValue << std::endl; 
+            std::cout << editValue << std::endl; */
             if ( (editValue > pi / 3.0 ) && (editValue < pi / 2.0) )
                 sobel_dir.at<uchar>(i,j) = 255;
             else
                 sobel_dir.at<uchar>(i,j) = 0;
         }
     }       
+    cv::Mat canny;
+    cv::Canny(sobel_mag, canny, 10, 20);
 
     //gray.release();
 
@@ -99,11 +104,11 @@ cv::Mat LaneFinder::findLanes(const sensor_msgs::Image& msg) {
     //TODO: Perspective transform    
     
     publishImage(hue, _hue_pub);
-    publishImage(saturation, _saturation_pub);
+    publishImage(abs_sobel_sat, _saturation_pub);
     publishImage(value, _value_pub);
-    publishImage(gray, _intensity_pub);
+    publishImage(abs_sobelX, _intensity_pub);
 
-    return sobel_mag;
+    return abs_sobelX;
 
 }
 

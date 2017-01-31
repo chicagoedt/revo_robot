@@ -19,8 +19,8 @@ class LaneFinder
 
         ros::NodeHandle     _nh;
 
-        ros::Publisher      _right_pub;
         ros::Publisher      _left_pub;
+        ros::Publisher      _right_pub;
         ros::Publisher      _hue_pub;
         ros::Publisher      _saturation_pub;
         ros::Publisher      _value_pub;
@@ -29,10 +29,10 @@ class LaneFinder
         ros::Subscriber     _left_sub;
         ros::Subscriber     _right_sub;
 
-        cv::Mat findLanes(const sensor_msgs::Image&);
-        void left_callback(const sensor_msgs::Image&);
-        void right_callback(const sensor_msgs::Image&);
-        void publishImage(cv::Mat&, ros::Publisher&);
+        cv::Mat findLanes( const sensor_msgs::Image& );
+        void left_callback( const sensor_msgs::Image& );
+        void right_callback( const sensor_msgs::Image& );
+        void publishImage( cv::Mat&, const ros::Publisher& );
 };
 
 #endif
