@@ -45,6 +45,17 @@ def houghOverlay ( img, rho=1, theta=np.pi/180, threshold=1, minLineLength=10, m
 
     return hough_overlay
 
+#TODO
+def getSlope(lines):
+    slope = []
+    for line in lines:
+        rise = line[3] - line[1]
+        run = line[2] - line[0]
+        if rise is int and run is int:
+            slope.append( rise / run )
+    return np.mean(slope)
+
+
 counter = 0
 while True:
     ret, full_frame = cap.read()
