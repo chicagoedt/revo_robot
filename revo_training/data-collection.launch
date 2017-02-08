@@ -49,8 +49,11 @@
     <!-- zed camera feed -->
     <node name="zed_feed" pkg="zed_ros" type="zed_ros" />
     
-    <!-- opencv -->
-    <remap from="image" to="stereo_camera/left/image_color" />
-    <node name
+    <node 
+        pkg="rosbag" 
+        name="bagger" 
+        type="record" 
+        args="-O sidewalk.bag cmd_vel stereo_camera/left/image_color" 
+    \>
 
 </launch>
