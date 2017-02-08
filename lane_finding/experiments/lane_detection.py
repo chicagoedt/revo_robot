@@ -57,11 +57,9 @@ def getSlope(lines):
 
 #TODO: Get more precise transform matrix.
 def getPerspectiveTransform():
-    return [[  1.33649160e+00   2.50032697e-01  -1.27593229e+02]
-            [  1.50587524e-01   1.94616896e+00  -3.16767176e+02]
-            [  2.18559541e-04   4.31596967e-04   1.00000000e+00]]
-
-
+    pts1 = np.float32([[330,375],[460,370],[310,610],[450,610]])
+    pts2 = np.float32([[330,375],[460,375],[330,689],[460,689]])
+    return cv2.getPerspectiveTransform(pts1,pts2)
 
 counter = 0
 while True:
@@ -74,7 +72,7 @@ while True:
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     hue, saturation, value = cv2.split(hsv)
 
-    sobelXInt = abs_sobel_thresh(intensity, thresh=(20,60))
+    sobelXInt = abs_sobel_thresh(intensity, thresh=(10,60))
     sobelXSat = abs_sobel_thresh(saturation, thresh=(30,60))
     magInt = mag_thresh(intensity, thresh=(10,100))
     magSat = mag_thresh(saturation, thresh=(10,50))
@@ -82,12 +80,14 @@ while True:
     dirSat = dir_thresh(saturation, sobel_kernel=7, thresh=(0.7,1.3))
 
     hough = houghOverlay(sobelXInt, threshold=20 )
+    #warp = cv2.warpPerspective( frame, getPerspectiveTransform(), (width/3,height/3) )
 
     cv2.imshow( 'Original', frame )
     #cv2.imshow( 'Raw Canny', cv2.Canny(frame, 30, 120))
     #cv2.imshow( 'Intensity', sobelXInt )
     #cv2.imshow( 'Saturation', sobelXSat )
     cv2.imshow( 'Hough', hough )
+    #cv2.imshow( 'Warp', warp )
 
     if cap.get(1) == cap.get(7): # Enums are broken, 1 is frame position, 7 is frame count
         cap.set(1, 0)
