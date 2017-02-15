@@ -54,4 +54,7 @@
         args="-O sidewalk.bag cmd_vel stereo_camera/left/image_color" 
     />
 
+    <node pkg="revo_training" name="feed_compressor" type="feed_compressor.py" />
+
+
 </launch>
