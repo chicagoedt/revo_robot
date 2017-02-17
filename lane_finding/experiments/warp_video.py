@@ -4,9 +4,15 @@ import sys
 
 cap = cv2.VideoCapture(sys.argv[1])
 counter = 0
+# (x,y)
+pt1 = ( 150, 580 ) # upper left
+pt2 = ( 345, 585 ) # upper right
+pt3 = ( 133, 747 ) # lower left
+pt4 = ( 345, 745 ) # lower right
 
-pts1 = np.float32([[330,375],[460,370],[310,610],[450,610]])
-pts2 = np.float32([[330,375],[460,375],[330,689],[460,689]])
+pts1 = np.float32([pt1,pt2,pt3,pt4])
+pts2 = np.float32([[150,580],[300,580],[150,730],[300,730]])
+
 M = cv2.getPerspectiveTransform(pts1,pts2)
 
 while True:
