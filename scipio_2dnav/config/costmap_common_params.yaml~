@@ -1,11 +1,12 @@
 transform_tolerance: 0.3
 
-obstacle_range: 5.0
-raytrace_range: 9.0
+obstacle_range: 10.0
+raytrace_range: 6.0
 footprint: [[0.4826, 0.4572], [0.4826, -0.4572], [-0.4826, -0.4572], [-0.4826, 0.4572]]
 #robot_radius: ir_of_robot
-inflation_radius: 0.5 
+inflation_radius: 1.0 
 static_map: false
+rolling_window: true
 
 #map_type: voxel
 #origin_z: 0.0
@@ -14,9 +15,10 @@ static_map: false
 #unknown_threshold: 10
 #mark_threshold: 0
 
-observation_sources: laser_scan_sensor point_cloud_sensor
+observation_sources: laser_scan_sensor point_cloud_sensor stereo_sensor
 
 laser_scan_sensor: {sensor_frame: laser, data_type: LaserScan, topic: /scan, marking: true, clearing: true}
 
 point_cloud_sensor: {sensor_frame: base_link, data_type: PointCloud, topic: /pointcloud_publisher/line_pointcloud, marking: true, clearing: true}
+stereo_sensor: {sensor_frame: base_link, data_type: PointCloud2, topic: /stereo_camera/obstacles, marking: true, clearing: true}
 #point_cloud_sensor: {sensor_frame: bumblebee_mount_link, data_type: PointCloud2, topic: /stereo_camera/points2, marking: true, clearing: true}

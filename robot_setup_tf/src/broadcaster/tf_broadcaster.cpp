@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 
 			broadcaster.sendTransform(
 				tf::StampedTransform(tf::Transform(tf::Quaternion(0, 0, 0, 1), tf::Vector3(0.4014, 0.0, 0.1686)),
-  		        ros::Time::now(),"base_link", "laser"));
+  		        ros::Time::now(),"base_link", "laser_mount_link"));
 
 			broadcaster.sendTransform(
 				tf::StampedTransform(tf::Transform(tf::createQuaternionFromRPY(-2.13, 0, -1.57), tf::Vector3(0.2, 0.0, 0.85)),
