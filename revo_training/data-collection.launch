@@ -1,51 +1,7 @@
 <?xml version="1.0"?>
 <launch>
-    <!-- if you're having problems try changing the number at the end
-            see http://wiki.ros.org/joy/Tutorials/ConfiguringALinuxJoystick -->
-    <node pkg="joy" type="joy_node" name="joystick">
-        <param name="dev" type="string" value="/dev/input/js0" />
-        <param name="deadzone" value="0.12" />
-    </node>
 
-    <!-- your params may be different
-            see http://wiki.ros.org/joy#Application -->
-    <param name="axis_linear" value="0" type="int"/>
-    <param name="axis_angular" value="1" type="int"/>
-
-    <param name="scale_linear" value="2" type="double"/>
-    <param name="scale_angular" value="2" type="double"/>
-
-    <param name="button_a"              value="0" type="int"/>
-    <param name="button_b"              value="1" type="int"/>
-    <param name="button_x"              value="2" type="int"/>
-    <param name="button_y"              value="3" type="int"/>
-
-    <param name="left_bumper"           value="4" type="int"/>
-    <param name="right_bumper"          value="5" type="int"/>
-    <param name="back_button"           value="6" type="int"/>
-    <param name="start_button"          value="7" type="int"/>
-    <param name="power_button"          value="8" type="int"/>
-    <param name="button_stick_left"     value="9" type="int"/>
-    <param name="button_stick_right"    value="10" type="int"/>
-    <param name="left_trigger"          value="2" type="int"/>
-    <param name="right_trigger"         value="5" type="int"/>
-    <param name="dpad_leftright"        value="6" type="int"/>
-    <param name="dpad_updown"           value="7" type="int"/>
-
-    <node pkg="base_controller" type="joystick_teleop" name="base_controller"/>
-
-    <!-- roboteq drivers -->
-    <arg name="port" default="/dev/ttyACM0" />
-    <node name="roboteq_serial" pkg="roboteq_node" type="roboteq_node" output="screen" >
-         <param name="mode" value="serial" type="str" />
-         <param name="device" value="$(arg port)" type="str" />
-         <param name="left" value="1" type="str" />
-         <param name="right" value="2" type="str" />
-    </node>
-
-    <!--
-    <node name="wheel_odometry" pkg="odom" type="odom" /> -->
-
+    <include file="move.launch"/>
     
     <node 
         pkg="rosbag" 

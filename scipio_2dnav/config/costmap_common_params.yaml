@@ -1,10 +1,10 @@
 transform_tolerance: 0.3
 
 obstacle_range: 10.0
-raytrace_range: 6.0
+raytrace_range: 8.0
 footprint: [[0.4826, 0.4572], [0.4826, -0.4572], [-0.4826, -0.4572], [-0.4826, 0.4572]]
 #robot_radius: ir_of_robot
-inflation_radius: 1.0 
+inflation_radius: 0.5 
 static_map: false
 rolling_window: true
 

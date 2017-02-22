@@ -34,16 +34,6 @@
 
     <node pkg="base_controller" type="joystick_teleop" name="base_controller"/>
 
-    <!-- roboteq drivers -->
-    <arg name="port" default="/dev/ttyACM0" />
-    <node name="roboteq_serial" pkg="roboteq_node" type="roboteq_node" output="screen" >
-         <param name="mode" value="serial" type="str" />
-         <param name="device" value="$(arg port)" type="str" />
-         <param name="left" value="1" type="str" />
-         <param name="right" value="2" type="str" />
-    </node>
-
-    <!--
-    <node name="wheel_odometry" pkg="odom" type="odom" /> -->
+    <include file="$(find scipio_2dnav)/launch/roboteq-serial.launch"/>
 
 </launch>
