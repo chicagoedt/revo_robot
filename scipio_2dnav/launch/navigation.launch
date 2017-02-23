@@ -1,4 +1,7 @@
 <launch>
 	<include file="$(find scipio_2dnav)/launch/move_base.launch"/>
 	<include file="$(find scipio_2dnav)/launch/localization/robot_localization.launch"/>
+
+    <node pkg="revo_training" type="laser_filter.py" name="laser_filter"/>
+
 </launch>
