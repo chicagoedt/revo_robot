@@ -4,7 +4,7 @@ obstacle_range: 5.0 # Do not set this above 9.0! (Inf readings are remapped to 9
 raytrace_range: 8.0
 footprint: [[0.4826, 0.4572], [0.4826, -0.4572], [-0.4826, -0.4572], [-0.4826, 0.4572]]
 #robot_radius: ir_of_robot
-inflation_radius: 0.333
+inflation_radius: 0.2
 static_map: false
 rolling_window: true
 
