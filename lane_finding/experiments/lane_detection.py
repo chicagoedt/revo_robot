@@ -66,7 +66,7 @@ while True:
     ret, full_frame = cap.read()
     height, width = full_frame.shape[:2]
     reframe = cv2.resize(full_frame, (width/3, height/3))
-    frame = cv2.GaussianBlur(reframe, ksize=(5,5), sigmaX=10)
+    frame = cv2.GaussianBlur(reframe, ksize=(3,3), sigmaX=10)
 
     intensity = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
@@ -79,15 +79,34 @@ while True:
     dirInt = dir_thresh(intensity, sobel_kernel=7, thresh=(0.7,1.3))
     dirSat = dir_thresh(saturation, sobel_kernel=7, thresh=(0.7,1.3))
 
+    wtf = frame.copy()
+    gthresh = 0.95
+    for x in xrange(frame.shape[0]):
+        for y in xrange(frame.shape[1]):
+            blue = frame.item(x,y,0)
+            green = gthresh * frame.item(x,y,1)
+            red = frame.item(x,y,2)
+            if green > red and green > blue:
+                for i in range(3):
+                     wtf.itemset((x,y,i),0)
+
+    sat_thresh = saturation.copy()*0
+    sthresh = 100
+    for x in xrange(saturation.shape[0]):
+        for y in xrange(saturation.shape[1]):
+            if saturation.item(x,y) < sthresh:
+                sat_thresh.itemset((x,y),255)
+
+
     hough = houghOverlay(sobelXInt, threshold=20 )
     #warp = cv2.warpPerspective( frame, getPerspectiveTransform(), (width/3,height/3) )
 
     cv2.imshow( 'Original', frame )
-    #cv2.imshow( 'Raw Canny', cv2.Canny(frame, 30, 120))
-    #cv2.imshow( 'Intensity', sobelXInt )
-    #cv2.imshow( 'Saturation', sobelXSat )
-    cv2.imshow( 'Hough', hough )
+    cv2.imshow( 'sat_thresh', sat_thresh)
+    cv2.imshow( 'Saturation', saturation)
+    #cv2.imshow( 'Hough', hough )
     #cv2.imshow( 'Warp', warp )
+    #cv2.imshow( 'WTF', wtf )
 
     if cap.get(1) == cap.get(7): # Enums are broken, 1 is frame position, 7 is frame count
         cap.set(1, 0)
