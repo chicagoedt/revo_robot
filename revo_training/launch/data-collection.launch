@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<launch>
+
+    <include file="move.launch"/>
+    
+    <node 
+        pkg="rosbag" 
+        name="bagger" 
+        type="record" 
+        args="-O sidewalk.bag cmd_vel revo_training/zed_feed" 
+    />
+
+    <node pkg="revo_training" name="feed_compressor" type="feed_compressor.py" />
+
+
+</launch>

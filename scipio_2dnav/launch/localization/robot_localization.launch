@@ -1,4 +1,4 @@
-<?xml version="0.0"?>
+<?xml version="1.0"?>
 <launch>
 
 	<!-- <arg name="magnetic_declination" default="-0.066904288"/> -->
@@ -9,7 +9,7 @@
   <arg name="stereo_odom" default="/stereo_camera/odom"/>
 
 	<include file="$(find scipio_2dnav)/launch/static_transforms.launch"/>
-
+<!--
     <node pkg="robot_localization" type="navsat_transform_node" name="navsat_transform_node" clear_params="true" respawn="true" output="screen">
     
       <param name="magnetic_declination_radians" value="$(arg magnetic_declination)"/>
@@ -24,7 +24,7 @@
       <remap from="/gps/fix" to="/fix" />
       <remap from="/imu/data" to="/heading" />
     </node>
-
+-->
 
     <node pkg="robot_localization" type="ekf_localization_node" name="ekf_localization" clear_params="true" output="screen">
 

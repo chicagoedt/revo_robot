@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<launch>
+    <node pkg="lane_finding" type="lane_finder" name="lane_finder" />
+
+    <node pkg="rosbag" name="bag" type="play" args="zed_sample_recording.bag" />
+</launch>

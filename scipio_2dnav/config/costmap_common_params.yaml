@@ -1,10 +1,10 @@
 transform_tolerance: 0.3
 
-obstacle_range: 10.0
-raytrace_range: 6.0
+obstacle_range: 5.0 # Do not set this above 9.0! (Inf readings are remapped to 9.9 and ignored.)
+raytrace_range: 8.0
 footprint: [[0.4826, 0.4572], [0.4826, -0.4572], [-0.4826, -0.4572], [-0.4826, 0.4572]]
 #robot_radius: ir_of_robot
-inflation_radius: 0.1 
+inflation_radius: 0.2
 static_map: false
 rolling_window: true
 
@@ -17,7 +17,7 @@ rolling_window: true
 
 observation_sources: laser_scan_sensor point_cloud_sensor stereo_sensor
 
-laser_scan_sensor: {sensor_frame: laser, data_type: LaserScan, topic: /scan, marking: true, clearing: true}
+laser_scan_sensor: {sensor_frame: laser, data_type: LaserScan, topic: /scan/filtered, marking: true, clearing: true}
 
 point_cloud_sensor: {sensor_frame: base_link, data_type: PointCloud, topic: /pointcloud_publisher/line_pointcloud, marking: true, clearing: true}
 stereo_sensor: {sensor_frame: base_link, data_type: PointCloud2, topic: /stereo_camera/obstacles, marking: true, clearing: true}

@@ -3,7 +3,7 @@
     <!-- if you're having problems try changing the number at the end
             see http://wiki.ros.org/joy/Tutorials/ConfiguringALinuxJoystick -->
     <node pkg="joy" type="joy_node" name="joystick">
-        <param name="dev" type="string" value="/dev/input/js1" />
+        <param name="dev" type="string" value="/dev/input/js0" />
         <param name="deadzone" value="0.12" />
     </node>
 
@@ -34,23 +34,6 @@
 
     <node pkg="base_controller" type="joystick_teleop" name="base_controller"/>
 
-    <!-- roboteq drivers -->
-    <arg name="port" default="/dev/ttyACM0" />
-    <node name="roboteq_serial" pkg="roboteq_node" type="roboteq_node" output="screen" >
-         <param name="mode" value="serial" type="str" />
-         <param name="device" value="$(arg port)" type="str" />
-         <param name="left" value="1" type="str" />
-         <param name="right" value="2" type="str" />
-    </node>
-
-    <!--
-    <node name="wheel_odometry" pkg="odom" type="odom" /> -->
-
-    <!-- zed camera feed -->
-    <node name="zed_feed" pkg="zed_ros" type="zed_ros" />
-    
-    <!-- opencv -->
-    <remap from="image" to="stereo_camera/left/image_color" />
-    <node name
+    <include file="$(find scipio_2dnav)/launch/roboteq-serial.launch"/>
 
 </launch>

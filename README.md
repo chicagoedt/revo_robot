@@ -12,7 +12,7 @@ Run the Real Robot
   - start the navigation stack (move_base)
 
 
----> `roslaunch scipio_2dnav start.launch`
+---> `roslaunch scipio_2dnav navigation.launch`
 
 
 **2)** Once configuration is launch, launch the state machine to send gps goals:

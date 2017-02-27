@@ -40,4 +40,5 @@ gazebo_config/lib/*
 *.jpeg
 *.jpg
 *.png
+*.bag
 /CMakeLists.txt
