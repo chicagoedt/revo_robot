@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import sys
+import string
+import random
 
 def thresh(img, tightThresh, wideThresh):
     pixels_to_check = set()
@@ -43,17 +45,28 @@ def isWeird(contour):
     else:
         return False
 
+def getID(size=6, chars=string.ascii_lowercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
 def getBadCountours(img, contours):
-    print "Hit 'd' if contour is bad, otherwise hit any other key."
+    eyedee = getID()
+    print eyedee
+    cv2.imwrite("data/" + eyedee + ".jpg", img)
+    bad = open("data/" + eyedee + "_bad", 'w')
+    good = open("data/" + eyedee + "_good",'w')
+    print "Hit 'd' if contour is bad, 'k' if contour is good, otherwise hit any other key."
     for c in contours:
         img = img * 0
         cv2.drawContours(img, [c], -1, 255, -1)
         cv2.imshow('Check', img)
         kp = cv2.waitKey(0)
         if 0xFF & kp == ord('d'):
-            print "YOU WILL BE DELETED"
+            bad.write(str(c) + '\n')
+        elif 0xFF & kp == ord('k'):
+            good.write(str(c) + '\n')
         elif 0xFF & kp == 27:
             break
+    cv2.destroyWindow('Check')
 
 
 cap = cv2.VideoCapture(sys.argv[1])
@@ -73,7 +86,7 @@ while True:
     sat_thresh = thresh( saturation, (30,80), (0,100) )
 
     athresh = cv2.adaptiveThreshold(saturation, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,33,12)
-    contours, hierarchy = cv2.findContours(athresh, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_SIMPLE)
+    contours, hierarchy = cv2.findContours(athresh, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
     bigContours = []
     normalContours = []
     for c in contours:
@@ -97,7 +110,7 @@ while True:
     if 0xFF & press == 27:
         break
     if 0xFF & press == 32:
-        tmpimg = frame.copy() * 0
+        tmpimg = con.copy()
         getBadCountours(tmpimg, normalContours)
     press = None
 
