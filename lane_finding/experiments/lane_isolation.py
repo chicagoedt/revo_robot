@@ -35,6 +35,8 @@ def thresh(img, tightThresh, wideThresh):
     return thresh_img
 
 
+
+
 cap = cv2.VideoCapture(sys.argv[1])
 counter = 0
 
@@ -48,11 +50,15 @@ while True:
     hsv = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
     hue, saturation, value = cv2.split(hsv)
 
-    sat_thresh = thresh( saturation, (30,80), (0,120) )
+    canny = cv2.Canny(saturation, 128, 255)
+    sat_thresh = thresh( saturation, (30,80), (0,100) )
+
+    athresh = cv2.adaptiveThreshold(saturation, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,33,12)
 
     cv2.imshow( 'Original', frame )
-    cv2.imshow( 'Canny', cv2.Canny(saturation, 100, 255))
-    cv2.imshow( 'sat_thresh', sat_thresh)
+    cv2.imshow( 'Canny', canny )
+    #cv2.imshow( 'sat_thresh', sat_thresh)
+    cv2.imshow( 'Adaptive', athresh )
     cv2.imshow( 'Saturation', saturation)
 
     if cap.get(1) == cap.get(7): # Enums are broken, 1 is frame position, 7 is frame count
