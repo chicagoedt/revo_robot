@@ -1,4 +1,4 @@
-base_controller/doc/*
+se_controller/doc/*
 base_controller/doc/html/*
 
 roboteq_driver/
@@ -35,6 +35,7 @@ line_detection/calibration_data/calibrationdata/left*
 sick_tim3xx/cfg/SickTim3xx.cfgc
 gazebo_config/build/*
 gazebo_config/lib/*
+lane_finding/experiments/data/*
 *.o
 *.orig
 *.jpeg

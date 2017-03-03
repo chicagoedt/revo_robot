@@ -45,6 +45,19 @@ def isWeird(contour):
     else:
         return False
 
+def normalize(contour):
+    lowest_x = 1e9
+    lowest_y = 1e9
+    for px in contour[0]:
+        if px[0] < lowest_x:
+            lowest_x = px[0]
+        if px[1] < lowest_y:
+            lowest_y = px[1]
+    for px in contour[0]:
+        px[0] = px[0] - lowest_x
+        px[1] = px[1] - lowest_y
+    return contour
+
 def getID(size=6, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
@@ -61,9 +74,9 @@ def getBadCountours(img, contours):
         cv2.imshow('Check', img)
         kp = cv2.waitKey(0)
         if 0xFF & kp == ord('d'):
-            bad.write(str(c) + '\n')
+            bad.write(str(normalize(c)) + '\n')
         elif 0xFF & kp == ord('k'):
-            good.write(str(c) + '\n')
+            good.write(str(normalize(c)) + '\n')
         elif 0xFF & kp == 27:
             break
     cv2.destroyWindow('Check')
@@ -75,7 +88,9 @@ counter = 0
 while True:
     ret, full_frame = cap.read()
     height, width = full_frame.shape[:2]
-    reframe = cv2.resize(full_frame, (width/3, height/3))
+    cropped_frame = full_frame[0:height - 200, 0:width]
+    height, width = cropped_frame.shape[:2]
+    reframe = cv2.resize(cropped_frame, (width/2, height/2))
     frame = cv2.GaussianBlur(reframe, ksize=(3,3), sigmaX=10)
 
     intensity = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -88,16 +103,12 @@ while True:
     athresh = cv2.adaptiveThreshold(saturation, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,33,12)
     contours, hierarchy = cv2.findContours(athresh, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
     bigContours = []
-    normalContours = []
     for c in contours:
         if cv2.contourArea(c) > 200:
             bigContours.append(c)
-    for c in bigContours:
-        if not isWeird(c):
-            normalContours.append(c)
 
     con = athresh.copy() * 0
-    cv2.drawContours(con, normalContours, -1, 255, -1)
+    cv2.drawContours(con, bigContours, -1, 255, -1)
 
     cv2.imshow( 'Original', frame )
     cv2.imshow( 'Saturation', saturation)
@@ -111,7 +122,7 @@ while True:
         break
     if 0xFF & press == 32:
         tmpimg = con.copy()
-        getBadCountours(tmpimg, normalContours)
+        getBadCountours(tmpimg, bigContours)
     press = None
 
 cap.release()
