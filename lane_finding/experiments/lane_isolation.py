@@ -66,8 +66,8 @@ def getBadCountours(img, contours):
     eyedee = getID()
     print eyedee
     cv2.imwrite("data/" + eyedee + ".jpg", img)
-    bad = open("data/" + eyedee + "_bad", 'w')
-    good = open("data/" + eyedee + "_good",'w')
+    badContours = []
+    goodContours = []
     print "Hit 'd' if contour is bad, 'k' if contour is good, otherwise hit any other key."
     for c in contours:
         img = img * 0
@@ -75,12 +75,18 @@ def getBadCountours(img, contours):
         cv2.imshow('Check', img)
         kp = cv2.waitKey(0)
         if 0xFF & kp == ord('d'):
-            pickle.dump(c)
+            badContours.append(c)
         elif 0xFF & kp == ord('k'):
-            pickle.dump(c)
+            goodContours.append(c)
         elif 0xFF & kp == 27:
             break
     cv2.destroyWindow('Check')
+    if len(badContours):
+        bad = open("data/" + eyedee + "_bad", 'w')
+        pickle.dump(badContours, bad)
+    if len(goodContours):
+        good = open("data/" + eyedee + "_good",'w')
+        pickle.dump(goodContours, good)
 
 
 cap = cv2.VideoCapture(sys.argv[1])
@@ -101,8 +107,8 @@ while True:
     canny = cv2.Canny(saturation, 128, 255)
     sat_thresh = thresh( saturation, (30,80), (0,100) )
 
-    athresh = cv2.adaptiveThreshold(saturation, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,33,12)
-    contours, hierarchy = cv2.findContours(athresh, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
+    athresh = cv2.adaptiveThreshold(saturation, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV,37,10)
+    contours, hierarchy = cv2.findContours(athresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
     bigContours = []
     for c in contours:
         if cv2.contourArea(c) > 200:
