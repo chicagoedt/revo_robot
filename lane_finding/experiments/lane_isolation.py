@@ -3,6 +3,7 @@ import numpy as np
 import sys
 import string
 import random
+import pickle
 
 def thresh(img, tightThresh, wideThresh):
     pixels_to_check = set()
@@ -74,9 +75,9 @@ def getBadCountours(img, contours):
         cv2.imshow('Check', img)
         kp = cv2.waitKey(0)
         if 0xFF & kp == ord('d'):
-            bad.write(str(normalize(c)) + '\n')
+            pickle.dump(c)
         elif 0xFF & kp == ord('k'):
-            good.write(str(normalize(c)) + '\n')
+            pickle.dump(c)
         elif 0xFF & kp == 27:
             break
     cv2.destroyWindow('Check')
