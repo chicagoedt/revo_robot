@@ -36,6 +36,7 @@ sick_tim3xx/cfg/SickTim3xx.cfgc
 gazebo_config/build/*
 gazebo_config/lib/*
 lane_finding/experiments/data/*
+revo_training/src/logs/*
 *.o
 *.orig
 *.jpeg

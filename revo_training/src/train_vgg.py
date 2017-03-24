@@ -1,6 +1,7 @@
 from keras.models import load_model
-from keras.preprocessing import ImageDataGenerator
-
+from keras.preprocessing.image import ImageDataGenerator
+from keras.callbacks import TensorBoard, ModelCheckpoint
+import numpy as np
 import sys
 
 img_height = 224
@@ -11,6 +12,7 @@ batch_size = 256
 epochs = 50
 
 model = load_model(sys.argv[1])
+model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'])
 
 datagen = ImageDataGenerator(
         rotation_range=20,
@@ -30,9 +32,22 @@ validation_generator = datagen.flow_from_directory(
         target_size=img_size,
         batch_size=batch_size)
 
+checkpoint = ModelCheckpoint(
+        'best.h5',
+        monitor='val_loss',
+        verbose=1,
+        save_best_only=True)
+
+tb = TensorBoard(
+        log_dir='./logs',
+        histogram_freq=0,
+        write_graph=True,
+        write_images=True)
+
 model.fit_generator(
         training_generator,
-        steps_per_epoch=8,
+        steps_per_epoch=7,
         epochs=epochs,
+        callbacks=[checkpoint, tb],
         validation_data=validation_generator,
         validation_steps=2)
