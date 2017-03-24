@@ -30,7 +30,8 @@ def mouseCallback(event, x, y, flags, param):
         if x - 112 < 0 or y - 112 < 0 or x + 112 > width or y + 112 > height:
             print "Out of bounds."
             return
-        capturing = True
+        else:
+            writeData(x,y)
     elif event == cv2.EVENT_MOUSEMOVE:
         img = frame.copy()
         if save_dir == 'data/lanes/':
@@ -43,11 +44,12 @@ def mouseCallback(event, x, y, flags, param):
             cv2.rectangle(img, (x - 112, y - 112), (x + 112, y + 112), (255,255,255), 5)
         cv2.imshow('Frame', img)
         capturing = False
+    '''
     elif event == cv2.EVENT_LBUTTONUP and capturing:
         writeData(x,y)
         capturing = False
         cv2.imshow('Frame', frame)
-
+    '''
 
 def getData():
     global save_dir
