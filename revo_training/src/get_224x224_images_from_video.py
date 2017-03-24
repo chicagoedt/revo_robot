@@ -18,8 +18,9 @@ def writeData(x, y):
         print "Please specify write mode."
         return
     crop = frame[y - 112 : y + 112, x - 112 : x + 112]
-    cv2.imwrite(save_dir + sys.argv[1] + getID() + '.png', crop)
-    print "Got it!"
+    path = save_dir + sys.argv[1] + getID() + '.png'
+    cv2.imwrite(path, crop)
+    print "Written to " + path
 
 def mouseCallback(event, x, y, flags, param):
     global capturing
