@@ -43,4 +43,5 @@ lane_finding/experiments/data/*
 *.png
 *.bag
 *.mp4
+*.h5
 /CMakeLists.txt
