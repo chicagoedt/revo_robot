@@ -20,7 +20,7 @@ class feed_writer:
   def __init__(self):
 
     self.bridge = CvBridge()
-    self.image_sub = rospy.Subscriber("/revo_training/zed_feed",Image,self.callback)
+    self.image_sub = rospy.Subscriber("/stereo_camera/left/image_color",Image,self.callback)
     self.fourcc = cv2.cv.CV_FOURCC(*'XVID')
 
   def callback(self,data):
