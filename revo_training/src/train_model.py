@@ -35,7 +35,7 @@ validation_generator = datagen.flow_from_directory(
 checkpoint = ModelCheckpoint(
         'best.h5',
         monitor='val_loss',
-        verbose=1,
+        verbose=0,
         save_best_only=True)
 
 tb = TensorBoard(
