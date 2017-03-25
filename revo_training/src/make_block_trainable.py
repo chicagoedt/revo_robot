@@ -7,4 +7,4 @@ for layer in model.layers:
     if layer.name.find(block) != -1:
         layer.trainable = True
     print(layer.name + ': ' + str(layer.trainable))
-model.save(sys.argv[1])
+model.save(sys.argv[1][:-3] + '-updated.h5')
