@@ -4,6 +4,9 @@ from keras.layers import Flatten, Dropout, Dense
 from keras.utils import plot_model
 
 vgg = VGG16(weights='imagenet', include_top=False, input_shape=(224,224,3))
+print(vgg.layers)
+for layer in vgg.layers:
+    layer.trainable = False
 
 flat = Flatten()(vgg.output)
 fc6 = Dense(1024, activation='relu', name='fc6')(flat)
