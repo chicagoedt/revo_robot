@@ -2,9 +2,9 @@ from keras.models import Model
 from keras.applications.vgg16 import VGG16
 from keras.layers import Flatten, Dropout, Dense
 from keras.utils import plot_model
+import string
 
 vgg = VGG16(weights='imagenet', include_top=False, input_shape=(224,224,3))
-print(vgg.layers)
 for layer in vgg.layers:
     layer.trainable = False
 
@@ -18,4 +18,4 @@ classify = Dense(3, activation='softmax', name='classify')(drop2)
 model = Model(vgg.input, classify)
 model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'])
 model.save('VGG16-new.h5')
-plot_model(model, 'VGG16-new_plot.png', show_shapes=True)
+plot_model(model, 'VGG16_plot.png', show_shapes=True)
