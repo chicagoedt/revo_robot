@@ -8,7 +8,7 @@ img_height = 224
 img_width = 224
 img_size = (img_height, img_width)
 input_shape = (img_height, img_width, 3)
-batch_size = 256
+batch_size = 64
 epochs = 50
 
 model = load_model(sys.argv[1])
@@ -46,8 +46,8 @@ tb = TensorBoard(
 
 model.fit_generator(
         training_generator,
-        steps_per_epoch=7,
+        steps_per_epoch=25,
         epochs=epochs,
         callbacks=[checkpoint, tb],
         validation_data=validation_generator,
-        validation_steps=2)
+        validation_steps=7)

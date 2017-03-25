@@ -16,5 +16,6 @@ drop2 = Dropout(0.5)(fc7)
 classify = Dense(3, activation='softmax', name='classify')(drop2)
 
 model = Model(vgg.input, classify)
+model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'])
 model.save('VGG16-new.h5')
 plot_model(model, 'VGG16-new_plot.png', show_shapes=True)
