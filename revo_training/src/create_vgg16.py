@@ -19,7 +19,7 @@ conv7pred = Flatten()(Conv2D(3, (1,1), activation='softmax', name='classify')(dr
 pool4pred = Flatten()(Conv2D(3, (14,14), activation='softmax', name='pool4pred')(vgg.layers[14].output))
 pool3pred = Flatten()(Conv2D(3, (28,28), activation='softmax', name='pool3pred')(vgg.layers[10].output))
 
-model = Model(inputs=[vgg.input],outputs=[conv7pred,pool4pred,pool3pred])
-model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'], loss_weights=[1,0.5,0.1])
+model = Model(inputs=[vgg.input],outputs=[conv7pred])
+model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'])
 model.save(sys.argv[1] + '.h5')
 plot_model(model, sys.argv[1] + '.png', show_shapes=True)
