@@ -9,6 +9,7 @@ import sys, os, string, random
 
 cnn = load_model(sys.argv[1])
 weights = cnn.get_weights()
+img = cv2.imread('test.png')
 vgg = VGG16(include_top=False, weights='imagenet', input_shape=(224,224,3))
 fc6_weights = cnn.layers[20].get_weights()
 conv6_weights = [fc6_weights[0].reshape([7,7,512,1024]), fc6_weights[1]]
@@ -29,7 +30,7 @@ preds = Conv2D(3, (1,1), activation='softmax')(conv7)
 #out = UpSampling2D((32,32))(preds)
 out = Flatten()(preds)
 
-fcn = Model(vgg.input, preds)
+fcn = Model(vgg.input, out)
 
 '''
 fcn.layers[19].set_weights([cnn.layers[20].get_weights()[0].reshape([7,7,512,1024])])
@@ -49,20 +50,20 @@ fcn.layers[21].set_weights(conv_pred_weights)
 
 fcn.compile(optimizer='adagrad', loss='categorical_crossentropy', metrics=['accuracy'])
 
-'''
+
 datagen = ImageDataGenerator(rescale=1./255)
 validation_generator = datagen.flow_from_directory(
         'data/validation',
         target_size=(224,224),
-        batch_size=2)
+        batch_size=16)
+print(fcn.evaluate_generator(validation_generator, 7))
 
-print(fcn.predict_generator(validation_generator, 7)[0])
+
 '''
-
-
-
-img = cv2.imread('test.png')
+#img = cv2.imread('test.png')
 height, width = img.shape[:2]
 inp = img.reshape(1,height,width,3)
-outp = fcn.predict(inp)
-print(outp)
+outp = fcn.predict(inp/255)
+hmap = outp.reshape(outp.shape[1:])*255
+cv2.imwrite('heatmap.png', hmap)
+'''
