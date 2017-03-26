@@ -7,15 +7,19 @@ import string
 vgg = VGG16(weights='imagenet', include_top=False, input_shape=(224,224,3))
 for layer in vgg.layers:
     layer.trainable = False
+    if layer.name == 'block3_pool':
+        break
 
 flat = Flatten()(vgg.output)
 fc6 = Dense(1024, activation='relu', name='fc6')(flat)
 drop1 = Dropout(0.5)(fc6)
 fc7 = Dense(1024, activation='relu', name='fc7')(drop1)
 drop2 = Dropout(0.5)(fc7)
-classify = Dense(3, activation='softmax', name='classify')(drop2)
+fc7pred = Dense(3, activation='softmax', name='classify')(drop2)
+pool4pred = Dense(3, activation='softmax', name='pool4pred')(Flatten()(vgg.layers[14].output))
+pool3pred = Dense(3, activation='softmax', name='pool3pred')(Flatten()(vgg.layers[10].output))
 
-model = Model(vgg.input, classify)
-model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'])
+model = Model(inputs=[vgg.input],outputs=[fc7pred,pool4pred,pool3pred])
+model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'], loss_weights=[1,1,1])
 model.save('VGG16-new.h5')
 plot_model(model, 'VGG16_plot.png', show_shapes=True)
