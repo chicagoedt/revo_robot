@@ -8,10 +8,10 @@ img_height = 224
 img_width = 224
 img_size = (img_height, img_width)
 input_shape = (img_height, img_width, 3)
-batch_size = 2
+batch_size = 64
 epochs = 50
-steps_per_epoch = int(1640/batch_size) + 1
-steps_on_val = int(425/batch_size) + 1
+steps_per_epoch = int(1539/batch_size) + 1
+steps_on_val = int(398/batch_size) + 1
 
 model = load_model(sys.argv[1])
 #model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'])
@@ -50,18 +50,18 @@ i = 1
 e = 1
 print("Epoch 1/" + str(epochs))
 for x_train, y_train in training_generator:
-    print("Batch " + str(i) + "...")
-    model.train_on_batch(x_train, [y_train, y_train, y_train])
+    print("Batch " + str(i) + " of " + str(steps_per_epoch) + ":")
+    print(model.train_on_batch(x_train, [y_train, y_train, y_train]))
     i += 1
     if i > steps_per_epoch:
-        i = 0
-        avg = [0,0,0,0,0,0,0]
+	model.save(str(e) + '.h5')
+	print("Validating...")
+        i = 1
         for x_val, y_val in validation_generator:
-            avg += model.test_on_batch(x_val, [y_val, y_val, y_val]))
+            print(model.test_on_batch(x_val, [y_val, y_val, y_val]))
             i += 1
             if i > steps_on_val:
-                print(avg / steps_on_val)
-                i = 0
+                i = 1
                 break
         print(model.metrics_names)
         e += 1
@@ -72,9 +72,9 @@ for x_train, y_train in training_generator:
 '''
 model.fit_generator(
         training_generator,
-        steps_per_epoch=25,
+        steps_per_epoch=steps_per_epoch,
         epochs=epochs,
         callbacks=[checkpoint, tb],
         validation_data=validation_generator,
-        validation_steps=7)
+        validation_steps=steps_on_val)
 '''
