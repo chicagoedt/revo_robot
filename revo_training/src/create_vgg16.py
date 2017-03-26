@@ -2,7 +2,7 @@ from keras.models import Model
 from keras.applications.vgg16 import VGG16
 from keras.layers import Flatten, Dropout, Dense
 from keras.utils import plot_model
-import string
+import string, sys
 
 vgg = VGG16(weights='imagenet', include_top=False, input_shape=(224,224,3))
 for layer in vgg.layers:
@@ -21,5 +21,5 @@ pool3pred = Dense(3, activation='softmax', name='pool3pred')(Flatten()(vgg.layer
 
 model = Model(inputs=[vgg.input],outputs=[fc7pred,pool4pred,pool3pred])
 model.compile(optimizer='adadelta', loss='categorical_crossentropy', metrics=['accuracy'], loss_weights=[1,1,1])
-model.save('VGG16-new.h5')
-plot_model(model, 'VGG16_plot.png', show_shapes=True)
+model.save(sys.argv[1] + '.h5')
+plot_model(model, sys.argv[1] + '.png', show_shapes=True)
