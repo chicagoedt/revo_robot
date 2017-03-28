@@ -19,9 +19,9 @@ def writeData(x, y):
         return
     crop = frame[y - 112 : y + 112, x - 112 : x + 112]
     if random.random() < 0.2:
-        path = 'data/validation/' + save_dir + sys.argv[1] + getID() + '.png'
+        path = 'data/classification/validation/' + save_dir + sys.argv[1] + getID() + '.png'
     else:
-        path = 'data/training/' + save_dir + sys.argv[1] + getID() + '.png'
+        path = 'data/classification/training/' + save_dir + sys.argv[1] + getID() + '.png'
     cv2.imwrite(path, crop)
     print "Written to " + path
 
