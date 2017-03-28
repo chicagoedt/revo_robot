@@ -23,6 +23,7 @@ def writeData(x, y):
     else:
         path = 'data/classification/training/' + save_dir + sys.argv[1] + getID() + '.png'
     cv2.imwrite(path, crop)
+    cv2.imwrite('data/to_segment/' + getID() + '.png')
     print "Written to " + path
 
 def mouseCallback(event, x, y, flags, param):
