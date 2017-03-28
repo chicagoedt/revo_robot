@@ -1,7 +1,7 @@
 import cv2
 import sys, random, string, os
 
-img_dir = 'data/classification/validation/lanes'
+img_dir = 'data/classification/training/lanes/'
 images = [os.path.join(dp, f) for dp, dn, fn in os.walk(os.path.expanduser(img_dir)) for f in fn]
 
 random.shuffle(images)
