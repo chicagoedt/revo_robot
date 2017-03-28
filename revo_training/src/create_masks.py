@@ -1,7 +1,7 @@
 import cv2
 import sys, random, string, os
 
-img_dir = 'data/classification/training/lanes/'
+img_dir = 'data/to_mask/'
 images = [os.path.join(dp, f) for dp, dn, fn in os.walk(os.path.expanduser(img_dir)) for f in fn]
 
 random.shuffle(images)
@@ -29,7 +29,7 @@ for i in images:
     hue, saturation, value = cv2.split(hsv)
     blur = cv2.GaussianBlur(saturation,(5,5),0)
 
-    ret,othresh = cv2.threshold(blur,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+    ret,othresh = cv2.threshold(blur,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     ocon = getContours(othresh)
 
     while True:
@@ -38,7 +38,7 @@ for i in images:
         else:
             save_dir = 'data/segmentation/training/'
         ID = getID()
-        athresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 35, C)
+        athresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 35, C)
         acon = getContours(athresh)
         cv2.imshow('Otsu Threshed', ocon)
         cv2.imshow('Adaptive Threshed', acon)
@@ -58,7 +58,7 @@ for i in images:
             cv2.imwrite(save_dir + 'masks/' + ID + '.png', ocon)
             print ID + " written to " + save_dir + " using Ostu's Binarization for thresholding."
             break
-        elif press == 82 and C > 0:
+        elif press == 82:
             C -= 1
             print C
         elif press == 84:

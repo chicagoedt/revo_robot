@@ -22,8 +22,8 @@ def writeData(x, y):
         path = 'data/classification/validation/' + save_dir + sys.argv[1] + getID() + '.png'
     else:
         path = 'data/classification/training/' + save_dir + sys.argv[1] + getID() + '.png'
-    cv2.imwrite(path, crop)
-    cv2.imwrite('data/to_mask/' + save_dir + getID() + '.png')
+    #cv2.imwrite(path, crop)
+    cv2.imwrite('data/to_mask/' + save_dir + getID() + '.png', crop)
     print "Written to " + path
 
 def mouseCallback(event, x, y, flags, param):
