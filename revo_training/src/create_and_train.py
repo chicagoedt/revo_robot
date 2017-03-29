@@ -1,9 +1,11 @@
 from keras.applications.vgg16 import VGG16
-from keras.models import Sequential
+from keras.models import Sequential, load_model
 from keras.utils import plot_model
 from keras.layers import Conv2D, MaxPooling2D, Dropout, UpSampling2D
 from keras.preprocessing.image import ImageDataGenerator
-from keras.callbacks import TensorBoard, ModelCheckpoint
+from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping
+import cv2
+import string, random
 
 # HYPERPARAMETERS
 img_height = 224
@@ -11,7 +13,7 @@ img_width = 224
 img_size = (img_height, img_width)
 input_shape = (img_height, img_width, 3)
 batch_size = 16
-epochs = 1000
+epochs = 100
 steps_per_epoch = int(1631/batch_size) + 1
 validation_steps = int(431/batch_size) + 1
 seed = 1
@@ -59,14 +61,20 @@ def buildModel():
     model.add(Conv2D(512, (3,3), padding='same', activation='relu', name='block5_conv3', dilation_rate=2))
 
     model.add(Conv2D(4096, (7,7), padding='same', activation='relu', name='conv6', dilation_rate=4))
-    model.add(Dropout(0.5))
+    #model.add(Dropout(0.5))
     model.add(Conv2D(4096, (1,1), padding='same', activation='relu', name='conv7'))
-    model.add(Dropout(0.5))
+    #model.add(Dropout(0.5))
     model.add(Conv2D(1, (1,1), padding='same', activation='sigmoid', name='pred'))
 
     #model.add(UpSampling2D(size=(8,8)))
 
     model.load_weights('vgg16_imagenet_weights.h5', by_name=True)
+    for layer in model.layers:
+	if layer.name == 'block5_conv1':
+	    break
+	else:
+	    layer.trainable = False    
+
     model.compile(optimizer='adadelta', loss='mean_squared_error', metrics=['accuracy'])
 
     plot_model(model, 'dilated.png', show_shapes=True)
@@ -77,6 +85,7 @@ data_gen_args = dict(rotation_range=30.,
                      width_shift_range=0.2,
                      height_shift_range=0.2,
                      zoom_range=0.2,
+		     fill_mode='constant',
                      horizontal_flip=True,
                      rescale=1./255)
 
@@ -102,13 +111,13 @@ train_generator = zip3(image_generator, mask_generator)
 val_image_datagen = ImageDataGenerator(rescale=1./255)
 val_mask_datagen = ImageDataGenerator(rescale=1./255)
 
-val_image_generator = image_datagen.flow_from_directory(
+val_image_generator = val_image_datagen.flow_from_directory(
 	'data/segmentation/validation/images/',
 	target_size=img_size,
 	batch_size=batch_size,
 	class_mode=None,
 	seed=seed)
-val_mask_generator = mask_datagen.flow_from_directory(
+val_mask_generator = val_mask_datagen.flow_from_directory(
 	'data/segmentation/validation/masks/',
 	target_size=(28,28),
 	color_mode='grayscale',
@@ -130,19 +139,30 @@ tb = TensorBoard(
         write_graph=True,
         write_images=True)
 
+early = EarlyStopping(patience=10, verbose=1)
+
 model = buildModel()
+#model = load_model('best.h5')
 
 model.fit_generator(
         train_generator,
         steps_per_epoch=steps_per_epoch,
         epochs=epochs,
-        callbacks=[checkpoint, tb],
+        callbacks=[checkpoint, tb, early],
 	validation_data=val_generator,
 	validation_steps=validation_steps)
 
-'''
-for x,y in train_generator:
-    print(x.shape)
-    print(y.shape)
-    model.train_on_batch(x,y)
-'''
+def getID(size=6, chars=string.ascii_lowercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(size))
+
+i = 0
+for x,y in val_generator:
+	predictions = model.predict_on_batch(x)
+	print(str(i) + '/' + str(validation_steps))
+	for i in range(len(predictions)):
+		ID = getID()
+		cv2.imwrite('results/' + ID + '_img.png', x[i]*255)
+		cv2.imwrite('results/' + ID + '_mask.png', y[i]*255)
+		cv2.imwrite('results/' + ID + '_pred.png', predictions[i]*255)
+	if i >= validation_steps:
+		break
