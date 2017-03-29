@@ -19,6 +19,20 @@ vgg = VGG16(include_top=False, weights='imagenet', input_shape=input_shape)
 plot_model(vgg, 'vgg.png', show_shapes=True)
 vgg.save_weights('vgg16_imagenet_weights.h5')
 
+def zip3(*iterables):
+    # zip('ABCD', 'xy') --> Ax By
+    sentinel = object()
+    iterators = [iter(it) for it in iterables]
+    while iterators:
+        result = []
+        for it in iterators:
+            elem = next(it, sentinel)
+            if elem is sentinel:
+                return
+            result.append(elem)
+        yield tuple(result)
+
+
 def buildModel():
     model = Sequential()
 
@@ -83,7 +97,7 @@ mask_generator = mask_datagen.flow_from_directory(
         class_mode=None,
         seed=seed)
 
-train_generator = zip(image_generator, mask_generator)
+train_generator = zip3(image_generator, mask_generator)
 
 checkpoint = ModelCheckpoint(
         'best.h5',
