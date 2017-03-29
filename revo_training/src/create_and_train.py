@@ -40,3 +40,5 @@ def buildModel():
     plot_model(model, 'dilated.png', show_shapes=True)
 
     return model
+
+#TODO: load VGG weights (save to h5 and import by_name), create generators, val generator resizes images to 28x28
