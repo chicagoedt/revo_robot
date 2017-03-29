@@ -73,7 +73,7 @@ def buildModel():
 	if layer.name == 'block5_conv1':
 	    break
 	else:
-	    layer.trainable = False    
+	    layer.trainable = False
 
     model.compile(optimizer='adadelta', loss='mean_squared_error', metrics=['accuracy'])
 
@@ -93,13 +93,13 @@ image_datagen = ImageDataGenerator(**data_gen_args)
 mask_datagen = ImageDataGenerator(**data_gen_args)
 
 image_generator = image_datagen.flow_from_directory(
-        'data/segmentation/training/images/',
+        'data/segmentation_lines/training/images/',
         target_size=img_size,
         batch_size=batch_size,
         class_mode=None,
         seed=seed)
 mask_generator = mask_datagen.flow_from_directory(
-        'data/segmentation/training/masks/',
+        'data/segmentation_lines/training/masks/',
         target_size=(28,28),
         color_mode='grayscale',
         batch_size=batch_size,
