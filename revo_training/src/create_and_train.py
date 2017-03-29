@@ -12,7 +12,7 @@ img_height = 224
 img_width = 224
 img_size = (img_height, img_width)
 input_shape = (img_height, img_width, 3)
-batch_size = 16
+batch_size = 8
 epochs = 100
 steps_per_epoch = int(1631/batch_size) + 1
 validation_steps = int(431/batch_size) + 1
@@ -112,13 +112,13 @@ val_image_datagen = ImageDataGenerator(rescale=1./255)
 val_mask_datagen = ImageDataGenerator(rescale=1./255)
 
 val_image_generator = val_image_datagen.flow_from_directory(
-	'data/segmentation/validation/images/',
+	'data/segmentation_lines/validation/images/',
 	target_size=img_size,
 	batch_size=batch_size,
 	class_mode=None,
 	seed=seed)
 val_mask_generator = val_mask_datagen.flow_from_directory(
-	'data/segmentation/validation/masks/',
+	'data/segmentation_lines/validation/masks/',
 	target_size=(28,28),
 	color_mode='grayscale',
 	batch_size=batch_size,
@@ -141,8 +141,8 @@ tb = TensorBoard(
 
 early = EarlyStopping(patience=10, verbose=1)
 
-model = buildModel()
-#model = load_model('best.h5')
+#model = buildModel()
+model = load_model('best.h5')
 
 model.fit_generator(
         train_generator,
@@ -155,14 +155,16 @@ model.fit_generator(
 def getID(size=6, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
-i = 0
+j = 0
 for x,y in val_generator:
+	j += 1
 	predictions = model.predict_on_batch(x)
-	print(str(i) + '/' + str(validation_steps))
+	print(str(j) + '/' + str(validation_steps))
 	for i in range(len(predictions)):
 		ID = getID()
 		cv2.imwrite('results/' + ID + '_img.png', x[i]*255)
 		cv2.imwrite('results/' + ID + '_mask.png', y[i]*255)
 		cv2.imwrite('results/' + ID + '_pred.png', predictions[i]*255)
-	if i >= validation_steps:
+		print(predictions[i].max())
+	if j >= validation_steps:
 		break
