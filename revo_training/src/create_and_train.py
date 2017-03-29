@@ -10,10 +10,11 @@ img_height = 224
 img_width = 224
 img_size = (img_height, img_width)
 input_shape = (img_height, img_width, 3)
-batch_size = 2
+batch_size = 16
 epochs = 1000
 steps_per_epoch = int(1631/batch_size) + 1
-steps_on_val = int(431/batch_size) + 1
+validation_steps = int(431/batch_size) + 1
+seed = 1
 
 vgg = VGG16(include_top=False, weights='imagenet', input_shape=input_shape)
 plot_model(vgg, 'vgg.png', show_shapes=True)
@@ -82,7 +83,6 @@ data_gen_args = dict(rotation_range=30.,
 image_datagen = ImageDataGenerator(**data_gen_args)
 mask_datagen = ImageDataGenerator(**data_gen_args)
 
-seed = 1
 image_generator = image_datagen.flow_from_directory(
         'data/segmentation/training/images/',
         target_size=img_size,
@@ -99,9 +99,28 @@ mask_generator = mask_datagen.flow_from_directory(
 
 train_generator = zip3(image_generator, mask_generator)
 
+val_image_datagen = ImageDataGenerator(rescale=1./255)
+val_mask_datagen = ImageDataGenerator(rescale=1./255)
+
+val_image_generator = image_datagen.flow_from_directory(
+	'data/segmentation/validation/images/',
+	target_size=img_size,
+	batch_size=batch_size,
+	class_mode=None,
+	seed=seed)
+val_mask_generator = mask_datagen.flow_from_directory(
+	'data/segmentation/validation/masks/',
+	target_size=(28,28),
+	color_mode='grayscale',
+	batch_size=batch_size,
+	class_mode=None,
+	seed=seed)
+
+val_generator = zip3(val_image_generator, val_mask_generator)
+
 checkpoint = ModelCheckpoint(
         'best.h5',
-        monitor='loss',
+        monitor='val_loss',
         verbose=0,
         save_best_only=True)
 
@@ -117,7 +136,9 @@ model.fit_generator(
         train_generator,
         steps_per_epoch=steps_per_epoch,
         epochs=epochs,
-        callbacks=[checkpoint, tb])
+        callbacks=[checkpoint, tb],
+	validation_data=val_generator,
+	validation_steps=validation_steps)
 
 '''
 for x,y in train_generator:
