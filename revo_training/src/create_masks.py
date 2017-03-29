@@ -49,13 +49,13 @@ for i in images:
         elif press == 32:
             break
         elif press == ord('a'):
-            cv2.imwrite(save_dir + 'images/' + ID + '.png' , img)
-            cv2.imwrite(save_dir + 'masks/' + ID + '.png', acon)
+            cv2.imwrite(save_dir + 'images/imgs/' + ID + '.png' , img)
+            cv2.imwrite(save_dir + 'masks/msks/' + ID + '.png', acon)
             print ID + " written to " + save_dir + " using adaptive thresholded mask."
             break
         elif press == ord('o'):
-            cv2.imwrite(save_dir + 'images/' + ID + '.png', img)
-            cv2.imwrite(save_dir + 'masks/' + ID + '.png', ocon)
+            cv2.imwrite(save_dir + 'images/imgs/' + ID + '.png', img)
+            cv2.imwrite(save_dir + 'masks/msks/' + ID + '.png', ocon)
             print ID + " written to " + save_dir + " using Ostu's Binarization for thresholding."
             break
         elif press == 82:

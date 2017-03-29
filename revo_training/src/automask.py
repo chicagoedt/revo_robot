@@ -17,5 +17,5 @@ for i in images:
     else:
         save_dir = 'data/segmentation/training/'
     ID = getID()
-    cv2.imwrite(save_dir + 'images/' + ID + '.png', img)
-    cv2.imwrite(save_dir + 'masks/' + ID + '.png', mask)
+    cv2.imwrite(save_dir + 'images/imgs/' + ID + '.png', img)
+    cv2.imwrite(save_dir + 'masks/msks/' + ID + '.png', mask)
