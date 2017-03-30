@@ -11,6 +11,7 @@ import string, random
 img_height = 224
 img_width = 224
 img_size = (img_height, img_width)
+mask_size = (112,112)
 input_shape = (img_height, img_width, 3)
 batch_size = 8
 epochs = 100
@@ -70,10 +71,10 @@ def buildModel():
 
     model.load_weights('vgg16_imagenet_weights.h5', by_name=True)
     for layer in model.layers:
-	if layer.name == 'block5_conv1':
-	    break
-	else:
-	    layer.trainable = False
+        if layer.name == 'block5_conv1':
+            break
+        else:
+            layer.trainable = False
 
     model.compile(optimizer='adadelta', loss='mean_squared_error', metrics=['accuracy'])
 
@@ -103,12 +104,13 @@ def buildSimpleModel():
 
 
     model.load_weights('vgg16_imagenet_weights.h5', by_name=True)
+    '''
     for layer in model.layers:
-	if layer.name == 'block5_conv1':
-	    break
+        if layer.name == 'block5_conv1':
+            break
 	else:
-	    layer.trainable = False
-
+            layer.trainable = False
+    '''
     model.compile(optimizer='adadelta', loss='mean_squared_error', metrics=['accuracy'])
 
     plot_model(model, 'dilated.png', show_shapes=True)
@@ -135,7 +137,7 @@ image_generator = image_datagen.flow_from_directory(
         seed=seed)
 mask_generator = mask_datagen.flow_from_directory(
         'data/segmentation_lines/training/masks/',
-        target_size=(28,28),
+        target_size=mask_size,
         color_mode='grayscale',
         batch_size=batch_size,
         class_mode=None,
@@ -154,7 +156,7 @@ val_image_generator = val_image_datagen.flow_from_directory(
 	seed=seed)
 val_mask_generator = val_mask_datagen.flow_from_directory(
 	'data/segmentation_lines/validation/masks/',
-	target_size=(28,28),
+	target_size=mask_size,
 	color_mode='grayscale',
 	batch_size=batch_size,
 	class_mode=None,
@@ -176,8 +178,8 @@ tb = TensorBoard(
 
 early = EarlyStopping(patience=10, verbose=1)
 
-#model = buildModel()
-model = load_model('best.h5')
+model = buildSimpleModel()
+#model = load_model('best.h5')
 
 model.fit_generator(
         train_generator,
