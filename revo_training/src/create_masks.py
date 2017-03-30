@@ -20,8 +20,26 @@ def getContours(img):
     cv2.drawContours(con, bigContours, -1, 255, -1)
     return con
 
-C = 2
+def mouseCallback(event, x, y, flags, param, image, window):
+    if event == cv2.EVENT_MOUSEMOVE:
+        img = image.copy()
+        cv2.circle(img, (x, y), 20, (127,127,127), 1)
+        cv2.imshow(window, img)
+    elif event == cv2.EVENT_LBUTTONDOWN:
+        cv2.circle(image, (x, y), 20, (0,0,0), -1)
+        cv2.imshow(window, image)
 
+def callback_A(event, x, y, flags, param):
+    mouseCallback(event, x, y, flags, param, acon, 'Adaptive')
+
+def callback_O(event, x, y, flags, param):
+    mouseCallback(event, x, y, flags, param, ocon, 'Otsu')
+
+C = 2
+cv2.namedWindow('Adaptive')
+cv2.setMouseCallback('Adaptive', callback_A)
+cv2.namedWindow('Otsu')
+cv2.setMouseCallback('Otsu', callback_O)
 for i in images:
     img = cv2.imread(i)
     cv2.imshow('Original', img)
@@ -29,19 +47,19 @@ for i in images:
     hue, saturation, value = cv2.split(hsv)
     blur = cv2.GaussianBlur(saturation,(5,5),0)
 
-    ret,othresh = cv2.threshold(blur,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+    ret,othresh = cv2.threshold(blur,0,255,cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
     ocon = getContours(othresh)
 
     while True:
         if random.random() < 0.2:
-            save_dir = 'data/segmentation/validation/'
+            save_dir = 'data/segmentation_lines/validation/'
         else:
-            save_dir = 'data/segmentation/training/'
+            save_dir = 'data/segmentation_lines/training/'
         ID = getID()
-        athresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 35, C)
+        athresh = cv2.adaptiveThreshold(blur, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY_INV, 35, C)
         acon = getContours(athresh)
-        cv2.imshow('Otsu Threshed', ocon)
-        cv2.imshow('Adaptive Threshed', acon)
+        cv2.imshow('Otsu', ocon)
+        cv2.imshow('Adaptive', acon)
 
         press = 0xFF & cv2.waitKey(0)
         if press == 27:
@@ -56,7 +74,7 @@ for i in images:
         elif press == ord('o'):
             cv2.imwrite(save_dir + 'images/imgs/' + ID + '.png', img)
             cv2.imwrite(save_dir + 'masks/msks/' + ID + '.png', ocon)
-            print ID + " written to " + save_dir + " using Ostu's Binarization for thresholding."
+            print ID + " written to " + save_dir + " using Otsu's Binarization for thresholding."
             break
         elif press == 82:
             C -= 1
