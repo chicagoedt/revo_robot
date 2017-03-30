@@ -81,6 +81,41 @@ def buildModel():
 
     return model
 
+def buildSimpleModel():
+    model = Sequential()
+
+    model.add(Conv2D(64, (3,3), padding='same', activation='relu', name='block1_conv1', input_shape=(224,224,3)))
+    model.add(Conv2D(64, (3,3), padding='same', activation='relu', name='block1_conv2'))
+    model.add(MaxPooling2D((2,2)))
+
+    model.add(Conv2D(128, (3,3), padding='same', activation='relu', name='block2_conv1', dilation_rate=2))
+    model.add(Conv2D(128, (3,3), padding='same', activation='relu', name='block2_conv2', dilation_rate=2))
+
+    model.add(Conv2D(256, (3,3), padding='same', activation='relu', name='block3_conv1', dilation_rate=4))
+    model.add(Conv2D(256, (3,3), padding='same', activation='relu', name='block3_conv2', dilation_rate=4))
+    model.add(Conv2D(256, (3,3), padding='same', activation='relu', name='block3_conv3', dilation_rate=4))
+
+    model.add(Conv2D(1024, (7,7), padding='same', activation='relu', name='conv6', dilation_rate=8))
+    #model.add(Dropout(0.5))
+    model.add(Conv2D(1024, (1,1), padding='same', activation='relu', name='conv7'))
+    #model.add(Dropout(0.5))
+    model.add(Conv2D(1, (1,1), padding='same', activation='sigmoid', name='pred'))
+
+
+    model.load_weights('vgg16_imagenet_weights.h5', by_name=True)
+    for layer in model.layers:
+	if layer.name == 'block5_conv1':
+	    break
+	else:
+	    layer.trainable = False
+
+    model.compile(optimizer='adadelta', loss='mean_squared_error', metrics=['accuracy'])
+
+    plot_model(model, 'dilated.png', show_shapes=True)
+
+    return model
+
+
 data_gen_args = dict(rotation_range=30.,
                      width_shift_range=0.2,
                      height_shift_range=0.2,

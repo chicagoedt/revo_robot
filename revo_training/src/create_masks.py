@@ -1,10 +1,11 @@
 import cv2
 import sys, random, string, os
 
-img_dir = 'data/to_mask/'
+img_dir = 'data/classification/training/terrain'
 images = [os.path.join(dp, f) for dp, dn, fn in os.walk(os.path.expanduser(img_dir)) for f in fn]
 
 random.shuffle(images)
+drawing = False
 
 def getID(size=6, chars=string.ascii_lowercase + string.digits):
    return ''.join(random.choice(chars) for _ in range(size))
@@ -21,13 +22,33 @@ def getContours(img):
     return con
 
 def mouseCallback(event, x, y, flags, param, image, window):
+    global drawing
     if event == cv2.EVENT_MOUSEMOVE:
         img = image.copy()
         cv2.circle(img, (x, y), 20, (127,127,127), 1)
+        cv2.circle(img, (x, y), 10, (127,127,127), 1)
         cv2.imshow(window, img)
+        if drawing:
+            cv2.circle(image, (x, y), 10, (255,255,255), -1)
+            cv2.imshow(window, img)
+            if window == 'Original':
+                cv2.circle(draw, (x, y), 10, (255,255,255), -1)
+                cv2.imshow('Draw', draw)
     elif event == cv2.EVENT_LBUTTONDOWN:
+        drawing = True
+        cv2.circle(image, (x, y), 10, (255,255,255), -1)
+        cv2.imshow(window, image)
+        if window == 'Original':
+            cv2.circle(draw, (x, y), 10, (255,255,255), -1)
+            cv2.imshow('Draw', draw)
+    elif event == cv2.EVENT_RBUTTONDOWN:
         cv2.circle(image, (x, y), 20, (0,0,0), -1)
         cv2.imshow(window, image)
+        if window == 'Original':
+            cv2.circle(draw, (x, y), 20, (0,0,0), -1)
+            cv2.imshow('Draw', draw)
+    elif event == cv2.EVENT_LBUTTONUP:
+        drawing = False
 
 def callback_A(event, x, y, flags, param):
     mouseCallback(event, x, y, flags, param, acon, 'Adaptive')
@@ -35,7 +56,13 @@ def callback_A(event, x, y, flags, param):
 def callback_O(event, x, y, flags, param):
     mouseCallback(event, x, y, flags, param, ocon, 'Otsu')
 
+def callback_D(event, x, y, flags, param):
+    mouseCallback(event, x, y, flags, param, img, 'Original')
+
 C = 2
+cv2.namedWindow('Original')
+cv2.namedWindow('Draw')
+cv2.setMouseCallback('Original', callback_D)
 cv2.namedWindow('Adaptive')
 cv2.setMouseCallback('Adaptive', callback_A)
 cv2.namedWindow('Otsu')
@@ -51,6 +78,8 @@ for i in images:
     ocon = getContours(othresh)
 
     while True:
+        draw = img.copy() * 0
+        cv2.imshow('Draw', draw)
         if random.random() < 0.2:
             save_dir = 'data/segmentation_lines/validation/'
         else:
@@ -75,6 +104,11 @@ for i in images:
             cv2.imwrite(save_dir + 'images/imgs/' + ID + '.png', img)
             cv2.imwrite(save_dir + 'masks/msks/' + ID + '.png', ocon)
             print ID + " written to " + save_dir + " using Otsu's Binarization for thresholding."
+            break
+        elif press == ord('d'):
+            cv2.imwrite(save_dir + 'images/imgs/' + ID + '.png', img)
+            cv2.imwrite(save_dir + 'masks/msks/' + ID + '.png', draw)
+            print ID + " written to " + save_dir + " using hand-drawn ground truth."
             break
         elif press == 82:
             C -= 1
