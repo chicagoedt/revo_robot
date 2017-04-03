@@ -11,10 +11,10 @@ import string, random
 img_height = 224
 img_width = 224
 img_size = (img_height, img_width)
-mask_size = (112,112)
+mask_size = (28,28)
 input_shape = (img_height, img_width, 3)
 batch_size = 8
-epochs = 100
+epochs = 500
 steps_per_epoch = int(1631/batch_size) + 1
 validation_steps = int(431/batch_size) + 1
 seed = 1
@@ -62,9 +62,9 @@ def buildModel():
     model.add(Conv2D(512, (3,3), padding='same', activation='relu', name='block5_conv3', dilation_rate=2))
 
     model.add(Conv2D(4096, (7,7), padding='same', activation='relu', name='conv6', dilation_rate=4))
-    #model.add(Dropout(0.5))
+    model.add(Dropout(0.5))
     model.add(Conv2D(4096, (1,1), padding='same', activation='relu', name='conv7'))
-    #model.add(Dropout(0.5))
+    model.add(Dropout(0.5))
     model.add(Conv2D(1, (1,1), padding='same', activation='sigmoid', name='pred'))
 
     #model.add(UpSampling2D(size=(8,8)))
@@ -81,42 +81,6 @@ def buildModel():
     plot_model(model, 'dilated.png', show_shapes=True)
 
     return model
-
-def buildSimpleModel():
-    model = Sequential()
-
-    model.add(Conv2D(64, (3,3), padding='same', activation='relu', name='block1_conv1', input_shape=(224,224,3)))
-    model.add(Conv2D(64, (3,3), padding='same', activation='relu', name='block1_conv2'))
-    model.add(MaxPooling2D((2,2)))
-
-    model.add(Conv2D(128, (3,3), padding='same', activation='relu', name='block2_conv1', dilation_rate=2))
-    model.add(Conv2D(128, (3,3), padding='same', activation='relu', name='block2_conv2', dilation_rate=2))
-
-    model.add(Conv2D(256, (3,3), padding='same', activation='relu', name='block3_conv1', dilation_rate=4))
-    model.add(Conv2D(256, (3,3), padding='same', activation='relu', name='block3_conv2', dilation_rate=4))
-    model.add(Conv2D(256, (3,3), padding='same', activation='relu', name='block3_conv3', dilation_rate=4))
-
-    model.add(Conv2D(1024, (7,7), padding='same', activation='relu', name='conv6', dilation_rate=8))
-    #model.add(Dropout(0.5))
-    model.add(Conv2D(1024, (1,1), padding='same', activation='relu', name='conv7'))
-    #model.add(Dropout(0.5))
-    model.add(Conv2D(1, (1,1), padding='same', activation='sigmoid', name='pred'))
-
-
-    model.load_weights('vgg16_imagenet_weights.h5', by_name=True)
-    '''
-    for layer in model.layers:
-        if layer.name == 'block5_conv1':
-            break
-	else:
-            layer.trainable = False
-    '''
-    model.compile(optimizer='adadelta', loss='mean_squared_error', metrics=['accuracy'])
-
-    plot_model(model, 'dilated.png', show_shapes=True)
-
-    return model
-
 
 data_gen_args = dict(rotation_range=30.,
                      width_shift_range=0.2,
@@ -176,11 +140,13 @@ tb = TensorBoard(
         write_graph=True,
         write_images=True)
 
-early = EarlyStopping(patience=10, verbose=1)
+early = EarlyStopping(patience=3, verbose=1)
 
-model = buildSimpleModel()
-#model = load_model('best.h5')
-
+model = buildModel()
+best_model = load_model('best.h5')
+best_model.save_weights('best_weights.h5')
+model.load_weights('best_weights.h5', by_name=True)
+'''
 model.fit_generator(
         train_generator,
         steps_per_epoch=steps_per_epoch,
@@ -188,7 +154,7 @@ model.fit_generator(
         callbacks=[checkpoint, tb, early],
 	validation_data=val_generator,
 	validation_steps=validation_steps)
-
+'''
 def getID(size=6, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
