@@ -15,8 +15,8 @@ mask_size = (28,28)
 input_shape = (img_height, img_width, 3)
 batch_size = 8
 epochs = 500
-steps_per_epoch = int(1631/batch_size) + 1
-validation_steps = int(431/batch_size) + 1
+steps_per_epoch = int(1406/batch_size) + 1
+validation_steps = int(361/batch_size) + 1
 seed = 1
 
 vgg = VGG16(include_top=False, weights='imagenet', input_shape=input_shape)
@@ -142,11 +142,9 @@ tb = TensorBoard(
 
 early = EarlyStopping(patience=3, verbose=1)
 
-model = buildModel()
-best_model = load_model('best.h5')
-best_model.save_weights('best_weights.h5')
-model.load_weights('best_weights.h5', by_name=True)
-'''
+#model = buildModel()
+model = load_model('best.h5')
+
 model.fit_generator(
         train_generator,
         steps_per_epoch=steps_per_epoch,
@@ -154,7 +152,7 @@ model.fit_generator(
         callbacks=[checkpoint, tb, early],
 	validation_data=val_generator,
 	validation_steps=validation_steps)
-'''
+
 def getID(size=6, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
