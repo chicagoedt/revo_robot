@@ -49,7 +49,7 @@ int main( int argc, char **argv ) {
             break;
         }
 
-        out_bridge = cv_bridge::CvImage( header, sensor_msgs::image_encodings::RGB8, frame );
+        out_bridge = cv_bridge::CvImage( header, sensor_msgs::image_encodings::BGR8, frame );
         out_bridge.toImageMsg( frame_msg );
 
         pub.publish( frame_msg );
