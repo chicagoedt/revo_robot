@@ -1,3 +1,5 @@
+// Broadcasts a video file as a sensor_msgs::Image topic.
+
 #include <opencv2/opencv.hpp>
 #include <iostream>
 #include <ros/ros.h>
