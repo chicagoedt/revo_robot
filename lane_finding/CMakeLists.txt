@@ -122,7 +122,6 @@ include_directories(include ${catkin_INCLUDE_DIRS} ${OpenCV_INCLUDE_DIRS})
 # add_dependencies(lane_finding ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
 ## Declare a C++ executable
-add_executable(lane_finder src/lane_finder.cpp)
 add_executable(testcaster src/testcaster.cpp)
 
 ## Add cmake target dependencies of the executable
