@@ -8,6 +8,8 @@ import cv2
 import string, random
 
 # HYPERPARAMETERS
+#img_height = 648
+#img_width = 1280
 img_height = 224
 img_width = 224
 img_size = (img_height, img_width)
@@ -40,7 +42,7 @@ def zip3(*iterables):
 def buildModel():
     model = Sequential()
 
-    model.add(Conv2D(64, (3,3), padding='same', activation='relu', name='block1_conv1', input_shape=(224,224,3)))
+    model.add(Conv2D(64, (3,3), padding='same', activation='relu', name='block1_conv1', input_shape=input_shape))
     model.add(Conv2D(64, (3,3), padding='same', activation='relu', name='block1_conv2'))
     model.add(MaxPooling2D((2,2)))
 
@@ -142,8 +144,10 @@ tb = TensorBoard(
 
 early = EarlyStopping(patience=3, verbose=1)
 
-#model = buildModel()
-model = load_model('best.h5')
+model = buildModel()
+#model = load_model('best.h5')
+model.load_weights('best_weights.h5')
+model.save('lane_finder.h5')
 
 model.fit_generator(
         train_generator,
