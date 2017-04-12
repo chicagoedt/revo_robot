@@ -16,9 +16,9 @@ import tensorflow as tf
 img_height = 224
 img_width = 224
 img_size = (img_height, img_width)
-mask_size = (224,224)
+mask_size = (112,112)
 input_shape = (img_height, img_width, 3)
-batch_size = 1
+batch_size = 4
 epochs = 500
 steps_per_epoch = int(1406/batch_size) + 1
 validation_steps = int(361/batch_size) + 1
@@ -65,7 +65,7 @@ def addBottleneck(model, output, downsampling=False, upsampling=False, asymmetri
         expansion = UpSampling2D()(PReLU()(BatchNormalization()(Conv2D(output, (1,1), padding='same')(conv))))
     else:
         expansion = PReLU()(BatchNormalization()(Conv2D(output, (1,1), padding='same')(conv)))
-    conv_branch = Dropout(0.1)(expansion)
+    conv_branch = Dropout(0.01)(expansion)
 
     out = PReLU()(add([conv_branch, main]))
 
@@ -77,17 +77,11 @@ def buildModel():
     p = MaxPooling2D()(i)
     initial_block_output = concatenate([c,p])
 
-<<<<<<< HEAD
     bottleneck_1_0 = addBottleneck(initial_block_output, 64, downsampling=True)
     bottleneck_1_1 = addBottleneck(bottleneck_1_0, 64)
     bottleneck_1_2 = addBottleneck(bottleneck_1_1, 64)
     bottleneck_1_3 = addBottleneck(bottleneck_1_2, 64)
     bottleneck_1_4 = addBottleneck(bottleneck_1_3, 64)
-=======
-    model.add(Conv2D(64, (3,3), padding='same', activation='relu', name='block1_conv1', input_shape=input_shape))
-    model.add(Conv2D(64, (3,3), padding='same', activation='relu', name='block1_conv2'))
-    model.add(MaxPooling2D((2,2)))
->>>>>>> d1ccb36c7ed1c340773feda2525e125908f1a2be
 
     bottleneck_2_0 = addBottleneck(bottleneck_1_4, 128, downsampling=True)
     bottleneck_2_1 = addBottleneck(bottleneck_2_0, 128)
@@ -115,7 +109,7 @@ def buildModel():
     bottleneck_5_0 = addBottleneck(bottleneck_4_2, 32, upsampling=True)
     bottleneck_5_1 = addBottleneck(bottleneck_5_0, 32)
 
-    fullconv = Conv2D(1, (112,112))(bottleneck_5_1)
+    fullconv = Conv2D(1, (1,1))(bottleneck_5_1)
 
     return Model(inputs=i, outputs=fullconv)
 
@@ -185,15 +179,10 @@ tb = TensorBoard(
 
 early = EarlyStopping(patience=3, verbose=1)
 
-<<<<<<< HEAD
 #model = buildModel()
 #model = load_model('best.h5')
-=======
-model = buildModel()
-#model = load_model('best.h5')
-model.load_weights('best_weights.h5')
-model.save('lane_finder.h5')
->>>>>>> d1ccb36c7ed1c340773feda2525e125908f1a2be
+#model.load_weights('best_weights.h5')
+#model.save('lane_finder.h5')
 
 model.fit_generator(
         train_generator,
