@@ -49,23 +49,25 @@ def buildModel():
     model.add(Conv2D(512, (7,7), padding='same', activation='relu', dilation_rate=4))
     model.add(Dropout(0.25))
     model.add(Conv2D(1024, (1,1), padding='same', activation='relu'))
-    model.add(Conv2D(1, (1,1), padding='same', activation='relu'))
+    model.add(Conv2D(1, (1,1), padding='same', activation='sigmoid'))
     return model
 
 def buildSimpleModel():
     img = Input(shape=input_shape)
-    one = Conv2D(256, (1,1), padding='same', activation='relu')(img)
-    three = Conv2D(256, (3,3), padding='same', activation='relu')(img)
-    five = Conv2D(256, (5,5), padding='same', activation='relu')(img)
-    inception1 = concatenate([one, three, five, img])
+    conv1_1 = Conv2D(64, (3,3), padding='same')(img)
+    conv1_2 = Conv2D(64, (3,3), padding='same', activation='relu')(conv1_1)
 
-    contract = Conv2D(256, (1,1), padding='same', activation='relu')(inception1)
-    dilate = Conv2D(256, (7,7), padding='same', activation='relu', dilation_rate=2)(contract)
-    msk = Conv2D(1, (1,1), padding='same', activation='relu')(dilate)
+    conv2_1 = Conv2D(128, (3,3), padding='same', dilation_rate=2)(conv1_2)
+    conv2_2 = Conv2D(128, (3,3), padding='same', dilation_rate=2, activation='relu')(conv2_1)
+
+    conv3_1 = Conv2D(256, (3,3), padding='same', dilation_rate=4)(conv2_2)
+    conv3_2 = Conv2D(256, (3,3), padding='same', dilation_rate=4, activation='relu')(conv3_1)
+
+    msk = Conv2D(1, (1,1), padding='same', activation='relu')(conv3_2)
 
     return Model(inputs=img, outputs=msk)
 
-model = buildModel()
+model = buildSimpleModel()
 #model = load_model('best.h5')
 model.compile(loss='binary_crossentropy', optimizer='adadelta', metrics=['accuracy'])
 
