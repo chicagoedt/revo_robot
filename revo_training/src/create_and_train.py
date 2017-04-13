@@ -20,8 +20,8 @@ mask_size = (112,112)
 input_shape = (img_height, img_width, 3)
 batch_size = 16
 epochs = 500
-steps_per_epoch = int(944/batch_size) + 1
-validation_steps = int(251/batch_size) + 1
+steps_per_epoch = int(2092/batch_size) + 1
+validation_steps = int(553/batch_size) + 1
 seed = 1
 
 def zip3(*iterables):
@@ -58,12 +58,14 @@ def buildSimpleModel():
     model.add(MaxPooling2D())
     model.add(Conv2D(256, (3,3), padding='same'))
     model.add(Conv2D(256, (3,3), padding='same', activation='relu'))
+    model.add(Dropout(0.5))
+    model.add(Conv2D(128, (3,3), padding='same', activation='relu', dilation_rate=2))
     model.add(Dropout(0.25))
-    model.add(Conv2D(128, (1,1), padding='same', activation='relu'))
-    model.add(Conv2D(1, (1,1), padding='same', activation='sigmoid'))
+    model.add(Conv2D(128, (3,3), padding='same', activation='relu', dilation_rate=4))
+    model.add(Conv2D(1, (5,5), padding='same', activation='sigmoid'))
     return model
 
-model = buildSimpleModel()
+model = buildModel()
 #model = load_model('best.h5')
 model.compile(loss='binary_crossentropy', optimizer='adadelta', metrics=['accuracy'])
 
@@ -79,13 +81,13 @@ image_datagen = ImageDataGenerator(**data_gen_args)
 mask_datagen = ImageDataGenerator(**data_gen_args)
 
 image_generator = image_datagen.flow_from_directory(
-        'data/segmentation_lines/training/images/',
+        'data/segmentation/training/images/',
         target_size=img_size,
         batch_size=batch_size,
         class_mode=None,
         seed=seed)
 mask_generator = mask_datagen.flow_from_directory(
-        'data/segmentation_lines/training/masks/',
+        'data/segmentation/training/masks/',
         target_size=mask_size,
         color_mode='grayscale',
         batch_size=batch_size,
@@ -98,13 +100,13 @@ val_image_datagen = ImageDataGenerator(rescale=1./255)
 val_mask_datagen = ImageDataGenerator(rescale=1./255)
 
 val_image_generator = val_image_datagen.flow_from_directory(
-	'data/segmentation_lines/validation/images/',
+	'data/segmentation/validation/images/',
 	target_size=img_size,
 	batch_size=batch_size,
 	class_mode=None,
 	seed=seed)
 val_mask_generator = val_mask_datagen.flow_from_directory(
-	'data/segmentation_lines/validation/masks/',
+	'data/segmentation/validation/masks/',
 	target_size=mask_size,
 	color_mode='grayscale',
 	batch_size=batch_size,
@@ -125,7 +127,7 @@ tb = TensorBoard(
         write_graph=True,
         write_images=True)
 
-early = EarlyStopping(patience=25, verbose=1)
+early = EarlyStopping(patience=12, verbose=1)
 
 j = 0
 for x,y in val_generator:
