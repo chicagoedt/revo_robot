@@ -6,7 +6,7 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping
 from keras import backend as K
 import cv2
-import string, random
+import string, random, time
 import numpy as np
 import tensorflow as tf
 
@@ -20,8 +20,8 @@ mask_size = (112,112)
 input_shape = (img_height, img_width, 3)
 batch_size = 4
 epochs = 500
-steps_per_epoch = int(1406/batch_size) + 1
-validation_steps = int(361/batch_size) + 1
+steps_per_epoch = int(944/batch_size) + 1
+validation_steps = int(251/batch_size) + 1
 seed = 1
 
 def zip3(*iterables):
@@ -39,17 +39,34 @@ def zip3(*iterables):
 
 def buildModel():
     model = Sequential()
-    model.add(Conv2D(96, (11,11), padding='same', activation='relu', input_shape=input_shape))
+    model.add(Conv2D(64, (11,11), padding='same', activation='relu', input_shape=input_shape))
     model.add(MaxPooling2D())
-    model.add(Conv2D(256, (5,5), padding='same', activation='relu'))
-    model.add(Conv2D(384, (3,3), padding='same', activation='relu', dilation_rate=2))
-    model.add(Conv2D(384, (3,3), padding='same', activation='relu', dilation_rate=2))
+    model.add(Conv2D(128, (5,5), padding='same', activation='relu'))
     model.add(Conv2D(256, (3,3), padding='same', activation='relu', dilation_rate=2))
-    model.add(Conv2D(4096, (28,28), padding='same', activation='relu', dilation_rate=4))
-    model.add(Conv2D(4096, (1,1), padding='same', activation='relu'))
+    model.add(Conv2D(256, (3,3), padding='same', activation='relu', dilation_rate=2))
+    model.add(Conv2D(128, (3,3), padding='same', activation='relu', dilation_rate=2))
+    model.add(Dropout(0.5))
+    model.add(Conv2D(512, (7,7), padding='same', activation='relu', dilation_rate=4))
+    model.add(Dropout(0.25))
+    model.add(Conv2D(1024, (1,1), padding='same', activation='relu'))
     model.add(Conv2D(1, (1,1), padding='same', activation='relu'))
+    return model
+
+def buildSimpleModel():
+    img = Input(shape=input_shape)
+    one = Conv2D(256, (1,1), padding='same', activation='relu')(img)
+    three = Conv2D(256, (3,3), padding='same', activation='relu')(img)
+    five = Conv2D(256, (5,5), padding='same', activation='relu')(img)
+    inception1 = concatenate([one, three, five, img])
+
+    contract = Conv2D(256, (1,1), padding='same', activation='relu')(inception1)
+    dilate = Conv2D(256, (7,7), padding='same', activation='relu', dilation_rate=2)(contract)
+    msk = Conv2D(1, (1,1), padding='same', activation='relu')(dilate)
+
+    return Model(inputs=img, outputs=msk)
 
 model = buildModel()
+#model = load_model('best.h5')
 model.compile(loss='binary_crossentropy', optimizer='adadelta', metrics=['accuracy'])
 
 data_gen_args = dict(rotation_range=30.,
@@ -111,6 +128,13 @@ tb = TensorBoard(
         write_images=True)
 
 early = EarlyStopping(patience=3, verbose=1)
+
+for x,y in val_generator:
+	start = time.clock()
+	predictions = model.predict_on_batch(x)
+	end = time.clock()
+	print("Seconds per image: " + str((end - start) / batch_size))
+	break
 
 model.fit_generator(
         train_generator,

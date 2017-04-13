@@ -1,11 +1,11 @@
 import sys, random, os
 import cv2
 
-mask_dir = 'data/segmentation/validation/masks/msks/'
-img_dir = 'data/segmentation/validation/images/imgs/'
+mask_dir = 'data/segmentation/training/masks/msks/'
+img_dir = 'data/segmentation/training/images/imgs/'
 
-new_mask_dir = 'data/segmentation_lines/validation/masks/msks/'
-new_img_dir = 'data/segmentation_lines/validation/images/imgs/'
+new_mask_dir = 'data/segmentation_lines/training/masks/msks/'
+new_img_dir = 'data/segmentation_lines/training/images/imgs/'
 
 masks = os.listdir(mask_dir)
 
