@@ -18,7 +18,7 @@ img_width = 224
 img_size = (img_height, img_width)
 mask_size = (112,112)
 input_shape = (img_height, img_width, 3)
-batch_size = 4
+batch_size = 16
 epochs = 500
 steps_per_epoch = int(944/batch_size) + 1
 validation_steps = int(251/batch_size) + 1
@@ -53,19 +53,15 @@ def buildModel():
     return model
 
 def buildSimpleModel():
-    img = Input(shape=input_shape)
-    conv1_1 = Conv2D(64, (3,3), padding='same')(img)
-    conv1_2 = Conv2D(64, (3,3), padding='same', activation='relu')(conv1_1)
-
-    conv2_1 = Conv2D(128, (3,3), padding='same', dilation_rate=2)(conv1_2)
-    conv2_2 = Conv2D(128, (3,3), padding='same', dilation_rate=2, activation='relu')(conv2_1)
-
-    conv3_1 = Conv2D(256, (3,3), padding='same', dilation_rate=4)(conv2_2)
-    conv3_2 = Conv2D(256, (3,3), padding='same', dilation_rate=4, activation='relu')(conv3_1)
-
-    msk = Conv2D(1, (1,1), padding='same', activation='relu')(conv3_2)
-
-    return Model(inputs=img, outputs=msk)
+    model = Sequential()
+    model.add(Conv2D(128, (11,11), padding='same', input_shape=input_shape))
+    model.add(MaxPooling2D())
+    model.add(Conv2D(256, (3,3), padding='same'))
+    model.add(Conv2D(256, (3,3), padding='same', activation='relu'))
+    model.add(Dropout(0.25))
+    model.add(Conv2D(128, (1,1), padding='same', activation='relu'))
+    model.add(Conv2D(1, (1,1), padding='same', activation='sigmoid'))
+    return model
 
 model = buildSimpleModel()
 #model = load_model('best.h5')
@@ -129,14 +125,17 @@ tb = TensorBoard(
         write_graph=True,
         write_images=True)
 
-early = EarlyStopping(patience=3, verbose=1)
+early = EarlyStopping(patience=25, verbose=1)
 
+j = 0
 for x,y in val_generator:
 	start = time.clock()
 	predictions = model.predict_on_batch(x)
 	end = time.clock()
 	print("Seconds per image: " + str((end - start) / batch_size))
-	break
+	j += 1
+	if j > 5:
+		break
 
 model.fit_generator(
         train_generator,
