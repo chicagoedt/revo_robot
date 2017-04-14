@@ -38,7 +38,7 @@ def zip3(*iterables):
             result.append(elem)
         yield tuple(result)
 
-# 0.05 sec/img, 
+# 0.05 sec/img, converges to ~0.98 val_acc
 def buildModelA():
     model = Sequential()
     model.add(Conv2D(64, (11,11), padding='same', activation='relu', input_shape=input_shape))
@@ -235,6 +235,7 @@ if sys.argv[2] == '-n':
     model = buildModelB6()
 elif sys.argv[2] == '-l': 
     model = load_model(model_name)
+
 model.compile(loss='binary_crossentropy', optimizer='adadelta', metrics=['accuracy'])
 
 data_gen_args = dict(rotation_range=30.,
@@ -307,17 +308,21 @@ for x,y in val_generator:
 	if j > 5:
 		break
 
+'''
 model.fit_generator(
-        train_generator,
-        steps_per_epoch=steps_per_epoch,
-        epochs=epochs,
-        callbacks=[checkpoint, tb, early],
+	train_generator,
+	steps_per_epoch=steps_per_epoch,
+	epochs=epochs,
+	callbacks=[checkpoint, tb, early],
 	validation_data=val_generator,
 	validation_steps=validation_steps)
+'''
 
 def getID(size=6, chars=string.ascii_lowercase + string.digits):
     return ''.join(random.choice(chars) for _ in range(size))
 
+
+#model = load_model(model_name)
 j = 0
 for x,y in val_generator:
 	j += 1
