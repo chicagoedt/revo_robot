@@ -6,7 +6,7 @@ from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping
 from keras import backend as K
 import cv2
-import string, random, time
+import string, random, time, sys
 import numpy as np
 import tensorflow as tf
 
@@ -18,11 +18,12 @@ img_width = 224
 img_size = (img_height, img_width)
 mask_size = (112,112)
 input_shape = (img_height, img_width, 3)
-batch_size = 16
+batch_size = 32
 epochs = 500
 steps_per_epoch = int(2092/batch_size) + 1
 validation_steps = int(553/batch_size) + 1
 seed = 1
+model_name= sys.argv[1]
 
 def zip3(*iterables):
     # zip('ABCD', 'xy') --> Ax By
@@ -37,7 +38,8 @@ def zip3(*iterables):
             result.append(elem)
         yield tuple(result)
 
-def buildModel():
+# 0.05 sec/img, 
+def buildModelA():
     model = Sequential()
     model.add(Conv2D(64, (11,11), padding='same', activation='relu', input_shape=input_shape))
     model.add(MaxPooling2D())
@@ -52,21 +54,187 @@ def buildModel():
     model.add(Conv2D(1, (1,1), padding='same', activation='sigmoid'))
     return model
 
-def buildSimpleModel():
-    model = Sequential()
-    model.add(Conv2D(128, (11,11), padding='same', input_shape=input_shape))
-    model.add(MaxPooling2D())
-    model.add(Conv2D(256, (3,3), padding='same'))
-    model.add(Conv2D(256, (3,3), padding='same', activation='relu'))
-    model.add(Dropout(0.5))
-    model.add(Conv2D(128, (3,3), padding='same', activation='relu', dilation_rate=2))
-    model.add(Dropout(0.25))
-    model.add(Conv2D(128, (3,3), padding='same', activation='relu', dilation_rate=4))
-    model.add(Conv2D(1, (5,5), padding='same', activation='sigmoid'))
-    return model
+# 0.006 sec/img, converges to ~0.9754 val_acc
+def buildModelB1():
+    img = Input(shape=input_shape)
+    inception_1 = Conv2D(8, (1,1), padding='same')(img)
+    inception_3 = Conv2D(8, (3,3), padding='same')(img)
+    inception_5 = Conv2D(8, (5,5), padding='same')(img)
+    
+    conv1 = Conv2D(32, (3,3), padding='same', activation='relu')(concatenate([inception_1, inception_3, inception_5]))
+    pool1 = MaxPooling2D()(conv1)
+   
+    conv2_1 = Conv2D(64, (3,3), padding='same')(pool1)
+    conv2_2 = Conv2D(64, (3,3), padding='same')(Dropout(0.25)(conv2_1))
+    conv2_3 = Conv2D(64, (3,3), padding='same', activation='relu')(Dropout(0.25)(conv2_2))
+    pred = Conv2D(1, (5,5), padding='same', activation='sigmoid')(conv2_3)
+    
+    return Model(inputs=img, outputs=pred)
 
-model = buildModel()
-#model = load_model('best.h5')
+# 0.0065 sec/img
+def buildModelB2():
+    img = Input(shape=input_shape)
+    inception_1 = Conv2D(8, (1,1), padding='same')(img)
+    inception_3 = Conv2D(8, (3,3), padding='same')(img)
+    inception_5 = Conv2D(8, (5,5), padding='same')(img)
+    
+    conv1 = Conv2D(32, (3,3), padding='same', activation='relu')(concatenate([inception_1, inception_3, inception_5]))
+    pool1 = MaxPooling2D()(conv1)
+   
+    conv2_1 = Conv2D(64, (3,3), padding='same')(pool1)
+    conv2_2 = Conv2D(64, (3,3), padding='same')(conv2_1)
+    conv2_3 = Conv2D(64, (3,3), padding='same', activation='relu')(conv2_2)
+
+    conv3_1 = Conv2D(64, (3,3), padding='same')(conv2_3)
+    conv3_2 = Conv2D(64, (3,3), padding='same')(conv3_1)
+    conv3_3 = Conv2D(64, (3,3), padding='same', activation='relu')(conv3_2)
+
+    pred = Conv2D(1, (5,5), padding='same', activation='sigmoid')(conv3_3)
+    
+    return Model(inputs=img, outputs=pred)
+
+# 0.0128 sec/img, converges to 0.945 val_acc
+def buildModelB3():
+    img = Input(shape=input_shape)
+    inception_1 = Conv2D(8, (1,1), padding='same')(img)
+    inception_3 = Conv2D(8, (3,3), padding='same')(img)
+    inception_5 = Conv2D(8, (5,5), padding='same')(img)
+    
+    conv1 = Conv2D(32, (3,3), padding='same', activation='relu')(concatenate([inception_1, inception_3, inception_5]))
+    pool1 = MaxPooling2D()(conv1)
+   
+    conv2_1 = Conv2D(64, (3,3), padding='same')(pool1)
+    conv2_2 = Conv2D(64, (3,3), padding='same')(conv2_1)
+    conv2_3 = Conv2D(64, (3,3), padding='same', activation='relu')(conv2_2)
+
+    conv3_1 = Conv2D(64, (3,3), padding='same')(conv2_3)
+    conv3_2 = Conv2D(64, (3,3), padding='same')(conv3_1)
+    conv3_3 = Conv2D(64, (3,3), padding='same', activation='relu')(conv3_2)
+
+    conv4_1 = Conv2D(64, (3,3), padding='same')(conv3_3)
+    conv4_2 = Conv2D(64, (3,3), padding='same')(conv4_1)
+    conv4_3 = Conv2D(64, (3,3), padding='same', activation='relu')(conv4_2)
+
+    conv5_1 = Conv2D(64, (3,3), padding='same')(conv4_3)
+    conv5_2 = Conv2D(64, (3,3), padding='same')(conv5_1)
+    conv5_3 = Conv2D(64, (3,3), padding='same', activation='relu')(conv5_2)
+
+    conv6_1 = Conv2D(64, (3,3), padding='same')(conv5_3)
+    conv6_2 = Conv2D(64, (3,3), padding='same')(conv6_1)
+    conv6_3 = Conv2D(64, (3,3), padding='same', activation='relu')(conv6_2)
+
+    pred = Conv2D(1, (5,5), padding='same', activation='sigmoid')(conv6_3)
+    
+    return Model(inputs=img, outputs=pred)
+
+# 0.013 sec/img, converges to ~0.977 val_acc
+def buildModelB4():
+    img = Input(shape=input_shape)
+    inception_1 = Conv2D(8, (1,1), padding='same')(img)
+    inception_3 = Conv2D(8, (3,3), padding='same')(img)
+    inception_5 = Conv2D(8, (5,5), padding='same')(img)
+    
+    conv1 = Conv2D(32, (3,3), padding='same', activation='relu')(concatenate([inception_1, inception_3, inception_5]))
+    pool1 = MaxPooling2D()(conv1)
+   
+    conv2_1 = Conv2D(64, (3,3), padding='same')(pool1)
+    conv2_2 = Conv2D(64, (3,3), padding='same')(conv2_1)
+    conv2_3 = Conv2D(64, (3,3), padding='same', activation='relu')(conv2_2)
+
+    conv3_1 = Conv2D(64, (3,3), padding='same')(conv2_3)
+    conv3_2 = Conv2D(64, (3,3), padding='same')(conv3_1)
+    conv3_3 = Conv2D(64, (3,3), padding='same', activation='relu')(conv3_2)
+
+    conv4_1 = Conv2D(64, (3,3), padding='same')(conv3_3)
+    conv4_2 = Conv2D(64, (3,3), padding='same')(conv4_1)
+    conv4_3 = Conv2D(64, (3,3), padding='same', activation='relu')(conv4_2)
+
+    conv5_1 = Conv2D(64, (3,3), padding='same', dilation_rate=2)(conv4_3)
+    conv5_2 = Conv2D(64, (3,3), padding='same', dilation_rate=2)(conv5_1)
+    conv5_3 = Conv2D(64, (3,3), padding='same', dilation_rate=2, activation='relu')(conv5_2)
+
+    conv6_1 = Conv2D(64, (3,3), padding='same', dilation_rate=4)(conv5_3)
+    conv6_2 = Conv2D(64, (3,3), padding='same', dilation_rate=4)(conv6_1)
+    conv6_3 = Conv2D(64, (3,3), padding='same', dilation_rate=4, activation='relu')(conv6_2)
+
+    pred = Conv2D(1, (5,5), padding='same', activation='sigmoid')(conv6_3)
+    
+    return Model(inputs=img, outputs=pred)
+
+# 0.016 sec/img, converges to ~0.983 val_acc
+def buildModelB5():
+    img = Input(shape=input_shape)
+    inception_1 = Conv2D(8, (1,1), padding='same')(img)
+    inception_3 = Conv2D(8, (3,3), padding='same')(img)
+    inception_5 = Conv2D(8, (5,5), padding='same')(img)
+    
+    conv1 = Conv2D(32, (3,3), padding='same', activation='relu')(concatenate([inception_1, inception_3, inception_5]))
+    pool1 = MaxPooling2D()(conv1)
+   
+    conv2_1 = Conv2D(64, (3,3), padding='same')(pool1)
+    conv2_2 = Conv2D(64, (3,3), padding='same')(conv2_1)
+    conv2_3 = Conv2D(64, (3,3), padding='same', activation='relu')(conv2_2)
+
+    conv3_1 = Conv2D(64, (3,3), padding='same', dilation_rate=2)(conv2_3)
+    conv3_2 = Conv2D(64, (3,3), padding='same', dilation_rate=2)(conv3_1)
+    conv3_3 = Conv2D(64, (3,3), padding='same', dilation_rate=2, activation='relu')(conv3_2)
+
+    conv4_1 = Conv2D(64, (3,3), padding='same', dilation_rate=4)(conv3_3)
+    conv4_2 = Conv2D(64, (3,3), padding='same', dilation_rate=4)(conv4_1)
+    conv4_3 = Conv2D(64, (3,3), padding='same', dilation_rate=4, activation='relu')(conv4_2)
+
+    conv5_1 = Conv2D(64, (3,3), padding='same', dilation_rate=8)(conv4_3)
+    conv5_2 = Conv2D(64, (3,3), padding='same', dilation_rate=8)(conv5_1)
+    conv5_3 = Conv2D(64, (3,3), padding='same', dilation_rate=8, activation='relu')(conv5_2)
+
+    conv6_1 = Conv2D(64, (3,3), padding='same', dilation_rate=16)(conv5_3)
+    conv6_2 = Conv2D(64, (3,3), padding='same', dilation_rate=16)(conv6_1)
+    conv6_3 = Conv2D(64, (3,3), padding='same', dilation_rate=16, activation='relu')(conv6_2)
+
+    pred = Conv2D(1, (5,5), padding='same', activation='sigmoid')(conv6_3)
+    
+    return Model(inputs=img, outputs=pred)
+
+# 0.0163 sec/img, converges to ~0.985 val_acc
+def buildModelB6():
+    img = Input(shape=input_shape)
+    inception_1 = Conv2D(8, (1,1), padding='same')(img)
+    inception_3 = Conv2D(8, (3,3), padding='same')(img)
+    inception_5 = Conv2D(8, (5,5), padding='same')(img)
+    
+    conv1 = Conv2D(32, (3,3), padding='same', activation='relu')(concatenate([inception_1, inception_3, inception_5]))
+    pool1 = MaxPooling2D()(conv1)
+   
+    conv2_1 = Conv2D(64, (3,3), padding='same')(pool1)
+    conv2_2 = Conv2D(64, (3,3), padding='same')(conv2_1)
+    conv2_3 = Conv2D(64, (3,3), padding='same', activation='relu')(conv2_2)
+
+    conv3_1 = Conv2D(64, (3,3), padding='same', dilation_rate=2)(conv2_3)
+    conv3_2 = Conv2D(64, (3,3), padding='same', dilation_rate=2)(conv3_1)
+    conv3_3 = Conv2D(64, (3,3), padding='same', dilation_rate=2, activation='relu')(conv3_2)
+
+    conv4_1 = Conv2D(64, (3,3), padding='same', dilation_rate=4)(conv3_3)
+    conv4_2 = Conv2D(64, (3,3), padding='same', dilation_rate=4)(conv4_1)
+    conv4_3 = Conv2D(64, (3,3), padding='same', dilation_rate=4, activation='relu')(conv4_2)
+
+    conv5_1 = Conv2D(64, (3,3), padding='same', dilation_rate=8)(conv4_3)
+    conv5_2 = Conv2D(64, (3,3), padding='same', dilation_rate=8)(conv5_1)
+    conv5_3 = Conv2D(64, (3,3), padding='same', dilation_rate=8, activation='relu')(conv5_2)
+
+    conv6_1 = Conv2D(64, (3,3), padding='same', dilation_rate=16)(Dropout(0.25)(conv5_3))
+    conv6_2 = Conv2D(64, (3,3), padding='same', dilation_rate=16)(conv6_1)
+    conv6_3 = Conv2D(64, (3,3), padding='same', dilation_rate=16, activation='relu')(conv6_2)
+
+    pred = Conv2D(1, (5,5), padding='same', activation='sigmoid')(Dropout(0.5)(conv6_3))
+    
+    return Model(inputs=img, outputs=pred)
+
+
+
+if sys.argv[2] == '-n':
+    model = buildModelB6()
+elif sys.argv[2] == '-l': 
+    model = load_model(model_name)
 model.compile(loss='binary_crossentropy', optimizer='adadelta', metrics=['accuracy'])
 
 data_gen_args = dict(rotation_range=30.,
@@ -116,7 +284,7 @@ val_mask_generator = val_mask_datagen.flow_from_directory(
 val_generator = zip3(val_image_generator, val_mask_generator)
 
 checkpoint = ModelCheckpoint(
-        'best.h5',
+        model_name,
         monitor='val_loss',
         verbose=0,
         save_best_only=True)
@@ -127,7 +295,7 @@ tb = TensorBoard(
         write_graph=True,
         write_images=True)
 
-early = EarlyStopping(patience=12, verbose=1)
+early = EarlyStopping(patience=batch_size, verbose=1)
 
 j = 0
 for x,y in val_generator:
