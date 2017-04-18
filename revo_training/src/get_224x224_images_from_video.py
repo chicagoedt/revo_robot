@@ -80,7 +80,7 @@ while cap.get(1) != cap.get(7): # while frame != last frame
     ret, frame = cap.read()
     height, width = frame.shape[:2]
     cv2.imshow('Frame', frame)
-    if counter % 50 == 0:
+    if counter % 25 == 0:
         getData()
     counter += 1
 

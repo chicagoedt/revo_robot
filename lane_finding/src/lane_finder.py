@@ -18,7 +18,7 @@ class lane_finder:
         self.graph = tf.get_default_graph()
         self.image_pub = rospy.Publisher("/stereo_camera/left/lanes",Image, queue_size=1)
         self.bridge = CvBridge()
-        self.image_sub = rospy.Subscriber("/stereo_camera/left/image_color",Image,self.callback)
+        self.image_sub = rospy.Subscriber("/stereo_camera/left/image_color",Image,self.callback, queue_size=1, buff_size=100000000)
 
     def callback(self,data):
         start = time.clock()
