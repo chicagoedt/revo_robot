@@ -16,9 +16,9 @@ import tensorflow as tf
 img_height = 224
 img_width = 224
 img_size = (img_height, img_width)
-mask_size = (112,112)
+mask_size = (56,56)
 input_shape = (img_height, img_width, 3)
-batch_size = 16
+batch_size = 32
 epochs = 500
 steps_per_epoch = int(2092/batch_size) + 1
 validation_steps = int(553/batch_size) + 1
@@ -287,8 +287,25 @@ def buildModelC1():
     return Model(inputs=img, outputs=pred)
 
 
+# 
+def buildModelD1():
+    img = Input(shape=input_shape)
+
+    conv1 = Conv2D(32, (3,3), padding='same', activation='relu')(img)
+    pool1 = MaxPooling2D()(conv1)
+
+    conv2 = Conv2D(32, (7,7), padding='same', activation='relu')(pool1)
+    pool2 = MaxPooling2D()(conv2)
+
+    conv3 = Conv2D(32, (11,11), padding='same', dilation_rate=2, activation='relu')(pool2)
+
+    pred = Conv2D(1, (1,1), padding='same', activation='sigmoid')(conv3)
+
+    return Model(inputs=img, outputs=pred)
+
+
 if sys.argv[2] == '-n':
-    model = buildModelC1()
+    model = buildModelD1()
 elif sys.argv[2] == '-l':
     model = load_model(model_name)
 
