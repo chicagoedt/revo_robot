@@ -20,8 +20,8 @@ mask_size = (56,56)
 input_shape = (img_height, img_width, 3)
 batch_size = 32
 epochs = 500
-steps_per_epoch = int(2092/batch_size) + 1
-validation_steps = int(553/batch_size) + 1
+steps_per_epoch = int(2459/batch_size) + 1
+validation_steps = int(647/batch_size) + 1
 seed = 1
 model_name= sys.argv[1]
 
@@ -323,7 +323,7 @@ image_datagen = ImageDataGenerator(**data_gen_args)
 mask_datagen = ImageDataGenerator(**data_gen_args)
 
 image_generator = image_datagen.flow_from_directory(
-        'data/segmentation/training/images/',
+        'data/segmentation/training/hsv/',
         target_size=img_size,
         batch_size=batch_size,
         class_mode=None,
@@ -338,12 +338,27 @@ mask_generator = mask_datagen.flow_from_directory(
 
 train_generator = zip3(image_generator, mask_generator)
 
-val_image_datagen = ImageDataGenerator(rescale=1./255)
+val_rgb_datagen = ImageDataGenerator(rescale=1./255)
+val_hsv_datagen = ImageDataGenerator(rescale=1./255)
+val_otsu_datagen = ImageDataGenerator(rescale=1./255)
 val_mask_datagen = ImageDataGenerator(rescale=1./255)
 
-val_image_generator = val_image_datagen.flow_from_directory(
-	'data/segmentation/validation/images/',
+val_rgb_generator = val_image_datagen.flow_from_directory(
+	'data/segmentation/validation/hsv/',
 	target_size=img_size,
+	batch_size=batch_size,
+	class_mode=None,
+	seed=seed)
+val_hsv_generator = val_image_datagen.flow_from_directory(
+	'data/segmentation/validation/hsv/',
+	target_size=img_size,
+	batch_size=batch_size,
+	class_mode=None,
+	seed=seed)
+val_otsu_generator = val_image_datagen.flow_from_directory(
+	'data/segmentation/validation/hsv/',
+	target_size=img_size,
+	color_mode='grayscale',
 	batch_size=batch_size,
 	class_mode=None,
 	seed=seed)
@@ -355,7 +370,8 @@ val_mask_generator = val_mask_datagen.flow_from_directory(
 	class_mode=None,
 	seed=seed)
 
-val_generator = zip3(val_image_generator, val_mask_generator)
+val_input_generator = zip3(val_rgb_generator, val_hsv_generator, val_otsu_generator)
+val_generator = zip3(val_input_generator, val_mask_generator)
 
 checkpoint = ModelCheckpoint(
         model_name,
