@@ -18,7 +18,7 @@ img_width = 224
 img_size = (img_height, img_width)
 mask_size = (112,112)
 input_shape = (img_height, img_width, 3)
-batch_size = 32
+batch_size = 16
 epochs = 500
 steps_per_epoch = int(2092/batch_size) + 1
 validation_steps = int(553/batch_size) + 1
@@ -229,11 +229,13 @@ def buildModelB6():
 
     return Model(inputs=img, outputs=pred)
 
-#
-def buildModelC1():
+def buildModelB6_1():
     img = Input(shape=input_shape)
+    inception_1 = Conv2D(8, (1,1), padding='same')(img)
+    inception_3 = Conv2D(8, (3,3), padding='same')(img)
+    inception_5 = Conv2D(8, (5,5), padding='same')(img)
 
-    conv1 = Conv2D(8, (1,1), padding='same')(img)
+    conv1 = Conv2D(32, (3,3), padding='same', activation='relu')(concatenate([inception_1, inception_3, inception_5]))
     pool1 = MaxPooling2D()(conv1)
 
     conv2_1 = Conv2D(64, (3,3), padding='same')(pool1)
@@ -244,17 +246,49 @@ def buildModelC1():
     conv3_2 = Conv2D(64, (3,3), padding='same', dilation_rate=2)(conv3_1)
     conv3_3 = Conv2D(64, (3,3), padding='same', dilation_rate=2, activation='relu')(conv3_2)
 
-    conv4_1 = Conv2D(64, (3,3), padding='same', dilation_rate=4)(conv3_3)
-    conv4_2 = Conv2D(64, (3,3), padding='same', dilation_rate=4)(conv4_1)
-    conv4_3 = Conv2D(64, (3,3), padding='same', dilation_rate=4, activation='relu')(conv4_2)
+    conv4_1 = Conv2D(128, (3,3), padding='same', dilation_rate=4)(conv3_3)
+    conv4_2 = Conv2D(128, (3,3), padding='same', dilation_rate=4)(conv4_1)
+    conv4_3 = Conv2D(128, (3,3), padding='same', dilation_rate=4, activation='relu')(conv4_2)
 
-    pred = Conv2D(1, (5,5), padding='same', dilation_rate=4, activation='sigmoid')(Dropout(0.5)(conv6_3))
+    conv5_1 = Conv2D(128, (3,3), padding='same', dilation_rate=8)(conv4_3)
+    conv5_2 = Conv2D(128, (3,3), padding='same', dilation_rate=8)(conv5_1)
+    conv5_3 = Conv2D(128, (3,3), padding='same', dilation_rate=8, activation='relu')(conv5_2)
+
+    conv6_1 = Conv2D(128, (3,3), padding='same', dilation_rate=16)(Dropout(0.25)(conv5_3))
+    conv6_2 = Conv2D(128, (3,3), padding='same', dilation_rate=16)(conv6_1)
+    conv6_3 = Conv2D(128, (3,3), padding='same', dilation_rate=16, activation='relu')(conv6_2)
+
+    pred = Conv2D(1, (5,5), padding='same', activation='sigmoid')(Dropout(0.5)(conv6_3))
+
+    return Model(inputs=img, outputs=pred)
+# 0.011 sec/img
+def buildModelC1():
+    img = Input(shape=input_shape)
+
+    conv1 = Conv2D(8, (1,1), padding='same')(img)
+    pool1 = MaxPooling2D()(conv1)
+
+    conv2_1 = Conv2D(64, (5,5), padding='same')(pool1)
+    conv2_2 = Conv2D(64, (5,5), padding='same')(conv2_1)
+    conv2_3 = Conv2D(64, (5,5), padding='same', activation='relu')(conv2_2)
+
+    conv3_1 = Conv2D(64, (5,5), padding='same', dilation_rate=2)(conv2_3)
+    conv3_2 = Conv2D(64, (5,5), padding='same', dilation_rate=2)(conv3_1)
+    conv3_3 = Conv2D(64, (5,5), padding='same', dilation_rate=2, activation='relu')(conv3_2)
+
+    conv4_1 = Conv2D(64, (5,5), padding='same', dilation_rate=4)(conv3_3)
+    conv4_2 = Conv2D(64, (5,5), padding='same', dilation_rate=4)(conv4_1)
+    conv4_3 = Conv2D(64, (5,5), padding='same', dilation_rate=4, activation='relu')(conv4_2)
+
+    conv5 = Conv2D(128, (11,11), padding='same', dilation_rate=2, activation='relu')(conv4_3)
+
+    pred = Conv2D(1, (5,5), padding='same', activation='sigmoid')(Dropout(0.5)(conv5))
 
     return Model(inputs=img, outputs=pred)
 
 
 if sys.argv[2] == '-n':
-    model = buildModelB6()
+    model = buildModelC1()
 elif sys.argv[2] == '-l':
     model = load_model(model_name)
 
@@ -327,7 +361,7 @@ for x,y in val_generator:
 	end = time.clock()
 	print("Seconds per image: " + str((end - start) / batch_size))
 	j += 1
-	if j > 0:
+	if j > 5:
 		break
 
 model.fit_generator(
