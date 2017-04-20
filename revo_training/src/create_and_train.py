@@ -287,9 +287,12 @@ def buildModelC1():
     return Model(inputs=img, outputs=pred)
 
 
-# 
+#
 def buildModelD1():
-    img = Input(shape=input_shape)
+    rgb = Input(shape=input_shape)
+    hsv = Input(shape=input_shape)
+    otsu = Input(shape=(224,224,1))
+    img = concatenate([rgb,hsv,otsu])
 
     conv1 = Conv2D(32, (3,3), padding='same', activation='relu')(img)
     pool1 = MaxPooling2D()(conv1)
@@ -301,7 +304,7 @@ def buildModelD1():
 
     pred = Conv2D(1, (1,1), padding='same', activation='sigmoid')(conv3)
 
-    return Model(inputs=img, outputs=pred)
+    return Model(inputs=[rgb,hsv,otsu], outputs=pred)
 
 
 if sys.argv[2] == '-n':
@@ -343,19 +346,19 @@ val_hsv_datagen = ImageDataGenerator(rescale=1./255)
 val_otsu_datagen = ImageDataGenerator(rescale=1./255)
 val_mask_datagen = ImageDataGenerator(rescale=1./255)
 
-val_rgb_generator = val_image_datagen.flow_from_directory(
+val_rgb_generator = val_rgb_datagen.flow_from_directory(
 	'data/segmentation/validation/hsv/',
 	target_size=img_size,
 	batch_size=batch_size,
 	class_mode=None,
 	seed=seed)
-val_hsv_generator = val_image_datagen.flow_from_directory(
+val_hsv_generator = val_hsv_datagen.flow_from_directory(
 	'data/segmentation/validation/hsv/',
 	target_size=img_size,
 	batch_size=batch_size,
 	class_mode=None,
 	seed=seed)
-val_otsu_generator = val_image_datagen.flow_from_directory(
+val_otsu_generator = val_otsu_datagen.flow_from_directory(
 	'data/segmentation/validation/hsv/',
 	target_size=img_size,
 	color_mode='grayscale',
