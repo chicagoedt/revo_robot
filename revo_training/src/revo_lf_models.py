@@ -1,3 +1,8 @@
+from keras.models import Sequential, Model, load_model
+from keras.layers import Conv2D, MaxPooling2D, Dropout, UpSampling2D, Input, BatchNormalization, add, concatenate, PReLU, Add, Conv2DTranspose
+
+input_shape = (224,224,3)
+
 # 0.05 sec/img, converges to ~0.98 val_acc
 def buildModelA():
     model = Sequential()
@@ -247,9 +252,12 @@ def buildModelC1():
     return Model(inputs=img, outputs=pred)
 
 
-# 
+#
 def buildModelD1():
-    img = Input(shape=input_shape)
+    rgb = Input(shape=input_shape)
+    hsv = Input(shape=input_shape)
+    otsu = Input(shape=(224,224,1))
+    img = concatenate([rgb, hsv, otsu])
 
     conv1 = Conv2D(32, (3,3), padding='same', activation='relu')(img)
     pool1 = MaxPooling2D()(conv1)
@@ -261,4 +269,4 @@ def buildModelD1():
 
     pred = Conv2D(1, (1,1), padding='same', activation='sigmoid')(conv3)
 
-    return Model(inputs=img, outputs=pred)
+    return Model(inputs=[rgb,hsv,otsu], outputs=pred)

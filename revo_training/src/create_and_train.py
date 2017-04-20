@@ -10,8 +10,8 @@ import string, random, time, sys
 import numpy as np
 import tensorflow as tf
 
-import revo_lf_models
-import revo_lf_generators
+import revo_lf_models as rm
+import revo_lf_generators as rg
 
 # HYPERPARAMETERS
 #img_height = 648
@@ -42,11 +42,14 @@ def zip3(*iterables):
         yield tuple(result)
 
 if sys.argv[2] == '-n':
-    model = buildModelD1()
+    model = rm.buildModelD1()
 elif sys.argv[2] == '-l':
     model = load_model(model_name)
 
 model.compile(loss='binary_crossentropy', optimizer='adadelta', metrics=['accuracy'])
+
+train_generator = rg.makeTrainingGenerator(img_size=img_size, mask_size=mask_size, batch_size=batch_size)
+val_generator = rg.makeValidationGenerator(img_size=img_size, mask_size=mask_size, batch_size=batch_size)
 
 checkpoint = ModelCheckpoint(
         model_name,
@@ -64,13 +67,13 @@ early = EarlyStopping(patience=batch_size, verbose=1)
 
 j = 0
 for x,y in val_generator:
-	start = time.clock()
-	predictions = model.predict_on_batch(x)
-	end = time.clock()
-	print("Seconds per image: " + str((end - start) / batch_size))
-	j += 1
-	if j > 5:
-		break
+    start = time.clock()
+    predictions = model.predict_on_batch(x)
+    end = time.clock()
+    print("Seconds per image: " + str((end - start) / batch_size))
+    j += 1
+    if j > 5:
+        break
 
 model.fit_generator(
 	train_generator,
