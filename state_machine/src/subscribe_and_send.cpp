@@ -32,6 +32,7 @@ void SerialPort(double sendCpuConsumption, double sendNumNodes) {
 	data[1] = sendCpuConsumption;
 
 	fd = open("/dev/ttyUSB0",O_RDWR | O_NOCTTY);
+
     if (fd <= 0)
     {
         printf("\n  Error! in Opening ttyUSB0\n");

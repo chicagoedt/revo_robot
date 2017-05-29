@@ -46,3 +46,7 @@ revo_training/src/logs/*
 *.mp4
 *.h5
 /CMakeLists.txt
+
+.DS_Store
+
+*~

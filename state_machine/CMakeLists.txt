@@ -52,13 +52,19 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate messages in the 'msg' folder
  add_message_files(
    FILES
+   gpsGuy.msg
    CPU.msg
  )
 
 ## Generate services in the 'srv' folder
+<<<<<<< HEAD
  #add_service_files(
   # FILES
  #)
+ #add_service_files(
+  # FILES
+ #)
+
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -89,6 +95,11 @@ catkin_package(
   CATKIN_DEPENDS actionlib geometry_msgs message_runtime move_base_msgs roscpp tf
 #  DEPENDS system_lib
 )
+
+=======
+add_executable(gps_subscriber_node src/gps_subscriber.cpp)
+target_link_libraries(gps_subscriber_node ${catkin_LIBRARIES})
+add_dependencies(gps_subscriber_node state_machine_generate_messages_cpp)
 
 add_executable(cpuMessage src/cpu_consumption.cpp)
 target_link_libraries(cpuMessage ${catkin_LIBRARIES})
