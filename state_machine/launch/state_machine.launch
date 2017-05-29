@@ -1,9 +1,23 @@
 <?xml version="1.0"?>
 <launch>
-
   <node pkg="state_machine" type="state_machine_node" name="state_machine" output="screen" >
   	<rosparam command="load" file="$(find state_machine)/yaml/goalpoints.yaml" />
   </node> 
-
+   <node pkg = "state_machine"
+	type = "cpuMessage"
+	name = "cpu_consumption"
+	launch-prefix = "xterm -e"
+  />
+  <node pkg = "state_machine"
+	type = "cpuSubscriber"
+	name = "subscribe_and_send"
+	launch-prefix = "xterm -e"
+  />
+  <node pkg = "state_machine"
+    name = "talker"
+	type = "running_nodes.py"
+	output = "screen"
+	launch-prefix = "xterm -e"
+  />
 </launch>
 

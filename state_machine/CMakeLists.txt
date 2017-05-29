@@ -10,6 +10,9 @@ find_package(catkin REQUIRED COMPONENTS
   geographic_msgs
   move_base_msgs
   roscpp
+  rospy
+  std_msgs
+  message_generation
   tf
 )
 
@@ -47,18 +50,15 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+ add_message_files(
+   FILES
+   CPU.msg
+ )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+ #add_service_files(
+  # FILES
+ #)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -68,10 +68,11 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   geometry_msgs#   move_base_msgs
-# )
+ generate_messages(
+   DEPENDENCIES
+   geometry_msgs#   move_base_msgs
+   std_msgs
+ )
 
 ###################################
 ## catkin specific configuration ##
@@ -85,9 +86,17 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
   INCLUDE_DIRS include
 #  LIBRARIES state_machine
-  CATKIN_DEPENDS actionlib geometry_msgs move_base_msgs roscpp tf
+  CATKIN_DEPENDS actionlib geometry_msgs message_runtime move_base_msgs roscpp tf
 #  DEPENDS system_lib
 )
+
+add_executable(cpuMessage src/cpu_consumption.cpp)
+target_link_libraries(cpuMessage ${catkin_LIBRARIES})
+add_dependencies(cpuMessage state_machine_generate_messages_cpp)
+
+add_executable(cpuSubscriber src/subscribe_and_send.cpp)
+target_link_libraries(cpuSubscriber ${catkin_LIBRARIES})
+add_dependencies(cpuSubscriber state_machine_generate_messages_cpp)
 
 ###########
 ## Build ##
@@ -109,6 +118,7 @@ add_executable(state_machine_node src/state_machine.cpp src/sm_main.cpp)
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
 add_dependencies(state_machine_node state_machine_generate_messages_cpp)
+add_dependencies(state_machine_node state_machine_gencpp)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(state_machine_node ${catkin_LIBRARIES} )
@@ -162,3 +172,5 @@ set(CMAKE_BUILD_TYPE Debug)
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+
