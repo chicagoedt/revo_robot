@@ -48,3 +48,5 @@ revo_training/src/logs/*
 /CMakeLists.txt
 
 .DS_Store
+
+*~
