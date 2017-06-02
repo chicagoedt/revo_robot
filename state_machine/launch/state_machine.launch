@@ -24,5 +24,10 @@
 	output = "screen"
 	launch-prefix = "xterm -e"
   />
+  <node pkg = "state_machine"
+	type = "ramMessage"
+	name = "ram_consumption"
+	launch-prefix = "xterm -e"
+  />
 </launch>
 

@@ -16,7 +16,7 @@
 #include <getopt.h>
 
 void SubscribeAndSend::CpuMessageReceived(const state_machine::CPU& msg) {
-	ROS_INFO_STREAM("The cpu consumption is: " << msg.average << " %");
+	ROS_INFO_STREAM("The CPU consumption is: " << msg.average << " %");
 	averageConsumption = msg.average;
 }
 
@@ -25,11 +25,19 @@ void SubscribeAndSend::NodeMessageReceived(const state_machine::CPU& msg) {
 	runningNodes = msg.numNodes;
 }
 
-void SerialPort(double sendCpuConsumption, double sendNumNodes) {
+void SubscribeAndSend::RamMessageReceived(const state_machine::CPU& msg) {
+	ramConsumption = msg.ram;
+	ramConsumption /= 1000000000.0;
+	ROS_INFO_STREAM("The RAM consumption is: " << ramConsumption);
+}
+
+void SerialPort(double sendCpuConsumption, double sendNumNodes, double sendRamConsumption) {
 	int fd;
-	char data[2];
+	
+	char data[3];
 	data[0] = sendNumNodes;
 	data[1] = sendCpuConsumption;
+	data[2] = sendRamConsumption;
 
 	fd = open("/dev/ttyUSB0",O_RDWR | O_NOCTTY);
 
@@ -39,7 +47,7 @@ void SerialPort(double sendCpuConsumption, double sendNumNodes) {
     }
 #ifdef __SERIAl_DEBUG__
     else
-        printf("\n  ttyUSB0 Opened Successfully\n fd = %d\n", fd);
+        printf("\n  ttyUSB1 Opened Successfully\n fd = %d\n", fd);
 #endif
     struct termios SerialPortSettings;
 
@@ -60,7 +68,7 @@ void SerialPort(double sendCpuConsumption, double sendNumNodes) {
     SerialPortSettings.c_cflag |= (CREAD | CLOCAL);
 
         /* Setting Time outs */
-    SerialPortSettings.c_cc[VMIN]  = 2; //Read X characters */
+    SerialPortSettings.c_cc[VMIN]  = 3; //Read X characters */
     SerialPortSettings.c_cc[VTIME] = 0;  /* Wait indefinitely   */
 
     SerialPortSettings.c_iflag &= ~(IXON | IXOFF | IXANY);
@@ -81,14 +89,14 @@ void SerialPort(double sendCpuConsumption, double sendNumNodes) {
 
     int bytes_sent = 0;
 
-    bytes_sent = write(fd, data ,2);
+    bytes_sent = write(fd, data, 3);
     printf("Bytes sent: %d\n", bytes_sent);
     //emit Data_Ready(data);
     if(bytes_sent <= 0)
     {
         //ERROR
     }
-    else if(bytes_sent == 2)
+    else if(bytes_sent == 3)
     {
         printf("Sent!");
     }
@@ -108,6 +116,9 @@ int main(int argc, char **argv) {
 
 	ros::Subscriber cpuSub = nh.subscribe("cpuMessage", 1000,
 	  &SubscribeAndSend::CpuMessageReceived, &subscribeObject);
+
+	ros::Subscriber ramSub = nh.subscribe("ramMessage", 1000,
+	  &SubscribeAndSend::RamMessageReceived, &subscribeObject);
 	
 	ros::Publisher cpuPub = nh.advertise<state_machine::CPU>("numNodes", 1000);
 	ros::Rate rate(2);	
@@ -116,9 +127,9 @@ int main(int argc, char **argv) {
 	
 	ros::spinOnce();
 		
-	rate.sleep();
+	rate.sleep();  
 	
-	SerialPort(subscribeObject.averageConsumption, subscribeObject.runningNodes);
+	SerialPort(subscribeObject.averageConsumption, subscribeObject.runningNodes,					 	   subscribeObject.ramConsumption);
 	}
 }
 

@@ -4,6 +4,7 @@ from keras.utils import plot_model
 from keras.layers import Conv2D, MaxPooling2D, Dropout, UpSampling2D, Input, BatchNormalization, add, concatenate, PReLU, Add, Conv2DTranspose
 from keras.preprocessing.image import ImageDataGenerator
 from keras.callbacks import TensorBoard, ModelCheckpoint, EarlyStopping
+from keras.optimizers import SGD
 from keras import backend as K
 import cv2
 import string, random, time, sys
@@ -21,8 +22,8 @@ img_width = 224
 img_size = (img_height, img_width)
 mask_size = (56,56)
 input_shape = (img_height, img_width, 3)
-batch_size = 32
-epochs = 500
+batch_size = 8
+epochs = 100
 steps_per_epoch = int(2459/batch_size) + 1
 validation_steps = int(647/batch_size) + 1
 seed = 1
@@ -42,18 +43,19 @@ def zip3(*iterables):
         yield tuple(result)
 
 if sys.argv[2] == '-n':
-    model = rm.buildModelD1()
+    model = rm.buildModelR()
 elif sys.argv[2] == '-l':
     model = load_model(model_name)
 
-model.compile(loss='binary_crossentropy', optimizer='adadelta', metrics=['accuracy'])
+sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9)
+model.compile(loss='binary_crossentropy', optimizer=sgd, metrics=['accuracy'])
 
 train_generator = rg.makeTrainingGenerator(img_size=img_size, mask_size=mask_size, batch_size=batch_size)
 val_generator = rg.makeValidationGenerator(img_size=img_size, mask_size=mask_size, batch_size=batch_size)
 
 checkpoint = ModelCheckpoint(
         model_name,
-        monitor='val_loss',
+        monitor='val_acc',
         verbose=0,
         save_best_only=True)
 
@@ -63,7 +65,7 @@ tb = TensorBoard(
         write_graph=True,
         write_images=True)
 
-early = EarlyStopping(patience=batch_size, verbose=1)
+early = EarlyStopping(patience=5, verbose=1)
 
 j = 0
 for x,y in val_generator:

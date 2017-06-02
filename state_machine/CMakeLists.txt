@@ -57,7 +57,6 @@ find_package(catkin REQUIRED COMPONENTS
  )
 
 ## Generate services in the 'srv' folder
-<<<<<<< HEAD
  #add_service_files(
   # FILES
  #)
@@ -96,7 +95,6 @@ catkin_package(
 #  DEPENDS system_lib
 )
 
-=======
 add_executable(gps_subscriber_node src/gps_subscriber.cpp)
 target_link_libraries(gps_subscriber_node ${catkin_LIBRARIES})
 add_dependencies(gps_subscriber_node state_machine_generate_messages_cpp)
@@ -108,6 +106,10 @@ add_dependencies(cpuMessage state_machine_generate_messages_cpp)
 add_executable(cpuSubscriber src/subscribe_and_send.cpp)
 target_link_libraries(cpuSubscriber ${catkin_LIBRARIES})
 add_dependencies(cpuSubscriber state_machine_generate_messages_cpp)
+
+add_executable(ramMessage src/ram_consumption.cpp)
+target_link_libraries(ramMessage ${catkin_LIBRARIES})
+add_dependencies(ramMessage state_machine_generate_messages_cpp)
 
 ###########
 ## Build ##

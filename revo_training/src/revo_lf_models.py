@@ -1,23 +1,49 @@
 from keras.models import Sequential, Model, load_model
-from keras.layers import Conv2D, MaxPooling2D, Dropout, UpSampling2D, Input, BatchNormalization, add, concatenate, PReLU, Add, Conv2DTranspose
+from keras.layers import Conv2D, MaxPooling2D, Dropout, UpSampling2D, Input, BatchNormalization, add, concatenate, PReLU, Add, Conv2DTranspose, BatchNormalization
 
 input_shape = (224,224,3)
 
 # 0.05 sec/img, converges to ~0.98 val_acc
 def buildModelA():
     model = Sequential()
-    model.add(Conv2D(64, (11,11), padding='same', activation='relu', input_shape=input_shape))
+    model.add(BatchNormalization(input_shape=input_shape))
+    model.add(Conv2D(16, (3,3), padding='same', activation='relu'))
     model.add(MaxPooling2D())
-    model.add(Conv2D(128, (5,5), padding='same', activation='relu'))
-    model.add(Conv2D(256, (3,3), padding='same', activation='relu', dilation_rate=2))
-    model.add(Conv2D(256, (3,3), padding='same', activation='relu', dilation_rate=2))
-    model.add(Conv2D(128, (3,3), padding='same', activation='relu', dilation_rate=2))
-    model.add(Dropout(0.5))
-    model.add(Conv2D(512, (7,7), padding='same', activation='relu', dilation_rate=4))
-    model.add(Dropout(0.25))
-    model.add(Conv2D(1024, (1,1), padding='same', activation='relu'))
-    model.add(Conv2D(1, (1,1), padding='same', activation='sigmoid'))
+    model.add(Dropout(0.4))
+    model.add(Conv2D(32, (3,3), padding='same', activation='relu'))
+    model.add(MaxPooling2D())
+    model.add(Dropout(0.4))
+    model.add(Conv2D(64, (3,3), padding='same', activation='relu'))
+    model.add(Dropout(0.4))
+    model.add(Conv2D(1, (3,3), padding='same', activation='sigmoid'))
+
     return model
+
+def addParallelDilatedConvolution(x, num_filters, name='parallel_dilated_convolution'):
+    conv1 = Conv2D(num_filters, (3,3), padding='same', activation='elu', dilation_rate=1, name=name + '/dil_1')(x)
+    conv2 = Conv2D(num_filters, (3,3), padding='same', activation='elu', dilation_rate=2, name=name + '/dil_2')(x)
+    conv4 = Conv2D(num_filters, (3,3), padding='same', activation='elu', dilation_rate=4, name=name + '/dil_4')(x)
+    conv8 = Conv2D(num_filters, (3,3), padding='same', activation='elu', dilation_rate=8, name=name + '/dil_8')(x)
+    a = add([conv1, conv2, conv4, conv8])
+
+    return a
+
+def buildModelR():
+    i = Input(shape=input_shape)
+    b = BatchNormalization()(i)
+    conv1 = Conv2D(16, (3,3), padding='same', activation='relu')(b)
+
+    pool1 = Dropout(0.4)(MaxPooling2D()(conv1))
+    conv2 = Conv2D(32, (3,3), padding='same', activation='relu')(pool1)
+
+    pool2 = Dropout(0.4)(MaxPooling2D()(conv2))
+
+    conv3 = addParallelDilatedConvolution(pool2, 32)
+
+    pred = Conv2D(1, (1,1), padding='same', activation='sigmoid')(Dropout(0.4)(conv3))
+
+    return Model(inputs=i, outputs=pred)
+
 
 # 0.006 sec/img, converges to ~0.9754 val_acc
 def buildModelB1():
