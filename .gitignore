@@ -44,6 +44,7 @@ revo_training/src/logs/*
 *.png
 *.bag
 *.mp4
+*.avi
 *.h5
 /CMakeLists.txt
 
