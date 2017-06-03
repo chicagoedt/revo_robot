@@ -1,7 +1,7 @@
 <launch>
     <node pkg="base_controller" name="joystick_teleop" type="joystick_teleop"/>
     <param name="axis_linear"  	value="1" type="int"/>
-    <param name="axis_angular" 	value="3" type="int"/>
+    <param name="axis_angular" 	value="2" type="int"/>
     <param name="button_a"				value="0" type="int"/>
     <param name="button_b"				value="1" type="int"/>
     <param name="button_x"				value="2" type="int"/>
@@ -24,5 +24,18 @@
         <param name="dev" type="string" value="/dev/input/js0" />
         <param name="deadzone" value="0.12" />
     </node>
+    <!--
+    <include file="$(find sick_tim)/launch/sick_tim551_2050001.launch"/>
+    <include file="$(find zed_ros)/launch/zed_ros.launch"/>
+    <include file="$(find microstrain_3dmgx2_imu)/microstrain_3dmgx2.launch"/>
+    -->
+    <include file="$(find roboteq_node)/launch/roboteq-serial.launch"/>
+
+    <node 
+        pkg="rosbag" 
+        name="record" 
+        type="record" 
+        args="-o IGVC2017 --split --size=1024 cmd_vel stereo_camera/left/image_color/compressed stereo_camera/right/image_color/compressed"
+    />
 
 </launch>

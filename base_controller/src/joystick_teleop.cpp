@@ -72,8 +72,8 @@ void TeleopJoy::callback(const sensor_msgs::Joy::ConstPtr& joy)
 	geometry_msgs::Twist 				vel;
 	base_controller::Xbox_Button_Msg	buttonPressed;
 
-	vel.angular.z 	= joy->axes[velAngular] * -1;
-	vel.linear.x 	= joy->axes[velLinear] * -1;
+	vel.angular.z 	= joy->axes[0];
+	vel.linear.x 	= joy->axes[1];
 
 /*	buttonPressed.a 					= joy->buttons[0];
 	buttonPressed.b 					= joy->buttons[buttonB];
