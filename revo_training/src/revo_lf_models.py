@@ -1,7 +1,9 @@
 from keras.models import Sequential, Model, load_model
 from keras.layers import Conv2D, MaxPooling2D, Dropout, UpSampling2D, Input, BatchNormalization, add, concatenate, PReLU, Add, Conv2DTranspose, BatchNormalization
+from keras.regularizers import l2
 
 input_shape = (224,224,3)
+weight_decay=0.0002
 
 # 0.05 sec/img, converges to ~0.98 val_acc
 def buildModelA():
@@ -31,10 +33,10 @@ def addParallelDilatedConvolution(x, num_filters, name='parallel_dilated_convolu
 def buildModelR():
     i = Input(shape=input_shape)
     b = BatchNormalization()(i)
-    conv1 = Conv2D(16, (3,3), padding='same', activation='relu')(b)
+    conv1 = Conv2D(8, (3,3), padding='same', activation='relu')(b)
 
     pool1 = Dropout(0.4)(MaxPooling2D()(conv1))
-    conv2 = Conv2D(32, (3,3), padding='same', activation='relu')(pool1)
+    conv2 = Conv2D(16, (3,3), padding='same', activation='relu')(pool1)
 
     pool2 = Dropout(0.4)(MaxPooling2D()(conv2))
 
@@ -42,6 +44,12 @@ def buildModelR():
 
     pred = Conv2D(1, (1,1), padding='same', activation='sigmoid')(Dropout(0.4)(conv3))
 
+    return Model(inputs=i, outputs=pred)
+
+def buildModelS():
+    i = Input(shape=input_shape)
+    b = BatchNormalization()(i)
+    pred = Conv2D(1, (3,3), padding='same', activation='sigmoid', kernel_regularizer=l2(weight_decay))(b)
     return Model(inputs=i, outputs=pred)
 
 
@@ -58,7 +66,7 @@ def buildModelB1():
     conv2_1 = Conv2D(64, (3,3), padding='same')(pool1)
     conv2_2 = Conv2D(64, (3,3), padding='same')(Dropout(0.25)(conv2_1))
     conv2_3 = Conv2D(64, (3,3), padding='same', activation='relu')(Dropout(0.25)(conv2_2))
-    pred = Conv2D(1, (5,5), padding='same', activation='sigmoid')(conv2_3)
+    pred = Conv2D(1, (17,17), padding='same', activation='sigmoid')(conv2_3)
 
     return Model(inputs=img, outputs=pred)
 

@@ -50,6 +50,8 @@ elif sys.argv[2] == '-l':
 sgd = SGD(lr=0.01, decay=1e-6, momentum=0.9)
 model.compile(loss='binary_crossentropy', optimizer=sgd, metrics=['accuracy'])
 
+plot_model(model, 'architecture.png', show_shapes=True)
+
 train_generator = rg.makeTrainingGenerator(img_size=img_size, mask_size=mask_size, batch_size=batch_size)
 val_generator = rg.makeValidationGenerator(img_size=img_size, mask_size=mask_size, batch_size=batch_size)
 
@@ -65,7 +67,7 @@ tb = TensorBoard(
         write_graph=True,
         write_images=True)
 
-early = EarlyStopping(patience=5, verbose=1)
+early = EarlyStopping(patience=10, verbose=1)
 
 j = 0
 for x,y in val_generator:
