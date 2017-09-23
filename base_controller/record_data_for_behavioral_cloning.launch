@@ -24,18 +24,18 @@
         <param name="dev" type="string" value="/dev/input/js0" />
         <param name="deadzone" value="0.12" />
     </node>
-    <!--
+    
     <include file="$(find sick_tim)/launch/sick_tim551_2050001.launch"/>
     <include file="$(find zed_ros)/launch/zed_ros.launch"/>
     <include file="$(find microstrain_3dmgx2_imu)/microstrain_3dmgx2.launch"/>
-    -->
+    
     <include file="$(find roboteq_node)/launch/roboteq-serial.launch"/>
 
     <node 
         pkg="rosbag" 
         name="record" 
         type="record" 
-        args="-o IGVC2017 --split --size=1024 cmd_vel stereo_camera/left/image_color/compressed stereo_camera/right/image_color/compressed"
+        args="-o IGVC2017 --split --size=1024 cmd_vel stereo_camera/left/image_color/compressed stereo_camera/right/image_color/compressed scan imu/data joy raw_odom tf"
     />
 
 </launch>
